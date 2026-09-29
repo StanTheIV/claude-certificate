@@ -1,0 +1,170 @@
+[
+  {
+    "id": "fc-1.1-1",
+    "domain": 1,
+    "taskStatement": "1.1",
+    "front": "What are the two `stop_reason` values that control an agentic loop, and what does each mean?",
+    "back": "`\"tool_use\"` — Claude wants to call a tool; execute it and continue the loop. `\"end_turn\"` — Claude is finished; stop the loop and show the result.",
+    "sourceRef": "Exam Guide TS 1.1; guide_en.md §1.3"
+  },
+  {
+    "id": "fc-1.1-2",
+    "domain": 1,
+    "taskStatement": "1.1",
+    "front": "Name the three agentic-loop termination anti-patterns called out by the exam.",
+    "back": "(1) Parsing assistant text for completion phrases. (2) Using an arbitrary iteration cap as the primary stop mechanism. (3) Checking for the presence of assistant text content as a completion signal.",
+    "sourceRef": "Exam Guide TS 1.1; guide_en.md §3.1"
+  },
+  {
+    "id": "fc-1.1-3",
+    "domain": 1,
+    "taskStatement": "1.1",
+    "front": "Why must tool results be explicitly appended to conversation history between loop iterations?",
+    "back": "Each API call is stateless — Claude has no memory between calls and only reasons over what's in the message history you send it.",
+    "sourceRef": "Exam Guide TS 1.1; guide_en.md §1.1"
+  },
+  {
+    "id": "fc-1.2-1",
+    "domain": 1,
+    "taskStatement": "1.2",
+    "front": "In hub-and-spoke multi-agent orchestration, who handles all inter-subagent communication, error handling, and routing?",
+    "back": "The coordinator. Subagents never communicate directly with each other — everything routes through the coordinator.",
+    "sourceRef": "Exam Guide TS 1.2; guide_en.md §3.3"
+  },
+  {
+    "id": "fc-1.2-2",
+    "domain": 1,
+    "taskStatement": "1.2",
+    "front": "If every subagent executed its assigned subtask correctly but a report's topic coverage is too narrow, where's the root cause?",
+    "back": "In the coordinator's task decomposition step — the subtask list itself was too narrow, not the subagents' execution.",
+    "sourceRef": "Exam Guide TS 1.2; Exam Guide §9 Q7"
+  },
+  {
+    "id": "fc-1.2-3",
+    "domain": 1,
+    "taskStatement": "1.2",
+    "front": "What does an iterative refinement loop do when the coordinator detects a coverage gap in a synthesis draft?",
+    "back": "It re-delegates to search/analysis with a targeted query aimed at the specific gap, then re-invokes synthesis — not a full pipeline restart.",
+    "sourceRef": "Exam Guide TS 1.2; guide_en.md §3.3"
+  },
+  {
+    "id": "fc-1.3-1",
+    "domain": 1,
+    "taskStatement": "1.3",
+    "front": "What must a coordinator's `allowedTools` include for it to be able to spawn subagents at all?",
+    "back": "`\"Task\"` — without it in allowedTools, the coordinator has no mechanism to invoke subagents, regardless of prompt wording.",
+    "sourceRef": "Exam Guide TS 1.3; guide_en.md §3.4"
+  },
+  {
+    "id": "fc-1.3-2",
+    "domain": 1,
+    "taskStatement": "1.3",
+    "front": "In study-guide notation, what do the `AgentDefinition` fields `system_prompt` and `allowed_tools` configure? (Note: current SDK docs name these `prompt` and `tools`.)",
+    "back": "`system_prompt` defines the subagent's role/behavior; `allowed_tools` restricts which tools it may call (principle of least privilege).",
+    "sourceRef": "Exam Guide TS 1.3; guide_en.md §3.2; verified against platform.claude.com/docs/en/agent-sdk/subagents"
+  },
+  {
+    "id": "fc-1.3-3",
+    "domain": 1,
+    "taskStatement": "1.3",
+    "front": "Do subagents automatically inherit the coordinator's conversation history?",
+    "back": "No. Subagents run with isolated context — all needed information must be explicitly included in the `Task` prompt.",
+    "sourceRef": "Exam Guide TS 1.3; guide_en.md §3.3"
+  },
+  {
+    "id": "fc-1.3-4",
+    "domain": 1,
+    "taskStatement": "1.3",
+    "front": "How should a coordinator spawn several independent subagents to minimize latency?",
+    "back": "Emit multiple `Task` tool calls within a single coordinator response so they execute in parallel, rather than one call per turn.",
+    "sourceRef": "Exam Guide TS 1.3; guide_en.md §3.4"
+  },
+  {
+    "id": "fc-1.4-1",
+    "domain": 1,
+    "taskStatement": "1.4",
+    "front": "Give the canonical example of a programmatic prerequisite gate from the exam guide.",
+    "back": "Block `process_refund` (and `lookup_order`) until `get_customer` has returned a verified customer ID.",
+    "sourceRef": "Exam Guide TS 1.4; Exam Guide §9 Q1"
+  },
+  {
+    "id": "fc-1.4-2",
+    "domain": 1,
+    "taskStatement": "1.4",
+    "front": "What fields belong in a structured handoff summary when escalating to a human agent?",
+    "back": "Customer ID, root cause, actions already taken, recommended action, and refund amount (if applicable) — the human has no access to the conversation transcript.",
+    "sourceRef": "Exam Guide TS 1.4; guide_en.md §9.3"
+  },
+  {
+    "id": "fc-1.5-1",
+    "domain": 1,
+    "taskStatement": "1.5",
+    "front": "What does a `PostToolUse` hook do, and give an example use.",
+    "back": "It intercepts a tool's result after execution, before the model sees it — used to normalize heterogeneous data (e.g., Unix timestamps, ISO 8601, numeric status codes) into a consistent format.",
+    "sourceRef": "Exam Guide TS 1.5; guide_en.md §3.5"
+  },
+  {
+    "id": "fc-1.5-2",
+    "domain": 1,
+    "taskStatement": "1.5",
+    "front": "What does a `PreToolUse` interception hook do, and give the exam's canonical example?",
+    "back": "It fires before a tool call executes, letting you block or redirect it — e.g., block any `process_refund` call over $500 and redirect to human escalation.",
+    "sourceRef": "Exam Guide TS 1.5; Exam Guide §9 Q1; verified against platform.claude.com/docs/en/agent-sdk/hooks"
+  },
+  {
+    "id": "fc-1.5-3",
+    "domain": 1,
+    "taskStatement": "1.5",
+    "front": "Hooks vs. prompt instructions: which gives a deterministic guarantee, and which gives probabilistic compliance?",
+    "back": "Hooks run in code every time = deterministic guarantee. Prompt instructions = probabilistic compliance (the model usually, not always, complies).",
+    "sourceRef": "Exam Guide TS 1.5; guide_en.md §3.5"
+  },
+  {
+    "id": "fc-1.6-1",
+    "domain": 1,
+    "taskStatement": "1.6",
+    "front": "When should you use prompt chaining (fixed pipeline) vs. dynamic adaptive decomposition?",
+    "back": "Prompt chaining: task structure is predictable and repeats the same shape (e.g., a review template). Dynamic decomposition: full scope is unknown up front and each step depends on what's discovered.",
+    "sourceRef": "Exam Guide TS 1.6; guide_en.md §8.1-8.2"
+  },
+  {
+    "id": "fc-1.6-2",
+    "domain": 1,
+    "taskStatement": "1.6",
+    "front": "What's the recommended two-pass structure for reviewing a large, multi-file pull request?",
+    "back": "A per-file local-analysis pass for each changed file, plus a separate cross-file integration pass — this avoids attention dilution.",
+    "sourceRef": "Exam Guide TS 1.6; Exam Guide §9 Q12; guide_en.md §8.3"
+  },
+  {
+    "id": "fc-1.7-1",
+    "domain": 1,
+    "taskStatement": "1.7",
+    "front": "What does `--resume <session-name>` do?",
+    "back": "Continues a specific named prior conversation, bringing back its accumulated context (files read, findings, decisions).",
+    "sourceRef": "Exam Guide TS 1.7; guide_en.md §5.10"
+  },
+  {
+    "id": "fc-1.7-2",
+    "domain": 1,
+    "taskStatement": "1.7",
+    "front": "What does `fork_session` do?",
+    "back": "Creates an independent branch from a shared analysis baseline to explore a divergent approach — the original session is unaffected and both share context only up to the fork point.",
+    "sourceRef": "Exam Guide TS 1.7; guide_en.md §5.10; verified against platform.claude.com/docs/en/agent-sdk/sessions"
+  },
+  {
+    "id": "fc-1.7-3",
+    "domain": 1,
+    "taskStatement": "1.7",
+    "front": "You resume a session after some of the files it investigated have changed. What should you do?",
+    "back": "Explicitly tell the agent which specific files changed, so it does targeted re-analysis of just those — don't resume silently or require full re-exploration.",
+    "sourceRef": "Exam Guide TS 1.7; guide_en.md §5.10"
+  },
+  {
+    "id": "fc-1.7-4",
+    "domain": 1,
+    "taskStatement": "1.7",
+    "front": "When is starting a fresh session with a structured summary more reliable than resuming?",
+    "back": "When prior tool results are substantially stale (files changed a lot, or a long time has passed) — resuming would carry forward outdated tool output the agent might trust.",
+    "sourceRef": "Exam Guide TS 1.7; guide_en.md §5.10"
+  }
+]

@@ -1,0 +1,1489 @@
+[
+  {
+    "id": "d4-4.1-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.1"],
+    "lesson": "4.1",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A style-review bot's instruction says: \"Only mention things you're pretty sure matter.\" It flags an unused import in one PR and lets an identical unused import pass in another PR from the same author that week. What is the most likely cause?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "The linter integration is broken and double-reports some imports.", "explanation": "Worse — this describes a tooling failure, not the pattern of inconsistent judgment the instruction produces." },
+      { "id": "B", "text": "\"Pretty sure matters\" isn't a fixed, checkable rule.", "explanation": "Correct — subjective phrasing has no fixed boundary, so identical code can get different verdicts run to run." },
+      { "id": "C", "text": "The model has a hard limit on how many findings it can report per file.", "explanation": "Worse — there's no such per-file cap; the inconsistency comes from the vague criterion, not a report limit." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "Subjective language like confidence or certainty is not a criterion; explicit categorical rules are checkable, subjective language is not.",
+    "sourceRef": "Exam Guide TS 4.1; guide_en.md §6.2"
+  },
+  {
+    "id": "d4-4.1-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.1"],
+    "lesson": "4.1",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "A team writes this criterion for their API-docs reviewer: \"Flag anything where the docs and the code disagree.\" They still get complaints about false positives on formatting nits. Based on the report/skip principle, what's missing?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "A confidence threshold added to the same sentence, so only high-confidence mismatches get flagged.", "explanation": "Worse — this just layers subjective confidence language on top of the same vague rule; it adds no new checkable boundary." },
+      { "id": "B", "text": "Switching from a review bot to a linter for every kind of finding.", "explanation": "Worse — this replaces the tool rather than fixing the criteria it's given; it doesn't address the missing skip list." },
+      { "id": "C", "text": "An explicit list of what NOT to flag (e.g., formatting nits), not just what to flag.", "explanation": "Correct — naming excluded categories removes the guesswork that produces formatting-nit false positives." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "A strong criteria prompt states both what to report and what to explicitly skip, as concrete categories.",
+    "sourceRef": "Exam Guide TS 4.1"
+  },
+  {
+    "id": "d4-4.1-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.1"],
+    "lesson": "4.1",
+    "chunk": 2,
+    "difficulty": 2,
+    "stem": "A team's \"unused variable\" category is wrong most of the time this month. Two weeks later, a security engineer opens a PR containing a real, accurate SQL-injection finding from a different, reliable category. Based on the lesson, how will the security engineer most likely react to it?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "They're likely to skim past it too — trust damage tends to spread across the whole report.", "explanation": "Correct — trust loss isn't contained to the noisy category; it generalizes to how developers treat the whole tool." },
+      { "id": "B", "text": "They'll treat it with full confidence, since it comes from a category with a good track record.", "explanation": "Worse — this treats categories as fully independent in developers' minds, which contradicts how trust erosion actually spreads." },
+      { "id": "C", "text": "They'll request that the noisy category start producing more findings to compensate.", "explanation": "Worse — more findings from an already-unreliable category would make the trust problem worse, not better." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "A high false-positive category erodes trust in the whole review tool, not just itself.",
+    "sourceRef": "Exam Guide TS 4.1"
+  },
+  {
+    "id": "d4-4.1-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.1"],
+    "lesson": "4.1",
+    "chunk": 2,
+    "difficulty": 2,
+    "stem": "A \"flag risky auth changes\" category catches most real issues but is wrong roughly half the time. A teammate proposes fixing it by adding \"only flag ones you're fairly confident about\" to the instruction. Will this improve the false-positive rate?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Yes — narrowing scope with a confidence qualifier reliably reduces false positives.", "explanation": "Worse — this is the misconception the lesson corrects; confidence language gives no new checkable rule." },
+      { "id": "B", "text": "No — confidence language still isn't a checkable rule.", "explanation": "Correct — replacing vague criteria with more vague criteria doesn't create a fixed boundary the model can apply consistently." },
+      { "id": "C", "text": "It doesn't matter, since high recall already outweighs any false-positive cost.", "explanation": "Worse — this contradicts the lesson's point that false-positive rate is a first-class constraint, not secondary to recall." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "False-positive rate is a first-class design constraint, and vague qualifiers don't fix it — only explicit categorical criteria do.",
+    "sourceRef": "Exam Guide TS 4.1"
+  },
+  {
+    "id": "d4-4.1-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.1"],
+    "lesson": "4.1",
+    "chunk": 3,
+    "difficulty": 1,
+    "stem": "Two files both contain a test that occasionally times out under load. One review run labels the finding \"high,\" another labels the same kind of finding \"medium,\" with no guidance beyond the four label names. What would most reliably fix this?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Merge \"high\" and \"medium\" into a single label to remove the ambiguity.", "explanation": "Worse — this discards a severity distinction the team needs instead of fixing why labels are applied inconsistently." },
+      { "id": "B", "text": "Ask the model to add a numeric confidence score next to the label instead.", "explanation": "Worse — a confidence number doesn't anchor what \"high\" versus \"medium\" means; it adds a different, subjective signal." },
+      { "id": "C", "text": "Add a worked code example anchoring each severity level.", "explanation": "Correct — an anchor example gives the model something concrete to compare a new finding against, producing consistent labels." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "Concrete code examples per severity level turn a subjective label into a checkable comparison.",
+    "sourceRef": "Exam Guide TS 4.1; guide_en.md §6.2"
+  },
+  {
+    "id": "d4-4.1-qc6",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.1"],
+    "lesson": "4.1",
+    "chunk": 4,
+    "difficulty": 2,
+    "stem": "A \"missing null check\" category is running at a high false-positive rate this sprint, while four other categories stay accurate. A manager suggests just telling the team to \"mentally discount findings from that category\" rather than changing anything in the tool. Why is temporarily disabling the category a better move?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Disabling it keeps the working categories credible right away.", "explanation": "Correct — this restores trust in the working parts right away, while the noisy category is fixed offline against real cases." },
+      { "id": "B", "text": "Mentally discounting reduces the total number of findings shown, which is the main goal.", "explanation": "Worse — reducing finding count isn't the goal; restoring trust in accurate findings without hiding the problem is." },
+      { "id": "C", "text": "Mentally discounting costs nothing in engineering time, so it's strictly the safer choice.", "explanation": "Worse — it still forces every developer to manually re-verify findings, and does nothing to stop trust from spreading to other categories." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Temporarily disabling a noisy category restores trust faster than asking developers to silently discount it.",
+    "sourceRef": "Exam Guide TS 4.1"
+  },
+
+  {
+    "id": "d4-4.2-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.2"],
+    "lesson": "4.2",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A support-ticket summarizer's system prompt already spells out every field to include in painstaking detail, but two summaries of the same ticket type still come out with different phrasing and section order each run. The team wants a fix that doesn't mean rewriting the instructions again. What should they try first?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Split the single instruction paragraph into several shorter paragraphs covering the same content.", "explanation": "Worse — restructuring the same prose without adding concrete examples is unlikely to converge the format." },
+      { "id": "B", "text": "Increase the required field count so there's more structure to anchor the output.", "explanation": "Worse — more required fields changes scope, not the phrasing or ordering consistency the team actually needs." },
+      { "id": "C", "text": "Add 2-4 concrete example ticket/summary pairs showing the exact phrasing wanted.", "explanation": "Correct — examples remove ambiguity that prose descriptions leave open, when instructions alone haven't converged the format." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "When instructions alone don't converge on a consistent format, show examples instead of writing more prose.",
+    "sourceRef": "Exam Guide TS 4.2; guide_en.md §6.1"
+  },
+  {
+    "id": "d4-4.2-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.2"],
+    "lesson": "4.2",
+    "chunk": 1,
+    "difficulty": 2,
+    "stem": "A moderation prompt's few-shot examples show only Input -> Label, with no rationale, for two borderline posts. A third, differently-worded borderline post appears in production. What is the most likely outcome?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "The model will always match it to whichever of the two labeled examples is closest, guaranteeing a consistent call.", "explanation": "Worse — this treats few-shot as a lookup table; without rationale, there's no guaranteed match to a \"closest\" case." },
+      { "id": "B", "text": "The model may handle it inconsistently — format-only examples don't teach the underlying judgment.", "explanation": "Correct — examples that only show format, without the reasoning for ambiguous cases, don't generalize the judgment to novel inputs." },
+      { "id": "C", "text": "The model will refuse to label anything outside the exact two examples shown.", "explanation": "Worse — the model still attempts a label; the risk is inconsistency, not refusal." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "Examples that show reasoning for ambiguous cases generalize; examples that only show format do not.",
+    "sourceRef": "Exam Guide TS 4.2; guide_en.md §6.1"
+  },
+  {
+    "id": "d4-4.2-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.2"],
+    "lesson": "4.2",
+    "chunk": 1,
+    "difficulty": 2,
+    "stem": "Existing few-shot examples cover \"get me a manager\" (immediate escalation) and \"my order is broken\" (investigate first). A customer instead writes: \"put me through to whoever's actually in charge.\" What should happen?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "The model generalizes the escalation pattern and escalates immediately anyway.", "explanation": "Correct — well-chosen examples teach the underlying judgment, not literal phrase matching." },
+      { "id": "B", "text": "The model should investigate first, since no example uses this exact wording.", "explanation": "Worse — this treats few-shot as literal pattern matching, contradicting how generalization works." },
+      { "id": "C", "text": "The model cannot act until a developer adds an exact-match example for this phrasing.", "explanation": "Worse — this misunderstands few-shot as a lookup table rather than a generalizable demonstration of judgment." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Few-shot examples transfer a decision principle to novel phrasing, not just to the literal cases shown.",
+    "sourceRef": "Exam Guide TS 4.2; guide_en.md §6.1"
+  },
+  {
+    "id": "d4-4.2-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.2"],
+    "lesson": "4.2",
+    "chunk": 2,
+    "difficulty": 1,
+    "stem": "A prompt has 10 few-shot examples, all slight rewordings of \"my package never arrived.\" A customer instead writes \"you charged me for something I never got.\" Compared to a prompt with 3 diverse ambiguous examples covering different complaint types, what is the most likely outcome for this new complaint?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Both prompts perform identically, since example count doesn't affect how new inputs are handled.", "explanation": "Worse — example choice does affect generalization; ten near-duplicates and three diverse examples are not equivalent." },
+      { "id": "B", "text": "The 10-duplicate prompt performs better, since more total examples always means broader coverage.", "explanation": "Worse — near-duplicate examples reinforce one narrow case; volume alone doesn't add coverage of a different kind of ambiguity." },
+      { "id": "C", "text": "The 10-duplicate prompt is less likely to handle this new complaint type well.", "explanation": "Correct — diversity across cases teaches the decision principle; many near-duplicates teach one narrow pattern more strongly." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "A small set of diverse, targeted examples generalizes better than many near-duplicate examples.",
+    "sourceRef": "Exam Guide TS 4.2; guide_en.md §6.1"
+  },
+  {
+    "id": "d4-4.2-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.2"],
+    "lesson": "4.2",
+    "chunk": 3,
+    "difficulty": 1,
+    "stem": "A linter-style reviewer already has a written rule: \"flag any catch block that does nothing.\" It still flags `catch (err) { /* ignored: expected timeout */ }` as a bug, even though the team treats documented, expected-error catches as fine. Real bugs look like `catch (err) {}` with no comment or handling at all. Having already tried tightening the prose rule with no luck, what should the team add next?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "A contrastive few-shot pair: commented catch as \"acceptable,\" empty catch as \"flag.\"", "explanation": "Correct — a contrastive pair teaches the exact distinguishing detail that a prose rule alone already failed to convey." },
+      { "id": "B", "text": "An even longer version of the same written rule, spelling out more edge cases in prose.", "explanation": "Worse — this is the same prose approach that already produced false positives; more prose is unlikely to succeed where prose already failed." },
+      { "id": "C", "text": "A rule that flags every catch block regardless of whether it's commented, to be safe.", "explanation": "Worse — this widens the false-positive problem instead of narrowing it." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "When a prose rule alone can't distinguish two similar-looking patterns, a contrastive few-shot pair teaches the distinguishing detail directly.",
+    "sourceRef": "Exam Guide TS 4.2; guide_en.md §6.1"
+  },
+  {
+    "id": "d4-4.2-qc6",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.2"],
+    "lesson": "4.2",
+    "chunk": 4,
+    "difficulty": 2,
+    "stem": "A recipe-extraction schema requires a numeric `amount_grams` field. Source text says \"a knob of butter\" and \"a few glugs of olive oil.\" The team's first instinct is to write a much longer paragraph of instructions converting cooking terms to grams. Is this the right first move?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Yes — a sufficiently detailed paragraph can enumerate every informal cooking phrase in advance.", "explanation": "Worse — informal phrasing is too varied to enumerate; a longer written rule doesn't cover every case." },
+      { "id": "B", "text": "No — a few few-shot examples mapping informal phrases to approximate values work better here.", "explanation": "Correct — examples let the model generalize a sensible approximation approach, where a longer written rule struggles with unseen phrasing." },
+      { "id": "C", "text": "No — the fix is to make `amount_grams` required so the model is forced to always produce a precise number.", "explanation": "Worse — forcing precision the source doesn't provide is exactly what causes fabrication, not what prevents it." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "Few-shot examples reduce extraction hallucination on informal input better than either more prose or a stricter required field.",
+    "sourceRef": "Exam Guide TS 4.2; guide_en.md §6.1"
+  },
+
+  {
+    "id": "d4-4.3-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.3"],
+    "lesson": "4.3",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "An extraction tool call returns a syntactically valid `total` field, but the value is wrong because the model read the number from the wrong table row. What does this show about tool_use with JSON schemas?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "It guarantees syntax validity, not semantic correctness.", "explanation": "Correct — schema-shaped output can still contain wrong values; that's a separate problem from malformed JSON." },
+      { "id": "B", "text": "It means the schema definition itself has a bug and needs a stricter type.", "explanation": "Worse — a stricter type wouldn't catch a value read from the wrong source location; that's a semantic, not a type, error." },
+      { "id": "C", "text": "It means tool_use failed and the request should be retried with the same prompt.", "explanation": "Worse — the tool_use call succeeded structurally; a blind retry with no feedback is unlikely to fix a semantic misread." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "tool_use with a JSON schema eliminates syntax errors, not semantic ones.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.5"
+  },
+  {
+    "id": "d4-4.3-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.3"],
+    "lesson": "4.3",
+    "chunk": 1,
+    "difficulty": 2,
+    "stem": "Your pipeline has three extraction tools — `extract_invoice`, `extract_receipt`, `extract_contract` — and a document that could be any of the three arrives with no type label. You set `tool_choice` to `{\"type\": \"auto\"}`. What is the most likely failure mode?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "The request is rejected, because \"auto\" requires a single named tool to be specified in advance.", "explanation": "Worse — \"auto\" doesn't require naming a tool in advance; that's what forcing a specific tool does." },
+      { "id": "B", "text": "The model may answer in plain text instead of calling any tool, breaking downstream parsing.", "explanation": "Correct — \"auto\" still permits skipping tool calls entirely, which breaks a pipeline that always expects structured output." },
+      { "id": "C", "text": "The model will call all three tools in the same turn and merge their outputs.", "explanation": "Worse — nothing about \"auto\" causes the model to call every available tool at once." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "tool_choice \"auto\" still permits a plain-text answer, unlike \"any\" or a forced tool name, which both guarantee a tool call.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.3"
+  },
+  {
+    "id": "d4-4.3-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.3"],
+    "lesson": "4.3",
+    "chunk": 1,
+    "difficulty": 2,
+    "stem": "A workflow must always run `verify_identity` as the very first tool call before any other tool in the same request, with zero exceptions. Which `tool_choice` setting guarantees this?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "`{\"type\": \"any\"}`, relying on `verify_identity` being the only tool listed for that call.", "explanation": "Worse — \"any\" only guarantees some tool call happens; it doesn't guarantee which one, even with a short tool list." },
+      { "id": "B", "text": "`{\"type\": \"auto\"}`, with a system-prompt instruction to always call it first.", "explanation": "Worse — \"auto\" still permits skipping tool calls entirely, which is a weaker guarantee than forcing the named tool." },
+      { "id": "C", "text": "`{\"type\": \"tool\", \"name\": \"verify_identity\"}` for the first call.", "explanation": "Correct — forcing the specific named tool is the only setting that guarantees this exact tool runs first." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "Forcing a named tool is the only tool_choice setting that guarantees a specific required first step.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.3"
+  },
+  {
+    "id": "d4-4.3-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.3"],
+    "lesson": "4.3",
+    "chunk": 2,
+    "difficulty": 1,
+    "stem": "A schema field `warranty_months` is marked required, but 30% of the product manuals in your source set never mention a warranty at all. What is the likely failure mode, and the fix?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "The model may invent a value to satisfy the field; nullable lets it honestly return null.", "explanation": "Correct — nullable optional fields give the model a third option besides fabricating or failing the call." },
+      { "id": "B", "text": "The tool_use call fails immediately whenever a required field can't be filled from the source.", "explanation": "Worse — a required string/number field doesn't automatically fail; the model can still supply an invented value that satisfies the type." },
+      { "id": "C", "text": "Nothing needs to change, since a required field only affects validation after extraction completes.", "explanation": "Worse — required fields affect what the model produces during extraction itself, not just a later validation step." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Required fields for sometimes-absent information push the model toward fabrication; nullable optional fields prevent it.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.4"
+  },
+  {
+    "id": "d4-4.3-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.3"],
+    "lesson": "4.3",
+    "chunk": 2,
+    "difficulty": 1,
+    "stem": "Should a `late_fee_amount` field be required or optional/nullable if 97% of your source invoices state a late fee and 3% simply don't charge one (no mention at all)?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Required — since the large majority of documents do contain the value.", "explanation": "Worse — a required field forces some output on the remaining 3%, which is exactly the fabrication risk nullable fields exist to prevent." },
+      { "id": "B", "text": "Optional and nullable — even a small missing share risks fabrication if required.", "explanation": "Correct — required fields should only be used when the information is essentially always present; 3% missing is still a real gap." },
+      { "id": "C", "text": "It doesn't matter, since tool_use always guarantees semantic correctness regardless of required/optional.", "explanation": "Worse — tool_use only guarantees syntax, not semantic correctness or the absence of fabrication." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "Mark a field required only when the information is essentially always available in the source.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.4"
+  },
+  {
+    "id": "d4-4.3-qc6",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.3"],
+    "lesson": "4.3",
+    "chunk": 3,
+    "difficulty": 1,
+    "stem": "A support-ticket classifier's `issue_type` enum has four fixed values. 12% of tickets describe a real, valid issue that doesn't match any of the four (e.g., a payment-details update request) — it's not that the ticket lacks a category, it's that no listed category fits. Which schema fix is correct, and why not simply make `issue_type` nullable instead?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Make `issue_type` nullable, since nullable fields already handle any case where a clean value isn't available.", "explanation": "Worse — nullable would only mark the category as absent; it wouldn't preserve what the real, valid category actually is." },
+      { "id": "B", "text": "Require the model to always pick one of the four values, since fabrication risk only applies to date or numeric fields.", "explanation": "Worse — this silently distorts the data by mapping a real issue into the nearest wrong category, and fabrication risk isn't limited to dates or numbers." },
+      { "id": "C", "text": "Add an \"other\" enum value with a nullable detail field, preserving the real category as text.", "explanation": "Correct — this keeps the enum closed for downstream code while preserving the real, out-of-taxonomy value as detail text." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "\"other\" + a detail string preserves extensible, out-of-taxonomy data — a plain nullable field only marks information as absent, not present-but-uncategorized.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.4"
+  },
+  {
+    "id": "d4-4.3-qc7",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.3"],
+    "lesson": "4.3",
+    "chunk": 4,
+    "difficulty": 1,
+    "stem": "A `call_duration` field's type is a valid string, so \"a couple hours\", \"2 hrs 15 min\", and \"135 minutes\" all pass schema validation, but they can't be compared downstream. What fixes this, given the schema alone can't?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Change the field's JSON type from string to number, which will force consistent formatting automatically.", "explanation": "Worse — a bare number type doesn't resolve which unit (minutes vs hours) the number refers to; normalization rules are still needed." },
+      { "id": "B", "text": "Nothing further is needed — passing schema validation means the values are already comparable.", "explanation": "Worse — schema validity only confirms type correctness, not consistent normalization across documents." },
+      { "id": "C", "text": "Add explicit normalization rules in the prompt alongside the schema.", "explanation": "Correct — normalization is a semantic consistency rule that the schema's type constraints don't cover." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "A schema enforces types, not normalization; inconsistent formats need explicit normalization rules in the prompt.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §6.1"
+  },
+
+  {
+    "id": "d4-4.4-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.4"],
+    "lesson": "4.4",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A `tool_use` call for a receipt extraction returns valid JSON — every field has the right type — but `tax_amount` doesn't match 8% of `subtotal`. Is this a validation-and-retry problem, or something schema/tool_choice settings already prevent?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "It's a schema problem — a stricter `input_schema` type would have caught this on the first call.", "explanation": "Worse — a stricter type constrains structure, not whether a number is arithmetically correct; that's a semantic error, not a type error." },
+      { "id": "B", "text": "It's a validation-and-retry problem — valid JSON doesn't mean correct values.", "explanation": "Correct — tool_use eliminates syntax errors, not semantic ones; a wrong-but-valid value needs a retry loop with specific feedback." },
+      { "id": "C", "text": "It's a `tool_choice` problem — forcing a specific named tool would have produced the correct tax amount.", "explanation": "Worse — tool_choice controls which tool runs, not whether the values it returns are arithmetically correct." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "A syntactically valid but semantically wrong value is a validation-and-retry problem, not something a stricter schema or tool_choice setting prevents.",
+    "sourceRef": "Exam Guide TS 4.4; guide_en.md §6.5"
+  },
+  {
+    "id": "d4-4.4-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.4"],
+    "lesson": "4.4",
+    "chunk": 1,
+    "difficulty": 2,
+    "stem": "A validation error flags a required `vendor_tax_id` as missing. You've confirmed the exact same document was sent, and it genuinely contains no tax ID anywhere on the page. Will retrying with detailed error feedback fix this?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Yes, as long as the error message names the exact field that's missing.", "explanation": "Worse — specificity helps for format/structural errors, but can't recover information that simply isn't present in the source." },
+      { "id": "B", "text": "Yes, because retries always succeed eventually given enough attempts.", "explanation": "Worse — this is the key misconception the lesson warns against; retries don't converge when the data isn't there to find." },
+      { "id": "C", "text": "No — the ID isn't in the document; feedback can't invent it.", "explanation": "Correct — retry only helps when the model misread available information, not when the information is absent from the source." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "Retry cannot recover information that is genuinely absent from the provided source document.",
+    "sourceRef": "Exam Guide TS 4.4; guide_en.md §6.5"
+  },
+  {
+    "id": "d4-4.4-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.4"],
+    "lesson": "4.4",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "A shipment-extraction tool puts the `delivery_date` value into the `order_date` field by mistake — the correct date is elsewhere on the same page. A different shipment's page never lists any delivery date at all. For which of these two problems is retry-with-feedback expected to succeed?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Only the misplaced-field case — the model can re-check the source and fix it.", "explanation": "Correct — retry works on structural mistakes the model can re-check against the source, not on information that isn't there." },
+      { "id": "B", "text": "Both cases equally, since specific error feedback always gives the model something to act on.", "explanation": "Worse — feedback about a field that genuinely has no value in the source gives the model nothing new to find." },
+      { "id": "C", "text": "Only the case with no date anywhere, since the model just needs to be told to look harder.", "explanation": "Worse — \"look harder\" can't produce a date that was never stated in the document." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Retry works on format and structural mistakes the model can re-examine, not on missing source information.",
+    "sourceRef": "Exam Guide TS 4.4; guide_en.md §6.5"
+  },
+  {
+    "id": "d4-4.4-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.4"],
+    "lesson": "4.4",
+    "chunk": 2,
+    "difficulty": 2,
+    "stem": "A finding's schema currently only records `file`, `line`, and a free-text description. What field would let you analyze whether false positives cluster around a specific code shape?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "`confidence` — a numeric score for how sure the model is.", "explanation": "Worse — confidence helps route findings for review, but doesn't reveal which underlying code pattern is unreliable." },
+      { "id": "B", "text": "`detected_pattern` — the construct that triggered it.", "explanation": "Correct — recording the triggering pattern lets you aggregate dismissals by pattern, not just by category." },
+      { "id": "C", "text": "`timestamp` — when the finding was generated.", "explanation": "Worse — timing data doesn't reveal which code construct is systematically triggering false positives." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "`detected_pattern` turns individual findings into analyzable data for systematic false-positive analysis.",
+    "sourceRef": "Exam Guide TS 4.4"
+  },
+  {
+    "id": "d4-4.4-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.4"],
+    "lesson": "4.4",
+    "chunk": 3,
+    "difficulty": 1,
+    "stem": "A shipment manifest states an overall `total_weight`, and the extraction schema also asks the model to independently sum the weights of each listed package into a `computed_weight` field. What is the purpose of comparing the two?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "It doubles the number of tool calls needed, so it should be avoided unless required.", "explanation": "Worse — both values are extracted in the same tool call; this doesn't describe an extra call." },
+      { "id": "B", "text": "It is only useful for currency totals, not for other derived numeric values like weight.", "explanation": "Worse — the same pattern generalizes to any value derivable from other extracted fields, not just currency." },
+      { "id": "C", "text": "It surfaces internal inconsistencies without a separate validation pass.", "explanation": "Correct — this self-correction pattern is built into the schema itself, catching discrepancies immediately." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "Extracting both a stated and a calculated value, with a conflict flag, catches inconsistencies immediately.",
+    "sourceRef": "Exam Guide TS 4.4; guide_en.md §6.6"
+  },
+  {
+    "id": "d4-4.4-qc6",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.4"],
+    "lesson": "4.4",
+    "chunk": 3,
+    "difficulty": 2,
+    "stem": "Your extraction schema already has both `detected_pattern` (recorded on every finding) and, for numeric totals, a `conflict_detected` flag comparing stated vs. calculated values. A reviewer wants to know which finding pattern gets dismissed 9 times out of 10. Which field answers that, and why not the other one?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "`detected_pattern` — it records the triggering construct, so dismissals can be aggregated by pattern.", "explanation": "Correct — `detected_pattern` turns individual findings into analyzable data for systematic false-positive analysis; the conflict flag serves a different, numeric-only purpose." },
+      { "id": "B", "text": "`conflict_detected` — any repeatedly dismissed finding counts as a detected conflict, regardless of what triggered it.", "explanation": "Worse — `conflict_detected` only compares a stated value to a calculated one; it says nothing about dismissal rates by pattern." },
+      { "id": "C", "text": "Neither — dismissal-rate analysis needs a separate service outside the extraction schema itself.", "explanation": "Worse — this is over-engineered; the schema already has the field needed for this analysis." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "`detected_pattern` enables pattern-level false-positive analysis; `conflict_detected` is a separate, narrower self-correction signal for derived numeric values.",
+    "sourceRef": "Exam Guide TS 4.4; guide_en.md §6.6"
+  },
+
+  {
+    "id": "d4-4.5-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.5"],
+    "lesson": "4.5",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A team submits an overnight batch at 11pm expecting results by 7am (8 hours later), because \"that's usually how long it takes.\" At 9am, the batch still hasn't returned. Is this a bug in the Batch API?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Yes — the API guarantees results within 8 hours whenever a team submits overnight.", "explanation": "Worse — there's no such guarantee tied to submission time; the batch endpoint has no latency SLA at all." },
+      { "id": "B", "text": "Yes — a batch that isn't among the fastest half of requests indicates a service outage.", "explanation": "Worse — the 50% figure is a cost saving, not a speed percentile; slower-than-usual is still within normal batch behavior." },
+      { "id": "C", "text": "No — batch can take up to 24 hours with no guaranteed SLA; this wait is normal.", "explanation": "Correct — batches trade latency guarantees for cost savings; up to 24 hours with no SLA is expected, not a bug." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "Message Batches: 50% savings, up to 24-hour processing, no latency SLA.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.1"
+  },
+  {
+    "id": "d4-4.5-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.5"],
+    "lesson": "4.5",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "Your support pipeline needs to call `get_customer`, inspect the result, and then decide whether to call `process_refund` — all within the same exchange. Can this run on the Message Batches API?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "No — Batch is one request in, one response out; no mid-request tool loop.", "explanation": "Correct — mid-request tool execution isn't supported by the batch endpoint." },
+      { "id": "B", "text": "Yes, as long as both tool names are listed in the same batch request's `params`.", "explanation": "Worse — listing tools doesn't enable a mid-request tool-then-reasoning loop; that capability isn't offered by the batch endpoint." },
+      { "id": "C", "text": "Yes, but only for batches under a certain document count.", "explanation": "Worse — there's no document-count threshold that unlocks multi-turn tool calling on the batch endpoint." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "The Batch API does not support multi-turn tool calling within a single request.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.1"
+  },
+  {
+    "id": "d4-4.5-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.5"],
+    "lesson": "4.5",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "A team needs to summarize 50,000 archived support tickets into a compliance report due at the end of the month. No one is actively waiting on any single ticket's result. Which API fits, and why?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Synchronous — large volumes always require the guaranteed, immediate response only the synchronous API provides.", "explanation": "Worse — volume alone doesn't require synchronous calls; a non-blocking workload is exactly what batch is for." },
+      { "id": "B", "text": "Batch — it tolerates the non-guaranteed, up-to-24-hour timing, and the volume benefits from the savings.", "explanation": "Correct — latency tolerance, not workload size, is the deciding factor, and this workload has no one blocked waiting." },
+      { "id": "C", "text": "Batch — but only because 50,000 exceeds some minimum document count required to use the Batch API.", "explanation": "Worse — there's no minimum document count requirement; fit is decided by latency tolerance, not volume thresholds." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "Batch fit is decided by latency tolerance, not by workload size alone.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.2"
+  },
+  {
+    "id": "d4-4.5-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.5"],
+    "lesson": "4.5",
+    "chunk": 2,
+    "difficulty": 2,
+    "stem": "Your SLA requires a result within 20 hours, and a batch submission can take up to 24 hours to process. What is the maximum safe submission window before the SLA deadline?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "No safe window exists — the worst case already exceeds the SLA.", "explanation": "Correct — 20 - 24 is negative, meaning the batch endpoint's worst case already exceeds the SLA; this workload needs a different approach." },
+      { "id": "B", "text": "4 hours, since 24 - 20 = 4, ignoring which direction the subtraction should go.", "explanation": "Worse — this subtracts in the wrong direction; the batch ceiling (24h) already exceeds the SLA (20h), leaving no safe window at all." },
+      { "id": "C", "text": "20 hours, matching the SLA exactly, leaving no safety margin at all.", "explanation": "Worse — a full-length submission window ignores that the batch's own worst-case processing time exceeds the SLA." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "If a batch's worst-case processing time already exceeds the SLA, no submission cadence can fix it.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.5"
+  },
+  {
+    "id": "d4-4.5-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.5"],
+    "lesson": "4.5",
+    "chunk": 2,
+    "difficulty": 2,
+    "stem": "Your SLA is 48 hours and the batch API can take up to 24 hours to process. What is the size of the available submission window before the deadline?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "48 hours, matching the full SLA.", "explanation": "Worse — this leaves zero margin for the batch's own processing time, which would blow past the SLA in the worst case." },
+      { "id": "B", "text": "72 hours (48 + 24), stacking the SLA and processing ceiling together.", "explanation": "Worse — this adds instead of subtracting; the processing ceiling must come out of the SLA, not add to it." },
+      { "id": "C", "text": "24 hours (48 - 24), the safe submission window.", "explanation": "Correct — this is exactly the SLA-minus-processing-ceiling calculation the exam expects." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "Submission window = SLA minus the batch API's worst-case processing time.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.5"
+  },
+  {
+    "id": "d4-4.5-qc6",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.5"],
+    "lesson": "4.5",
+    "chunk": 3,
+    "difficulty": 1,
+    "stem": "A batch of 300 documents returns 280 successes and 20 failures tagged with a malformed-encoding error, each still carrying its original `custom_id`. What is the most efficient recovery step?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Resubmit all 300 documents in a fresh batch to be safe, just in case.", "explanation": "Worse — wastes the savings already captured on the 280 successes and doesn't address the actual failure cause." },
+      { "id": "B", "text": "Re-encode the 20 failures, then resubmit just those by `custom_id`.", "explanation": "Correct — this fixes the actual cause and avoids reprocessing the 280 that already succeeded." },
+      { "id": "C", "text": "Discard the 20 failed documents and just proceed without them entirely.", "explanation": "Worse — throws away recoverable data when re-encoding is a straightforward fix." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "Resubmit only the failed items by custom_id, with a modification that addresses the actual failure cause.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.4"
+  },
+  {
+    "id": "d4-4.5-qc7",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.5"],
+    "lesson": "4.5",
+    "chunk": 4,
+    "difficulty": 1,
+    "stem": "A team is about to submit 5,000 contracts to the Batch API for extraction. Their plan: split the 5,000 into two batches of 2,500 sent at the same time, \"so if one fails we still have the other.\" What's the flaw in this plan?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "It skips sample validation first, risking full-volume failure in both batches.", "explanation": "Correct — batch is for scaling a prompt you already trust; validating on a sample synchronously first catches systematic issues before a slow, costly full run." },
+      { "id": "B", "text": "Batches can only accept 2,500 documents at a time, so this is the only valid split.", "explanation": "Worse — there's no such document-count limit driving this split; the real issue is skipping sample validation." },
+      { "id": "C", "text": "There is no flaw — splitting into two batches is strictly safer than one large batch.", "explanation": "Worse — splitting the same untested prompt doesn't address whether the prompt itself is reliable; it just runs the same risk twice." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Validate a prompt on a sample synchronously before scaling it up to a large batch run.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §8 Exercise 3"
+  },
+
+  {
+    "id": "d4-4.6-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.6"],
+    "lesson": "4.6",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A developer asks the same Claude session that just wrote a caching layer to also list any bugs in it. The session reports no issues, but a subtle race condition is actually present in the code it just wrote. What is the most likely explanation?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "The session ran out of available context tokens before it could analyze the caching code.", "explanation": "Worse — token limits are out of scope here; the issue is retained reasoning context, not token exhaustion." },
+      { "id": "B", "text": "The session still carries the reasoning that justified its own decisions.", "explanation": "Correct — shared reasoning context is exactly the structural limitation described." },
+      { "id": "C", "text": "The session lacks the technical knowledge needed to recognize race conditions.", "explanation": "Worse — knowledge gaps aren't the described limitation; the issue is the shared reasoning trace from generation." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "Self-review is limited because the same session still carries the reasoning that produced the original output.",
+    "sourceRef": "Exam Guide TS 4.6"
+  },
+  {
+    "id": "d4-4.6-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.6"],
+    "lesson": "4.6",
+    "chunk": 1,
+    "difficulty": 2,
+    "stem": "A team, frustrated that self-review misses bugs, turns on extended thinking for the review step so the same session \"thinks harder\" before reporting back. Six months later, the miss rate on subtle bugs is about the same. What's the most likely reason this didn't help?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Extended thinking is disabled by default during review steps, so it never actually activated.", "explanation": "Worse — nothing about a review step disables extended thinking by default; that's not the described limitation." },
+      { "id": "B", "text": "Extended thinking only works for extraction tasks, not for code review.", "explanation": "Worse — extended thinking isn't task-restricted this way; the issue is the shared session context, not the task type." },
+      { "id": "C", "text": "More thinking tokens in the same session don't create a fresh perspective.", "explanation": "Correct — extended thinking on the same instance is not a substitute for review by an instance without the generator's reasoning trace." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "Extended thinking in the same session doesn't substitute for review by an independent instance.",
+    "sourceRef": "Exam Guide TS 4.6"
+  },
+  {
+    "id": "d4-4.6-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.6"],
+    "lesson": "4.6",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "Two setups are compared for reviewing a generated data-migration script: (1) the same session that wrote it, now asked to critique it, and (2) a brand-new session given only the finished script with no prior conversation. Which is structurally better positioned to catch a subtle bug, and why?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "The new session, since it never carries the generating session's justification for each choice, isn't primed to accept those choices without scrutiny.", "explanation": "Correct — independence from the generator's reasoning context is the structural advantage." },
+      { "id": "B", "text": "The same session — it already understands the intent behind the migration, which matters more than a fresh perspective.", "explanation": "Worse — understanding intent doesn't offset the risk of the same session defending its own earlier choices." },
+      { "id": "C", "text": "Neither — review quality depends only on the underlying model, not on which session performs it.", "explanation": "Worse — this ignores the described mechanism entirely; context isolation, not model choice, is what improves review quality." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Independence from the generator's reasoning context, not a different model, is what improves review quality.",
+    "sourceRef": "Exam Guide TS 4.6"
+  },
+  {
+    "id": "d4-4.6-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.6"],
+    "lesson": "4.6",
+    "chunk": 2,
+    "difficulty": 1,
+    "stem": "A review pass across 22 files in one pull request leaves detailed comments on the first few files, only a one-line note on files near the end, and misses a duplicated bug that appears in two different files. Is this best explained by the self-review ceiling, or by attention dilution?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Attention dilution — analysis spread across too much material, regardless of who wrote the code.", "explanation": "Correct — this matches the lesson's diagnosis of attention dilution, which is about analysis depth over volume, not who wrote the code." },
+      { "id": "B", "text": "The self-review ceiling — the reviewer still carries reasoning context from having written the code, biasing it toward approving its own choices.", "explanation": "Worse — the self-review ceiling is about reviewing your own prior reasoning, which isn't what's described here; the symptom is depth varying by file position." },
+      { "id": "C", "text": "Neither — this pattern only happens when the model runs out of available tools mid-review.", "explanation": "Worse — tool access isn't the cause of inconsistent per-file review depth." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Attention dilution across many files is a distinct failure mode from the self-review ceiling, and is fixed by per-file passes plus an integration pass, not more context capacity.",
+    "sourceRef": "Exam Guide TS 4.6; guide_en.md §8.3"
+  },
+  {
+    "id": "d4-4.6-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.6"],
+    "lesson": "4.6",
+    "chunk": 3,
+    "difficulty": 2,
+    "stem": "A team runs four independent full-PR review passes over all 20 files in a large refactor and keeps only findings that appear in at least three of the four passes. Does this fix attention dilution?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Yes — running the review four times always improves reliability regardless of structure.", "explanation": "Worse — repetition without restructuring the passes doesn't address inconsistent per-file depth." },
+      { "id": "B", "text": "Yes, because requiring three-of-four agreement eliminates all false positives.", "explanation": "Worse — it can eliminate some inconsistent findings, but it also suppresses genuine issues that were only caught intermittently, the opposite of the goal." },
+      { "id": "C", "text": "No — each pass still shares the same inconsistent depth per file.", "explanation": "Correct — the root cause (too much material per pass) is untouched, and majority voting can actively discard true findings." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "Majority-vote across repeated full-PR passes doesn't fix attention dilution and can suppress real findings.",
+    "sourceRef": "Exam Guide TS 4.6; guide_en.md §9 sample Q12"
+  },
+  {
+    "id": "d4-4.6-qc6",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 4,
+    "taskStatements": ["4.6"],
+    "lesson": "4.6",
+    "chunk": 4,
+    "difficulty": 1,
+    "stem": "A separate verification instance — given only the finished code, not the generating session's reasoning — reports `confidence: 0.92` on one finding and `confidence: 0.35` on another. A team wants to auto-apply trivial fixes without a human step, but only for some findings. How should this per-finding confidence be used?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Ignore both scores and treat every finding identically, since a self-reported score isn't reliable enough to act on.", "explanation": "Worse — this discards a useful routing signal instead of using it to prioritize reviewer attention." },
+      { "id": "B", "text": "Auto-apply the high-confidence finding, and route the low-confidence one to a human instead.", "explanation": "Correct — per-finding confidence enables calibrated routing, which pairs well with review from an instance that lacks the generator's reasoning trace." },
+      { "id": "C", "text": "Auto-apply both findings, since running review on an independent instance already guarantees each finding is correct.", "explanation": "Worse — independence improves review quality but doesn't guarantee correctness; low-confidence findings still need human review." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "Per-finding confidence enables calibrated routing of findings to the right level of attention, especially alongside independent review.",
+    "sourceRef": "Exam Guide TS 4.6"
+  },
+
+  {
+    "id": "d4-4.1-p1",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.1"
+    ],
+    "scenario": 5,
+    "difficulty": 2,
+    "stem": "Your CI code-review bot runs five finding categories. Over the last two weeks, the \"possible race condition\" category has a 78% false-positive rate (31 of 40 flagged instances were dismissed as non-issues), while the other four categories average an 8% false-positive rate. Developers have started ignoring the bot's comments entirely, including on the low-false-positive categories. What is the most effective first step?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Temporarily disable the category, tighten its criteria, then re-enable it.",
+        "explanation": "Correct — this restores trust in the other four working categories immediately while the noisy one is fixed offline against real dismissal data."
+      },
+      {
+        "id": "B",
+        "text": "Reword the instruction to \"only flag race conditions you are highly confident about.\"",
+        "explanation": "Worse — this is the same confidence-based filtering the lesson shows doesn't improve precision; it gives no new checkable rule."
+      },
+      {
+        "id": "C",
+        "text": "Keep the category active, but add a disclaimer that some findings may be inaccurate.",
+        "explanation": "Worse — this still forces developers to manually filter every finding, the exact cost automation was meant to remove."
+      },
+      {
+        "id": "D",
+        "text": "Remove the category permanently, since it has proven unreliable this sprint.",
+        "explanation": "Worse — an overreaction that permanently discards a category's value instead of iterating on its criteria."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Temporarily disabling a high-false-positive category restores trust faster than confidence language, disclaimers, or permanent removal.",
+    "sourceRef": "Exam Guide TS 4.1; guide_en.md §6.2"
+  },
+  {
+    "id": "d4-4.1-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.1"
+    ],
+    "scenario": 5,
+    "difficulty": 2,
+    "stem": "Your CI review prompt classifies findings using only the words low/medium/high/critical, with no further guidance. Across 200 recent findings, the same SQL-injection pattern was labeled \"high\" in 60% of files and \"critical\" in the rest, and reviewers can't predict which label a given finding will get. What change would most reliably fix the inconsistent severity labels?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Ask the model to score severity numerically from 1 to 100 instead of the four labels, hoping more granularity reduces disagreement.",
+        "explanation": "Worse — finer granularity adds no anchor to compare against; a numeric scale without examples is just as inconsistent."
+      },
+      {
+        "id": "B",
+        "text": "Add a concrete code example anchoring each level, e.g. \"CRITICAL: NullPointerException during payment processing.\"",
+        "explanation": "Correct — anchoring each level with a worked example is what makes classification repeatable across files and runs."
+      },
+      {
+        "id": "C",
+        "text": "Replace the four-level scale with a single boolean \"is_serious\" flag to remove ambiguity.",
+        "explanation": "Worse — this discards severity distinctions the team actually needs downstream instead of fixing their consistency."
+      },
+      {
+        "id": "D",
+        "text": "Instruct the model to \"be more precise when assigning severity levels.\"",
+        "explanation": "Worse — vague guidance with no checkable rule, the same failure mode as \"be conservative.\""
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Concrete code examples per severity level anchor classification and make it consistent across files and runs.",
+    "sourceRef": "Exam Guide TS 4.1; guide_en.md §6.2"
+  },
+  {
+    "id": "d4-4.1-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.1"
+    ],
+    "scenario": 5,
+    "difficulty": 2,
+    "stem": "A CI job flags comments that might be inaccurate. Over one sprint it produced 54 flags; developers agreed only 12 were real problems. The rest were style nitpicks or comments accusing already-fixed TODOs of \"still being open.\" The current prompt says: \"Check that code comments are accurate and up to date.\" Which replacement prompt is most likely to reduce false positives while keeping the true positives?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Flag any comment older than six months as potentially outdated for manual review.",
+        "explanation": "Worse — comment age isn't the signal behind the 12 real problems; this targets a different, unrelated criterion."
+      },
+      {
+        "id": "B",
+        "text": "Keep the same instruction, but require the model to write a short paragraph summarizing why each flagged comment might be wrong and how confident it is.",
+        "explanation": "Worse — a longer summary requirement doesn't change the underlying vague criterion that produced the 42 false positives."
+      },
+      {
+        "id": "C",
+        "text": "Flag a comment only if it contradicts the code, references a deleted symbol, or is a stale fixed-bug TODO; skip stylistic wording.",
+        "explanation": "Correct — this replaces the vague instruction with a closed list matching exactly the 12 real problems, while excluding the categories that produced the noise."
+      },
+      {
+        "id": "D",
+        "text": "Keep the same instruction, but add \"only report high-confidence findings\" on top of it.",
+        "explanation": "Worse — layering a confidence filter onto the same vague instruction still gives no checkable rule."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Explicit categorical criteria, naming both what to flag and what to skip, replace vague accuracy checks with a checkable rule.",
+    "sourceRef": "Exam Guide TS 4.1; guide_en.md §6.2"
+  },
+  {
+    "id": "d4-4.2-p1",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.2"
+    ],
+    "scenario": 1,
+    "difficulty": 2,
+    "stem": "Your support agent has get_customer, lookup_order, process_refund, and escalate_to_human tools. Without few-shot examples, it investigates every vague complaint via lookup tools even when a customer explicitly asks for a human, and sometimes escalates simple order-status questions immediately without checking anything first. Your target is 80%+ first-contact resolution while still honoring explicit escalation requests. What is the most effective fix?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a single rule: \"Always call lookup_order before deciding whether to escalate.\"",
+        "explanation": "Worse — a blanket rule ignores customers who explicitly ask for a human, missing the distinction the scenario needs."
+      },
+      {
+        "id": "B",
+        "text": "Broaden the system prompt to say \"use good judgment about when to escalate.\"",
+        "explanation": "Worse — vague guidance with no concrete pattern to follow, the same failure mode explicit criteria are meant to fix."
+      },
+      {
+        "id": "C",
+        "text": "Add ten few-shot examples covering many phrasings of \"my order is broken,\" hoping broader coverage of that one case helps.",
+        "explanation": "Worse — many near-duplicate examples reinforce one pattern rather than teaching the ambiguous-vs-explicit distinction."
+      },
+      {
+        "id": "D",
+        "text": "Add 2-4 few-shot examples pairing ambiguous requests with the correct action and a short rationale for the choice.",
+        "explanation": "Correct — targeted examples with rationale teach the model to distinguish investigate-first cases from immediate-escalation cases and generalize that judgment."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Few-shot examples that show reasoning for ambiguous cases teach the model when to investigate versus when to escalate immediately.",
+    "sourceRef": "Exam Guide TS 4.2; guide_en.md §6.1"
+  },
+  {
+    "id": "d4-4.2-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.2"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your extraction pipeline pulls statistics and their sources from research documents. On a 50-document sample, it correctly extracts sources from documents using inline citations (\"as shown in the study (Smith, 2023)...\") but returns null or the wrong source for the 18 documents that instead use numbered bibliography references (\"The rate is 42%. [1]\"). The schema and prose instructions already describe both formats. What is the most effective next step?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Mark the \"source\" field as required so the model can no longer return null on bibliography-style documents.",
+        "explanation": "Worse — this forces some value even though the model still doesn't reliably recognize the pattern, risking fabrication instead of fixing recognition."
+      },
+      {
+        "id": "B",
+        "text": "Add one few-shot example per citation style showing the correct extraction for each.",
+        "explanation": "Correct — concrete examples of both formats teach the extraction pattern that the existing prose description failed to convey."
+      },
+      {
+        "id": "C",
+        "text": "Rewrite the prose instructions with a longer, more detailed description of bibliography citations.",
+        "explanation": "Worse — detailed prose describing both formats already exists and hasn't worked; more prose is unlikely to succeed where prose already failed."
+      },
+      {
+        "id": "D",
+        "text": "Split the pipeline into two tools, one per citation style, selected via tool_choice.",
+        "explanation": "Worse — this adds new infrastructure to solve a format-recognition problem that targeted few-shot examples solve directly."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Few-shot examples for each document structure teach correct extraction where prose descriptions of the same structures failed.",
+    "sourceRef": "Exam Guide TS 4.2; guide_en.md §6.1"
+  },
+  {
+    "id": "d4-4.2-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.2"
+    ],
+    "scenario": 5,
+    "difficulty": 2,
+    "stem": "Your CI linting-augmentation prompt flags \"loose equality\" issues. It correctly flags `if (x.active == true)`, but it also flags `const items = data.filter(x => x.active)` — a plain boolean filter with no comparison at all — accounting for 22 of the last 30 flags in this category. The instruction currently reads: \"Flag any use of == that could indicate a type-coercion bug.\" What change is most likely to reduce these false positives without losing the real detections?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a regex pre-filter outside the prompt that excludes any line containing `.filter(`.",
+        "explanation": "Worse — brittle and narrowly aimed at one example; would also miss real `.filter(` comparison bugs elsewhere."
+      },
+      {
+        "id": "B",
+        "text": "Change the instruction to \"only flag == usage when you are highly confident it's a bug.\"",
+        "explanation": "Worse — confidence language gives the model no new checkable rule, the same failure mode as \"be conservative.\""
+      },
+      {
+        "id": "C",
+        "text": "Remove the \"loose equality\" category entirely, since it clearly produces far too much noise for the review to be trustworthy.",
+        "explanation": "Worse — discards a category that still catches real bugs like the `== true` case; an overreaction versus a targeted fix."
+      },
+      {
+        "id": "D",
+        "text": "Add a paired few-shot example showing the acceptable boolean-filter pattern next to the real loose-equality problem.",
+        "explanation": "Correct — showing the two similar-looking patterns side by side teaches exactly the detail the written rule missed."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Pairing an acceptable pattern with a similar-looking problem pattern as few-shot examples reduces false positives without losing true positives.",
+    "sourceRef": "Exam Guide TS 4.2; guide_en.md §6.1"
+  },
+  {
+    "id": "d4-4.3-p1",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.3"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your extraction pipeline has three tools: extract_invoice, extract_receipt, and extract_contract. Incoming documents are a mixed pile from multiple vendors; you don't know a document's type ahead of time, but every document must produce some structured extraction — free-text answers are unacceptable to your downstream parser. Which tool_choice setting should you use?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Call all three tools in a single turn and keep the result with the highest self-reported confidence.",
+        "explanation": "Worse — wastes calls on two tools guaranteed wrong for a given document; adds complexity tool_choice \"any\" avoids."
+      },
+      {
+        "id": "B",
+        "text": "`{\"type\": \"tool\", \"name\": \"extract_invoice\"}`, forcing the most common document type.",
+        "explanation": "Worse — forcing one tool regardless of actual document type misfires on every receipt or contract in the mix."
+      },
+      {
+        "id": "C",
+        "text": "`{\"type\": \"any\"}`, so the model must call one of the three tools but can pick whichever fits.",
+        "explanation": "Correct — guarantees a structured tool call every time while letting the model choose the right schema for an unknown document type."
+      },
+      {
+        "id": "D",
+        "text": "`{\"type\": \"auto\"}`, so the model calls whichever tool seems appropriate.",
+        "explanation": "Worse — \"auto\" still allows a plain-text answer instead of a tool call, breaking a parser that always expects structured output."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "tool_choice \"any\" guarantees structured output without pre-committing to a single schema when document type is unknown.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.3"
+  },
+  {
+    "id": "d4-4.3-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.3"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your pipeline must always run extract_metadata first (it produces a document_id and document_type that every later step depends on) before any enrichment tool runs. With tool_choice set to `{\"type\": \"any\"}`, the model sometimes calls an enrichment tool first when the document type looks obvious from the filename, which breaks the pipeline because enrichment expects metadata that hasn't been extracted yet. What is the correct fix?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Duplicate extract_metadata's fields into the enrichment tools' schemas, so either can run first.",
+        "explanation": "Worse — duplicating fields works around the ordering problem instead of actually enforcing the required order."
+      },
+      {
+        "id": "B",
+        "text": "Keep `tool_choice: \"any\"`, but list extract_metadata first in the tools array.",
+        "explanation": "Worse — array order doesn't determine which tool the model calls under \"any\"; it can still pick a different one."
+      },
+      {
+        "id": "C",
+        "text": "Switch to `tool_choice: \"auto\"` and instruct the model to call extract_metadata first.",
+        "explanation": "Worse — \"auto\" is an even weaker guarantee than \"any\" since it also permits skipping tool calls entirely."
+      },
+      {
+        "id": "D",
+        "text": "Set `tool_choice` to `{\"type\": \"tool\", \"name\": \"extract_metadata\"}` for the first call.",
+        "explanation": "Correct — forcing the named tool guarantees this exact tool runs first, regardless of what the filename suggests."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Forcing a specific named tool guarantees a required first step; array order and \"auto\"/\"any\" do not.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.3"
+  },
+  {
+    "id": "d4-4.3-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.3"
+    ],
+    "scenario": 3,
+    "difficulty": 3,
+    "stem": "Your research synthesis subagent extracts findings using a structured tool with a `publication_date` field currently marked required. For 15 of 60 sources (blog posts and forum threads with no visible publish date), the model has started filling in a plausible-looking date instead of leaving the field empty, and two of those fabricated dates have already been cited as fact in a generated report. What schema change most directly fixes this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Make `publication_date` optional and nullable, returning null when the source states no date.",
+        "explanation": "Correct — this gives the model an honest option besides fabricating a value, directly addressing why the two false dates were invented."
+      },
+      {
+        "id": "B",
+        "text": "Remove the `publication_date` field from the schema entirely so it can't be fabricated.",
+        "explanation": "Worse — over-corrects and discards real, available dates from the 45 sources that do state one."
+      },
+      {
+        "id": "C",
+        "text": "Keep the field required, but add an instruction telling the model not to guess dates.",
+        "explanation": "Worse — an instruction conflicts with a required field that still demands some value; weaker than actually making the field optional."
+      },
+      {
+        "id": "D",
+        "text": "Add a `date_confidence` field alongside the still-required `publication_date` field, to flag guesses for downstream review.",
+        "explanation": "Worse — the field is still required, so the model must produce some date; a confidence label on a fabricated guess doesn't stop the fabrication."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Nullable optional fields let the model honestly report missing information instead of fabricating a value to satisfy a required field.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.4"
+  },
+  {
+    "id": "d4-4.4-p1",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.4"
+    ],
+    "scenario": 6,
+    "difficulty": 3,
+    "stem": "An invoice extraction fails validation because `total` = 150.00 but the sum of `line_items` = 145.00. Your current retry logic re-sends the original prompt unchanged, hoping for a different result; on a sample of 40 such failures, only 3 were fixed. What retry design is most likely to improve the fix rate?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Resend just the document, leaving out the prior failed extraction entirely so the model isn't anchored to its earlier mistake.",
+        "explanation": "Worse — dropping the failed extraction removes the specific evidence of what went wrong; the model has nothing concrete to correct."
+      },
+      {
+        "id": "B",
+        "text": "Resend the document, the prior extraction, and the specific error: \"total 150.00 vs sum(line_items) 145.00; re-check.\"",
+        "explanation": "Correct — this gives the model the evidence, prior mistake, and precise discrepancy it needs to self-correct."
+      },
+      {
+        "id": "C",
+        "text": "Resend the document with a reworded instruction asking the model to \"be more careful with totals this time.\"",
+        "explanation": "Worse — still vague, and omits both the specific numeric discrepancy and the prior wrong answer."
+      },
+      {
+        "id": "D",
+        "text": "Increase `max_tokens` on the retry request so the model has more room to reconsider its answer.",
+        "explanation": "Worse — the original response wasn't truncated; more output space doesn't supply the missing error feedback."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Effective retry prompts include the document, the prior wrong extraction, and the specific validation error.",
+    "sourceRef": "Exam Guide TS 4.4; guide_en.md §6.5"
+  },
+  {
+    "id": "d4-4.4-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.4"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "A contract extraction pipeline flags a validation error: `renewal_terms` is null, but your business rule requires it to be populated. On inspection, the source document given to the model is a 2-page excerpt that never mentions renewal terms at all — that information lives only in a separate amendment document that wasn't included in the request. Your team has already retried this document 4 times with detailed error feedback, with no change in the result. What should happen next?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Escalate the whole document to a human reviewer to manually redo the extraction from scratch.",
+        "explanation": "Worse — overreaction; the extraction logic isn't the problem, the missing source document is, and the human faces the same gap."
+      },
+      {
+        "id": "B",
+        "text": "Retry a fifth time with an even more detailed validation error describing exactly which rule failed.",
+        "explanation": "Worse — more detailed feedback about the rule doesn't help when the information isn't present anywhere in the source provided."
+      },
+      {
+        "id": "C",
+        "text": "Stop retrying the same excerpt; supply the amendment document, or accept the field as null/unclear.",
+        "explanation": "Correct — recognizing the information is absent from the given source, not misread, means retry can't help; the fix is a different source or an honest null result."
+      },
+      {
+        "id": "D",
+        "text": "Default `renewal_terms` to \"standard terms apply\" so the business-rule validation passes without further investigation.",
+        "explanation": "Worse — fabricates a value to force validation to pass, exactly what nullable fields and honest \"unclear\" results are meant to prevent."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Retry cannot recover information absent from the source; recognize this and either supply the missing source or accept null/unclear.",
+    "sourceRef": "Exam Guide TS 4.4; guide_en.md §6.5"
+  },
+  {
+    "id": "d4-4.4-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.4"
+    ],
+    "scenario": 5,
+    "difficulty": 2,
+    "stem": "Your CI review bot's \"unsynchronized shared state\" finding has fired 42 times over a month. Developers dismissed 37 of those as false positives, but your findings only record the file, line, and a free-text description, so you can't tell whether the false positives cluster around a specific code shape or are spread evenly. What schema addition would most directly enable you to analyze this pattern?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Lower the overall sensitivity of the \"unsynchronized shared state\" category so it fires less often.",
+        "explanation": "Worse — reduces recall across the board without learning which specific pattern is unreliable; treats the symptom."
+      },
+      {
+        "id": "B",
+        "text": "Require developers to write a one-line reason whenever they dismiss a finding.",
+        "explanation": "Worse — adds process burden and depends on humans, instead of the model recording what it detected at generation time."
+      },
+      {
+        "id": "C",
+        "text": "Add a `detected_pattern` field naming the code construct behind each finding, then aggregate dismissals by pattern.",
+        "explanation": "Correct — this turns individual findings into analyzable data, revealing which specific code shape drives most of the 37 dismissals."
+      },
+      {
+        "id": "D",
+        "text": "Add a `confidence` field so low-confidence findings can be deprioritized in the review queue ahead of a deeper investigation.",
+        "explanation": "Worse — helps route individual findings, but doesn't reveal which underlying code pattern is systematically unreliable."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "detected_pattern fields turn dismissed findings into analyzable data for systematic false-positive pattern analysis.",
+    "sourceRef": "Exam Guide TS 4.4"
+  },
+  {
+    "id": "d4-4.5-p1",
+    "source": "original",
+    "duplicateOf": "off-11",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.5"
+    ],
+    "scenario": 5,
+    "difficulty": 3,
+    "stem": "Your CI pipeline runs a pre-merge review that blocks merging until it completes, and a separate weekly dependency-audit report. Switching both to the Message Batches API would cut your combined Claude API costs by roughly 50%, and your manager wants both moved to batch. Pre-merge reviews currently complete in under 2 minutes with the synchronous API. What is the correct recommendation?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Batch the weekly audit report for the savings; keep the pre-merge review synchronous since developers are blocked waiting for it.",
+        "explanation": "Correct — matches each workflow to its latency tolerance: the audit can wait up to 24 hours, the pre-merge check cannot."
+      },
+      {
+        "id": "B",
+        "text": "Batch both, adding a client-side timeout that falls back to synchronous if a pre-merge batch runs long.",
+        "explanation": "Worse — adds real complexity (tracking and cancelling in-flight jobs) to a workflow that should never have used batch."
+      },
+      {
+        "id": "C",
+        "text": "Keep both synchronous, since batch results supposedly can't be reliably matched back without knowing submission order.",
+        "explanation": "Worse — a misconception; `custom_id` reliably correlates requests and responses regardless of order."
+      },
+      {
+        "id": "D",
+        "text": "Batch both, since batches \"usually\" complete much faster than the full 24-hour window in practice.",
+        "explanation": "Worse — relying on typical, unguaranteed completion for a blocking workflow ignores that batch offers no latency SLA at all."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Match the API to each workflow's latency tolerance: synchronous for blocking checks, batch for latency-tolerant work.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §9 sample Q11"
+  },
+  {
+    "id": "d4-4.5-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.5"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "You submit a batch of 250 documents for extraction. When results return, 233 succeeded and 17 failed with a context-limit-exceeded error; each failed result includes the `custom_id` originally assigned to that document. What is the most efficient way to recover?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Resubmit all 250 documents in a new batch with a higher `max_tokens` setting, to be safe.",
+        "explanation": "Worse — reprocesses 233 already-successful documents, wasting the captured savings; `max_tokens` on the response doesn't fix an oversized input."
+      },
+      {
+        "id": "B",
+        "text": "Resubmit the 17 failed documents synchronously, unmodified, since sync calls allow larger context.",
+        "explanation": "Worse — context limits aren't specific to the batch endpoint; resending the same oversized document won't fix the cause."
+      },
+      {
+        "id": "C",
+        "text": "Discard the 17 failed documents and proceed with the 233 successful extractions, flagging the rest for manual review.",
+        "explanation": "Worse — avoids reprocessing but throws away recoverable data when a straightforward fix (chunking) is available."
+      },
+      {
+        "id": "D",
+        "text": "Chunk the 17 oversized documents into smaller sections and resubmit only those, by `custom_id`, in a new batch.",
+        "explanation": "Correct — addresses the actual failure cause and resubmits only the documents that need it, preserving the savings already captured."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Resubmit only failed documents by custom_id, with a modification (like chunking) that addresses the actual failure cause.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.4"
+  },
+  {
+    "id": "d4-4.5-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.5"
+    ],
+    "scenario": 3,
+    "difficulty": 3,
+    "stem": "Your research system generates a comprehensive weekly report that must be delivered within 28 hours of its Monday-morning kickoff, and the Message Batches API can take up to 24 hours per submission. Rather than submitting only once at the very start of the window, your team wants a submission cadence that keeps a safety margin while still guaranteeing every submission's worst case lands inside the 28-hour SLA. Which cadence is correct?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Submit every 2 hours within the 4-hour window the SLA allows (28 - 24 = 4 hours).",
+        "explanation": "Correct — the available submission window is SLA minus the batch's worst-case processing time; submitting more often than the minimum inside it adds margin."
+      },
+      {
+        "id": "B",
+        "text": "Submit once at hour 0 and again at hour 24, since 24 hours is the batch processing ceiling.",
+        "explanation": "Worse — a submission at hour 24 could take up to another 24 hours, landing at hour 48, far past the 28-hour SLA."
+      },
+      {
+        "id": "C",
+        "text": "Submit continuously in real time, since more frequent submissions always reduce risk.",
+        "explanation": "Worse — frequency alone doesn't help outside the safe 4-hour window; this ignores the 24-hour worst case per batch."
+      },
+      {
+        "id": "D",
+        "text": "Submit once, immediately at kickoff, since 24 hours already fits inside the 28-hour SLA.",
+        "explanation": "Worse — fits only the exact worst case with zero safety margin, unlike a cadence spread across the full safe window."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Submission cadence should use the full available window (SLA minus batch processing ceiling), not just a single edge-case submission.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.5"
+  },
+  {
+    "id": "d4-4.6-p1",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.6"
+    ],
+    "scenario": 3,
+    "difficulty": 2,
+    "stem": "Your synthesis subagent produces a 12-page research report from 40 sources. To catch errors, you configure a verification step where the same subagent, in the same session, is asked to \"critically re-check your report for unsupported claims before finalizing it.\" Across the last 10 reports, this self-check step has caught zero errors that were later found by a human editor to be present. What architectural change is most likely to improve error detection?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Reduce the source count per report so the subagent has an easier self-check task.",
+        "explanation": "Worse — changes the report's scope rather than fixing the review architecture; doesn't address why self-review keeps missing errors."
+      },
+      {
+        "id": "B",
+        "text": "Repeat the self-check instruction three times within the same session, and keep only the claims flagged as unsupported in all three repetitions.",
+        "explanation": "Worse — every repetition still runs in the same session with the same reasoning history, so it adds no genuine independence."
+      },
+      {
+        "id": "C",
+        "text": "Keep the same self-check step, but enable extended thinking so it reasons longer before finalizing.",
+        "explanation": "Worse — more reasoning tokens in the same context don't remove the shared reasoning-trace limitation."
+      },
+      {
+        "id": "D",
+        "text": "Route the report to a new, independent Claude instance with no access to the subagent's reasoning history, to verify claims.",
+        "explanation": "Correct — an independent instance without the generator's reasoning context is structurally better positioned to catch claims the generator already reasoned itself into accepting."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Independent review instances without the generator's reasoning context catch subtle issues self-review and extended thinking miss.",
+    "sourceRef": "Exam Guide TS 4.6"
+  },
+  {
+    "id": "d4-4.6-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.6"
+    ],
+    "scenario": 3,
+    "difficulty": 2,
+    "stem": "Your research coordinator receives findings from 9 subagents (one per source cluster) and asks a single review pass to check all 9 subagents' findings together for accuracy and internal consistency in one prompt. The review gives shallow feedback on some subagents' findings, misses a clear factual contradiction between two subagents' findings about the same statistic, and gives detailed feedback to others. What restructuring addresses this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Reduce the number of subagents from 9 to 3 so each review pass covers less material.",
+        "explanation": "Worse — changes the research system's scope rather than fixing the review structure, and loses source coverage."
+      },
+      {
+        "id": "B",
+        "text": "Run the single review pass three times and merge the three resulting feedback lists into one.",
+        "explanation": "Worse — each repetition still reviews all 9 subagents at once, so it doesn't isolate per-source analysis or add a dedicated integration pass."
+      },
+      {
+        "id": "C",
+        "text": "Run one focused pass per subagent for local accuracy, then a separate integration pass comparing findings for contradictions.",
+        "explanation": "Correct — per-source passes restore consistent depth, and a dedicated integration pass specifically targets cross-subagent contradictions like the one missed here."
+      },
+      {
+        "id": "D",
+        "text": "Increase `max_tokens` on the single review pass so it can write longer feedback for every one of the nine subagents individually.",
+        "explanation": "Worse — more output space doesn't fix inconsistent analysis depth across subagents; it only lengthens text for whichever ones already got attention."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Splitting large multi-source reviews into per-source passes plus a dedicated integration pass fixes attention dilution and catches cross-source contradictions.",
+    "sourceRef": "Exam Guide TS 4.6; guide_en.md §8.3"
+  },
+  {
+    "id": "d4-4.6-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.6"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your document extraction pipeline processes insurance claims. On a labeled validation set, overall field accuracy is 91%, but the `claim_amount` field is wrong in 22% of cases specifically when the source document is a handwritten form, versus under 3% for typed forms. Currently, every extraction is sent straight to downstream processing with no differentiation. What change would most effectively route the least reliable extractions to human review without slowing down the reliable ones?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Retry every extraction from handwritten forms twice and keep the majority result.",
+        "explanation": "Worse — misapplies retry to a recognition problem rather than a fixable format or structural error."
+      },
+      {
+        "id": "B",
+        "text": "Have the model report a confidence score per extracted field, and route low-confidence fields to human review.",
+        "explanation": "Correct — field-level confidence naturally correlates with error-prone cases like handwritten claim_amount, enabling calibrated routing without a blanket document-type rule."
+      },
+      {
+        "id": "C",
+        "text": "Send every extraction from a handwritten-form document to human review, and every typed-form extraction straight to processing.",
+        "explanation": "Worse — a coarse, document-type-only rule that ignores per-field reliability and won't catch low-confidence typed-form extractions."
+      },
+      {
+        "id": "D",
+        "text": "Add a post-processing rule that flags any `claim_amount` over $10,000 for manual review.",
+        "explanation": "Worse — an arbitrary dollar threshold is unrelated to whether the extraction is actually reliable, and misses low-value amounts that are still wrong."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Field-level self-reported confidence enables calibrated routing to human review, generalizing better than coarse document-type or value-threshold rules.",
+    "sourceRef": "Exam Guide TS 4.6"
+  }
+]

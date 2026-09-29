@@ -1,0 +1,329 @@
+[
+  {
+    "id": "mech-01",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.1"],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "Your team wants a coding-style standard (\"always use named exports, never default exports\") to apply to every file Claude Code touches, for every developer on the project, with no per-file exceptions and no need for anyone to invoke anything. Where should this rule live?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "In the project-level CLAUDE.md at the repository root, committed to version control.", "explanation": "Project-level CLAUDE.md is loaded automatically at the start of every session for every contributor who has the repo — exactly the \"always applies, no invocation needed\" behavior this standard requires." },
+      { "id": "B", "text": "In a `.claude/rules/` file with `paths: [\"**/*\"]` in its frontmatter, so it technically matches every file.", "explanation": "This is a near-miss: it can be made to match everything with a broad glob, but path-scoped rules exist specifically to load *conditionally* per file being edited — using them to fake \"always on\" is a roundabout way to get what a project CLAUDE.md already does directly." },
+      { "id": "C", "text": "In a project skill under `.claude/skills/`, so developers can run `/style-check` whenever they want a reminder.", "explanation": "Skills load on demand when invoked, not automatically into every conversation — this fails the \"no need for anyone to invoke anything\" requirement." },
+      { "id": "D", "text": "In each developer's personal `~/.claude/CLAUDE.md`, with instructions for everyone to copy the same content into their own file.", "explanation": "User-level CLAUDE.md is not shared via version control; relying on every developer to manually copy and keep it in sync is fragile and defeats the point of a team-wide standard." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "A universal, always-on, team-wide standard belongs in project-level CLAUDE.md — not in a path rule stretched to match everything, a skill, or a personal file everyone must replicate.",
+    "sourceRef": "Exam Guide TS 3.1; guide_en.md §5.1"
+  },
+  {
+    "id": "mech-02",
+    "source": "original",
+    "duplicateOf": "off-06",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.3"],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "Your infrastructure code lives in Terraform files scattered across `infra/network/`, `infra/compute/`, and `services/*/terraform/`. You want Claude Code to automatically load Terraform-specific conventions (module naming, required tags) only when it's editing a `.tf` file, regardless of which of those directories the file is in. What's the most maintainable way to configure this?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Create a CLAUDE.md file in each of `infra/network/`, `infra/compute/`, and every `services/*/terraform/` directory, each repeating the same Terraform conventions.", "explanation": "This is a near-miss: directory-level CLAUDE.md does load automatically for files in that directory, but it requires manually duplicating and maintaining the same content in every current and future Terraform directory, which doesn't scale as new services are added." },
+      { "id": "B", "text": "Create a `.claude/rules/terraform.md` file with YAML frontmatter `paths: [\"**/*.tf\"]`, so it loads only when a matching file is being edited.", "explanation": "Glob-pattern path rules apply conventions by file type regardless of directory location — exactly what's needed when the relevant files are spread across `infra/`, `services/*/terraform/`, and possibly more locations later." },
+      { "id": "C", "text": "Add a \"Terraform Conventions\" section to the root project CLAUDE.md, trusting Claude to apply it only when the current file ends in `.tf`.", "explanation": "The root CLAUDE.md loads for every file, so the Terraform section would also load — and compete for attention — while editing unrelated Python or TypeScript files; nothing about a plain section header conditionally scopes it." },
+      { "id": "D", "text": "Create a project skill named `terraform-conventions` that developers run with `/terraform-conventions` before editing infrastructure code.", "explanation": "This requires developers to remember to invoke it every time, rather than having the convention load automatically whenever a `.tf` file is actually being edited." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "When a convention applies to files by type/pattern regardless of directory, use .claude/rules/ with a paths glob — not directory-bound CLAUDE.md files or on-demand skills.",
+    "sourceRef": "Exam Guide TS 3.3; guide_en.md §5.3"
+  },
+  {
+    "id": "mech-03",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.2"],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "You want a `/analyze-deps` command that developers run only when they explicitly need a dependency-graph report for a directory. The report-generation process reads many files and produces verbose intermediate output, and you don't want any of that verbose output left sitting in the main conversation once the report is done. Which configuration best fits this need?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "A plain `.claude/commands/analyze-deps.md` slash command, since slash commands are also invoked on demand.", "explanation": "This is a near-miss: a plain slash command is on-demand, but it runs inline in the main conversation — it has no mechanism to isolate the verbose exploration output the way `context: fork` does." },
+      { "id": "B", "text": "A section in the project CLAUDE.md describing the dependency-analysis steps, so it runs automatically without a developer needing to type a command.", "explanation": "CLAUDE.md loads into every session automatically rather than being invoked on demand, and it provides no isolation for verbose output — the opposite of what's needed here." },
+      { "id": "C", "text": "A `.claude/skills/analyze-deps/SKILL.md` with `context: fork`, so it's invoked on demand and the exploration runs in an isolated sub-agent context.", "explanation": "`context: fork` runs the skill in an isolated sub-agent, so the verbose file-reading and intermediate output stay out of the main conversation, while the skill itself is still only invoked on demand via `/analyze-deps`." },
+      { "id": "D", "text": "A `.claude/rules/dependencies.md` file with `paths: [\"**/*\"]` so it's always available when needed.", "explanation": "Path rules load automatically based on which file is being edited; they aren't invoked by name on demand, and they don't isolate output in a sub-agent context." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "For on-demand tasks whose verbose output shouldn't pollute the main session, use a skill with context: fork — a plain slash command is on-demand but not isolated.",
+    "sourceRef": "Exam Guide TS 3.2; guide_en.md §5.5"
+  },
+  {
+    "id": "mech-04",
+    "source": "original",
+    "duplicateOf": "d1-1.5-p1",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.5"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "Your developer productivity agent has a `deploy_to_prod` tool. Company policy requires that this tool never be called for any repository on a Friday, regardless of what the agent decides, and regardless of how the system prompt is worded. What's the most reliable way to guarantee this?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Add a prominent instruction at the very top of CLAUDE.md: \"NEVER call deploy_to_prod on a Friday — hard company rule, zero exceptions.\"", "explanation": "This is a near-miss: it states the rule clearly and prominently, but CLAUDE.md instructions are still probabilistic guidance the model can misjudge or override under unusual phrasing of a request — not a guaranteed block." },
+      { "id": "B", "text": "Add a few-shot example to the prompt showing the agent declining a deployment request made on a Friday.", "explanation": "A few-shot example demonstrates the desired behavior but is still a probabilistic nudge; it doesn't guarantee the model generalizes correctly to every phrasing of a Friday deployment request." },
+      { "id": "C", "text": "Ask the agent to self-report its confidence that today is a safe day to deploy, and only proceed if confidence is high.", "explanation": "Self-reported confidence is not a reliable, calibrated signal, and it still leaves the actual decision to the model's judgment rather than a guaranteed rule." },
+      { "id": "D", "text": "Implement a PreToolUse hook that checks the date before `deploy_to_prod` runs, and blocks the call outright if it's a Friday.", "explanation": "A hook intercepts the outgoing tool call deterministically, before it executes, and can enforce an arbitrary condition (like the day of the week) with code — the only approach here that guarantees the rule regardless of what the model decides." }
+    ],
+    "correct": ["D"],
+    "keyPrinciple": "When a rule must be guaranteed regardless of model behavior, enforce it with a hook that intercepts the tool call — prompts, examples, and self-reported confidence are all probabilistic.",
+    "sourceRef": "Exam Guide TS 1.5; guide_en.md §3.5"
+  },
+  {
+    "id": "mech-05",
+    "source": "original",
+    "duplicateOf": "d3-3.1-p5",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.1"],
+    "scenario": 2,
+    "difficulty": 1,
+    "stem": "You personally prefer Claude Code to always respond with terse, bullet-point answers rather than prose, across every project you work on. This is a personal style preference, not a team standard, and it should not change how Claude Code behaves for your teammates. Where should you configure it?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "In your user-level `~/.claude/CLAUDE.md`, which applies only to your own sessions and isn't shared via version control.", "explanation": "User-level CLAUDE.md is scoped to the individual user and is never committed or shared with teammates — exactly right for a personal preference that shouldn't affect anyone else." },
+      { "id": "B", "text": "In the project-level CLAUDE.md at each repository's root.", "explanation": "Project-level CLAUDE.md is shared with every contributor via version control — adding a personal style preference there would change behavior for the whole team, not just you." },
+      { "id": "C", "text": "In a `.claude/rules/` file with `paths: [\"**/*\"]` committed to each project you contribute to.", "explanation": "Committing a rule file to the project shares it with the team through version control, the opposite of keeping a preference personal." },
+      { "id": "D", "text": "In a project skill that you invoke with `/terse` at the start of every session.", "explanation": "This works but requires manually invoking it every single session across every project — far less convenient than a setting that just always applies to you automatically." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Personal preferences that should follow you across every project, without affecting teammates, belong in user-level CLAUDE.md — never in a committed project file.",
+    "sourceRef": "Exam Guide TS 3.1; guide_en.md §5.1"
+  },
+  {
+    "id": "mech-06",
+    "source": "original",
+    "duplicateOf": "off-04",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.2"],
+    "scenario": 2,
+    "difficulty": 1,
+    "stem": "You've written a `/release-notes` slash command that generates a changelog from recent commits. You want every developer to have it available automatically the moment they clone or pull the repository, with no manual setup step on their part. Where should the command file live?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "In `~/.claude/commands/release-notes.md` on your own machine, with a note in the README telling teammates to copy it to their own home directory.", "explanation": "User-scoped commands are personal by design and are never distributed through git; requiring each teammate to manually copy the file is exactly the manual setup step you're trying to avoid." },
+      { "id": "B", "text": "In `.claude/commands/release-notes.md`, committed to the project repository.", "explanation": "Project-scoped commands under `.claude/commands/` are stored in version control, so every developer gets the command automatically as soon as they clone or pull — no manual setup required." },
+      { "id": "C", "text": "In the project's root CLAUDE.md, described in prose as a set of steps to follow when asked to generate release notes.", "explanation": "This isn't a reusable named command at all — there's no `/release-notes` invocation, and CLAUDE.md prose is a much less reliable way to reproduce the exact same generation steps every time." },
+      { "id": "D", "text": "In a `.claude/rules/release-notes.md` file with `paths: [\"CHANGELOG.md\"]` in its frontmatter.", "explanation": "Path rules load automatically when a matching file is being edited — they aren't invoked by name like a slash command, so this doesn't give developers an on-demand `/release-notes` command." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "Project-scoped commands in .claude/commands/ are the way to give the whole team an on-demand command automatically via version control — personal command directories require manual per-person setup.",
+    "sourceRef": "Exam Guide TS 3.2; guide_en.md §5.4"
+  },
+  {
+    "id": "mech-07",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.2"],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "You want a simple, reusable `/summarize-pr` prompt template that developers invoke by name. It doesn't need to run in isolation, doesn't need restricted tool access, and doesn't need argument hints — it's just the same short prompt every time. What's the most appropriate way to implement it?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "A `.claude/skills/summarize-pr/SKILL.md` with `context: fork`, `allowed-tools`, and `argument-hint` all configured, even though none of those behaviors are needed.", "explanation": "This is a near-miss: it would technically work, but configuring isolation, tool restrictions, and argument hints the task doesn't need is unnecessary overhead for what is just a fixed, simple prompt template." },
+      { "id": "B", "text": "A note in CLAUDE.md instructing Claude to summarize any pull request whenever a developer says the word \"summarize\".", "explanation": "Relying on keyword-triggered inference from an always-loaded file is far less reliable and explicit than a dedicated named command, and it risks misfiring on unrelated uses of the word \"summarize\"." },
+      { "id": "C", "text": "A plain project-scoped slash command in `.claude/commands/summarize-pr.md` containing the prompt text.", "explanation": "A plain slash command is exactly proportionate here: it's invoked on demand by name and needs none of the extra configuration (isolation, tool restriction, argument hints) that a skill provides." },
+      { "id": "D", "text": "A `.claude/rules/summarize-pr.md` file with `paths: [\"**/*.md\"]` so it loads whenever a Markdown file is being edited.", "explanation": "This solves a different problem — conditional loading based on which file is being edited — rather than giving developers an on-demand, explicitly invoked command." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "Reach for the simplest mechanism that fits: a plain slash command for a fixed on-demand prompt, not a skill configured with isolation and restrictions it doesn't need.",
+    "sourceRef": "Exam Guide TS 3.2; guide_en.md §5.4, §5.5"
+  },
+  {
+    "id": "mech-08",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.3"],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "Database migration files (`*_migration.sql`) live inside dozens of different service directories across a monorepo, with new service directories being added every quarter. You want a consistent rule — always number migrations sequentially and always include a rollback statement — applied automatically whenever any such file is edited, without updating configuration each time a new service is added. What's the most maintainable approach?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "A CLAUDE.md file placed in each current service directory that contains migrations, to be copied into each new service directory as it's created.", "explanation": "This is a near-miss: directory CLAUDE.md files do load automatically for their directory, but the rule explicitly says new service directories are added every quarter — this approach requires remembering to add a new file each time, which doesn't scale." },
+      { "id": "B", "text": "A single root-level CLAUDE.md section describing the migration rules, trusting Claude to recognize when a `.sql` file is a migration.", "explanation": "The root CLAUDE.md loads for every file in every service, not just migration files, adding irrelevant context everywhere else and relying on inference rather than an explicit, guaranteed match." },
+      { "id": "C", "text": "A project skill named `check-migration`, with an `argument-hint` prompting for the service name, that a developer must remember to run manually after writing each new migration file.", "explanation": "Requiring a manual invocation means the rule only applies when someone remembers to run the skill, rather than loading automatically whenever a migration file is actually being edited." },
+      { "id": "D", "text": "A `.claude/rules/migrations.md` file with `paths: [\"**/*_migration.sql\"]`, matching migration files anywhere in the monorepo, including services added later.", "explanation": "A glob pattern keyed on the filename convention automatically covers matching files in any directory, present or future, with zero maintenance when new services are added — exactly the scalability this situation needs." }
+    ],
+    "correct": ["D"],
+    "keyPrinciple": "A filename/extension-based glob in .claude/rules/ scales automatically to new directories; directory-bound CLAUDE.md files require ongoing manual upkeep as the codebase grows.",
+    "sourceRef": "Exam Guide TS 3.3; guide_en.md §5.3"
+  },
+  {
+    "id": "mech-09",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.1"],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "Your project's root CLAUDE.md has grown to over 2,000 lines because it inlines testing conventions, API conventions, and deployment steps all in one file. You want to split these into three focused files for readability, but all three must still load automatically into every session — you do not want any of them to become conditional on which file is being edited. What's the most appropriate change?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Move each section into its own file (e.g. `standards/testing.md`) and reference each one from the root CLAUDE.md using `@` import syntax.", "explanation": "`@import` keeps CLAUDE.md modular while every imported file still loads automatically as part of the same always-loaded configuration — exactly what's needed when the content must keep applying universally, just organized into separate files." },
+      { "id": "B", "text": "Move each section into its own `.claude/rules/` file with a broad `paths: [\"**/*\"]` frontmatter block on each.", "explanation": "This is a near-miss: with a catch-all glob the rules would load for most files, but `.claude/rules/` exists specifically to make loading *conditional* on the file being edited — stretching it to always match is a roundabout substitute for what `@import` already does directly, without the conditional-loading upside." },
+      { "id": "C", "text": "Move each section into its own directory-level CLAUDE.md, placed in the directories most related to that topic.", "explanation": "Directory-level CLAUDE.md only loads when working with files in that specific directory — it would make each section conditional on location, which is the opposite of \"must still load automatically into every session.\"" },
+      { "id": "D", "text": "Turn each section into a project skill that's invoked at the start of a session.", "explanation": "Skills load on demand when invoked, not automatically for every session — this would require someone to remember to invoke all three at the start of every conversation." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "To keep a large, always-loaded CLAUDE.md modular without making any part conditional, use @import to split it into files that still all load together.",
+    "sourceRef": "Exam Guide TS 3.1; guide_en.md §5.2"
+  },
+  {
+    "id": "mech-10",
+    "source": "original",
+    "duplicateOf": "d3-3.2-p4",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.2"],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "Your team has a shared `.claude/skills/review/SKILL.md` used by everyone for code review. You'd like to tweak its instructions to match your own review habits more closely, but you don't want your changes to affect what your teammates get when they run `/review`. What's the best way to do this?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Edit `.claude/skills/review/SKILL.md` directly, and ask teammates to ignore the parts that don't apply to them.", "explanation": "Editing the shared project skill file changes it for everyone who pulls the repo, which directly conflicts with the goal of not affecting teammates." },
+      { "id": "B", "text": "Create a personal variant under a different name in `~/.claude/skills/`, such as `~/.claude/skills/my-review/SKILL.md`, with your own tweaks.", "explanation": "A personal skill in the user-scoped directory, under a distinct name, applies only to your own sessions and leaves the shared project skill — and everyone else's `/review` — completely untouched." },
+      { "id": "C", "text": "Add your personal preferences as a new section in the project's root CLAUDE.md.", "explanation": "The project CLAUDE.md is shared via version control, so adding your personal habits there would change behavior for the whole team, not just you." },
+      { "id": "D", "text": "Wrap your preferences in a `.claude/rules/review-preferences.md` file scoped with `paths: [\"**/*\"]`.", "explanation": "A rule file committed to the project's `.claude/rules/` directory is shared with the team through version control, not kept personal — and rules are meant for path-conditional conventions, not a personal override of a specific skill." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "To customize a shared skill for yourself without affecting teammates, create a personal variant under a different name in ~/.claude/skills/ rather than editing the shared project skill.",
+    "sourceRef": "Exam Guide TS 3.2; guide_en.md §5.5"
+  },
+  {
+    "id": "mech-11",
+    "source": "original",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.5"],
+    "scenario": 4,
+    "difficulty": 1,
+    "stem": "You need a complete list of every file in the repository whose name ends in `.controller.ts`, regardless of what those files contain. What's the most direct way to get that list?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Use Grep to search file contents for the pattern `class.*Controller`, assuming every controller file defines a class with \"Controller\" in its name.", "explanation": "This is a near-miss: it might catch many controller files by convention, but it depends entirely on content matching a naming assumption — a controller file that doesn't follow that exact class-naming pattern would be missed, and unrelated files that happen to match wouldn't be filtered out by filename." },
+      { "id": "B", "text": "Use Read on the project's root directory to list its contents, then repeat recursively for each subdirectory.", "explanation": "Read is for loading file contents, not for listing directory structure, and manually recursing through every subdirectory is far slower than a single pattern match." },
+      { "id": "C", "text": "Use Glob with the pattern `**/*.controller.ts` to match filenames across every directory.", "explanation": "Glob matches file paths by name pattern, so this returns exactly the set of matching files in one call, with no dependency on their contents." },
+      { "id": "D", "text": "Use Bash to run `find . -type f` and manually scan the full output for anything ending in `.controller.ts`.", "explanation": "This reimplements what Glob already does natively, requiring more steps and manual scanning of a potentially huge, unfiltered file listing." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "When the task is defined purely by filename pattern, Glob is the direct tool — a content search is only a proxy and can both miss and over-match.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.1"
+  },
+  {
+    "id": "mech-12",
+    "source": "original",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.5"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "You need to find every place in the codebase where the environment variable name `API_KEY` is referenced in code (not just in `.env` files), so you can confirm all references are updated when it's renamed. What's the most direct way to do this?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Use Bash to run the shell's own `grep -r API_KEY .` command instead of the Grep tool.", "explanation": "This is a near-miss: shelling out to a command-line grep would likely find the same matches, but it reimplements a purpose-built tool through a more error-prone, less integrated path (quoting, working-directory, and output-parsing issues) for no benefit over using Grep directly." },
+      { "id": "B", "text": "Use Glob with the pattern `**/*API_KEY*` to find files with that string in their filename.", "explanation": "Glob matches file paths, not contents — a reference to `API_KEY` inside a file's code has nothing to do with what the file is named, so this would miss virtually every real reference." },
+      { "id": "C", "text": "Read the project's `.env.example` file to see where `API_KEY` is documented, and treat that as the complete list of references.", "explanation": "A documentation or example file only shows where the variable is declared for local setup — it says nothing about where it's actually referenced throughout the application code." },
+      { "id": "D", "text": "Use Grep to search file contents for the literal string `API_KEY` across the repository.", "explanation": "Grep is built for exactly this — searching file contents for a literal pattern across the whole codebase in one call, returning every reference regardless of which file or directory it's in." }
+    ],
+    "correct": ["D"],
+    "keyPrinciple": "Grep is the purpose-built tool for content search across a codebase — shelling out to a CLI equivalent via Bash adds risk without benefit.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.1"
+  },
+  {
+    "id": "mech-13",
+    "source": "original",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.5"],
+    "scenario": 4,
+    "difficulty": 1,
+    "stem": "After making a small automated fix, your agent needs to stage the changed files and create a git commit with a descriptive message. What's the correct way to do this?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Use Bash to run `git add` and `git commit -m \"...\"` through the normal git CLI.", "explanation": "Bash executes shell commands, and git operations are exactly the kind of command-execution task Bash is for — this uses git's own tooling to create a correct, well-formed commit." },
+      { "id": "B", "text": "Use Bash to directly edit the contents of `.git/COMMIT_EDITMSG` and `.git/index` to simulate what a commit would produce.", "explanation": "This is a near-miss: it uses the right tool (Bash) but the wrong method — manually editing git's internal files bypasses git's own consistency checks and can easily corrupt the repository instead of creating a valid commit." },
+      { "id": "C", "text": "Use Edit to append the change description as a comment at the top of each changed file.", "explanation": "Editing file contents to describe a change is not the same as creating a git commit; it doesn't stage or record anything in version control history." },
+      { "id": "D", "text": "Use Write to create a new file named `commit-message.txt` containing the intended commit message.", "explanation": "Creating a text file describing what should be committed doesn't actually stage or commit anything — it's a note, not a git operation." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Bash runs real commands like git through their own CLI — never simulate what a command does by hand-editing the tool's internal files.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.1"
+  },
+  {
+    "id": "mech-14",
+    "source": "original",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.5"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "Your agent needs to change one line in `src/config.ts`: `const MAX_RETRIES = 3;` to `const MAX_RETRIES = 5;`. This exact line appears only once in the file. What's the most appropriate way to make this change?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Use Read to load the file, then Write the entire file back with the one value changed.", "explanation": "This is a near-miss: it would work, since Read + Write is the documented fallback for non-unique matches — but here the anchor text is already unique, so rewriting the whole file is unnecessary extra risk (e.g., of dropping unrelated content) compared to a precise Edit." },
+      { "id": "B", "text": "Use Edit, matching the unique text `const MAX_RETRIES = 3;` and replacing it with the new value.", "explanation": "Edit is designed for exactly this: a targeted, single change identified by unique anchor text — since the line is unique in the file, Edit can apply the change precisely and verifiably." },
+      { "id": "C", "text": "Use Bash to run a `sed` command that replaces `MAX_RETRIES = 3` with `MAX_RETRIES = 5` in the file.", "explanation": "This is a near-miss: `sed` could make the same change, but it modifies the file outside of Edit's exact-match verification, making it harder to confirm precisely what changed and more error-prone if the pattern appears elsewhere in the future." },
+      { "id": "D", "text": "Use Grep to confirm the line's current value, and stop there since confirming the value is the main risk.", "explanation": "Confirming the current value doesn't make the actual change — the task still requires editing the file's content, which Grep cannot do." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "For a single, well-scoped change with a unique anchor, Edit is the right tool — reserve Read+Write for when Edit's match isn't unique.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.3"
+  },
+  {
+    "id": "mech-15",
+    "source": "original",
+    "duplicateOf": "d2-2.5-p3",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.5"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "Your agent tries to use Edit to change `retries: 3` to `retries: 5` inside `deploy.yaml`. The Edit fails because that exact text appears three times in the file. It then tries adding one extra line of surrounding context to disambiguate, but that fails too, because the surrounding line is identical in all three places as well. What should it do next?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Keep adding more lines of surrounding context to the Edit call, on the assumption that a large enough block of text will eventually become unique.", "explanation": "This is a near-miss: more context sometimes resolves ambiguity, but it already failed once and there's no guarantee it ever becomes unique if the surrounding structure is genuinely repeated — it's a probabilistic guess-and-check approach rather than a reliable fix." },
+      { "id": "B", "text": "Give up on the automated change and ask the user to manually edit the file themselves.", "explanation": "Escalating to the user for a change the agent has the tools to make reliably (Read + Write) is unnecessary and slower than simply using the documented fallback." },
+      { "id": "C", "text": "Use Read to load the full file, determine which of the three occurrences is the correct one from its broader context, and use Write to save the corrected file.", "explanation": "This is the documented fallback for exactly this situation: when Edit can't find unique anchor text even with added context, Read the whole file, use the full surrounding structure to identify the right occurrence, and Write the corrected content back reliably." },
+      { "id": "D", "text": "Use Bash to replace every occurrence of `retries: 3` with `retries: 5` in the file, since all three should probably end up consistent anyway.", "explanation": "This assumes all three occurrences should change without actually confirming that from the file's structure — if only one was meant to change, a global replace silently makes the other two wrong instead." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "When Edit repeatedly fails to find unique anchor text, fall back to Read + Write rather than guessing at more context or blindly replacing every match.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.3"
+  },
+  {
+    "id": "mech-16",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.5"],
+    "scenario": 5,
+    "difficulty": 3,
+    "stem": "Your team is deciding which of the following mechanisms actually *guarantee* a rule is followed, independent of whether the model chooses to comply, versus which ones only make compliance more likely. Which TWO mechanisms provide a deterministic guarantee? (Select TWO.)",
+    "selectCount": 2,
+    "options": [
+      { "id": "A", "text": "A PreToolUse hook that inspects an outgoing tool call and blocks it in code when it violates a rule.", "explanation": "A hook runs as code outside the model's own reasoning and can unconditionally block a call before it executes — this doesn't depend on the model agreeing to comply." },
+      { "id": "B", "text": "An instruction in CLAUDE.md stating the rule in clear, emphatic language.", "explanation": "CLAUDE.md instructions are context the model reads and reasons about — highly effective on average, but still probabilistic: the model can misapply or override them for an unusual phrasing of a request." },
+      { "id": "C", "text": "A permission `deny` rule in settings that blocks a specific tool or command pattern from being used at all.", "explanation": "A permission deny rule is enforced by the harness before the tool can run, independent of the model's own judgment — like a hook, it's a code-level guarantee rather than a request for compliance." },
+      { "id": "D", "text": "A few-shot example demonstrating the agent correctly declining to violate the rule.", "explanation": "Few-shot examples improve the odds the model generalizes correctly, but they're still part of the prompt the model interprets — not an enforced guarantee." },
+      { "id": "E", "text": "A skill description that tells the agent when the rule applies.", "explanation": "A skill's description only helps the model decide whether to invoke the skill in the first place — it's advisory context, not an enforcement mechanism, and doesn't block anything if the model doesn't invoke it or doesn't follow it." }
+    ],
+    "correct": ["A", "C"],
+    "keyPrinciple": "Only mechanisms enforced outside the model's own reasoning — hooks and permission deny rules — provide a true guarantee; CLAUDE.md, few-shot examples, and skill descriptions are all probabilistic guidance.",
+    "sourceRef": "Exam Guide TS 1.5; guide_en.md §3.5"
+  }
+]

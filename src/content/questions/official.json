@@ -1,0 +1,434 @@
+[
+  {
+    "id": "off-01",
+    "source": "official-sample",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.4", "1.5"],
+    "scenario": 1,
+    "difficulty": 3,
+    "stem": "Production data shows that in 12% of cases, your agent skips `get_customer` entirely and calls `lookup_order` using only the customer's stated name, occasionally leading to misidentified accounts and incorrect refunds. What change would most effectively address this reliability issue?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a programmatic prerequisite that blocks `lookup_order` and `process_refund` calls until `get_customer` has returned a verified customer ID.",
+        "explanation": "A programmatic gate provides a deterministic guarantee that the required sequence is followed. When identity verification must precede financial operations, this kind of enforcement is needed because prompt-based approaches have a non-zero failure rate."
+      },
+      {
+        "id": "B",
+        "text": "Enhance the system prompt to state that customer verification via `get_customer` is mandatory before any order operations.",
+        "explanation": "A stronger instruction still relies on probabilistic LLM compliance. That's exactly the kind of guidance already in place informally, and it still produced the 12% skip rate — it doesn't guarantee the sequence."
+      },
+      {
+        "id": "C",
+        "text": "Add few-shot examples showing the agent always calling `get_customer` first, even when customers volunteer order details.",
+        "explanation": "Examples nudge behavior probabilistically, the same way prompt instructions do. They don't guarantee the call order, so misidentification can still slip through on financially consequential operations."
+      },
+      {
+        "id": "D",
+        "text": "Implement a routing classifier that analyzes each request and enables only the subset of tools appropriate for that request type.",
+        "explanation": "This changes which tools are reachable for a request type, not the required order between them. It addresses tool availability rather than the actual problem, which is tool sequencing."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "When a specific call sequence is required for a business-critical action, enforce it with a programmatic prerequisite gate, not a prompt instruction — prompts have a non-zero compliance failure rate.",
+    "sourceRef": "Exam Guide §9 Q1; TS 1.4"
+  },
+  {
+    "id": "off-02",
+    "source": "official-sample",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.1"],
+    "scenario": 1,
+    "difficulty": 2,
+    "stem": "Production logs show the agent frequently calls `get_customer` when users ask about orders (e.g., \"check my order #12345\"), instead of calling `lookup_order`. Both tools have minimal descriptions (\"Retrieves customer information\" / \"Retrieves order details\") and accept similar identifier formats. What's the most effective first step to improve tool selection reliability?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Add few-shot examples to the system prompt demonstrating correct tool selection patterns, with 5-8 examples showing order-related queries routing to `lookup_order`.",
+        "explanation": "Examples add token overhead on every call and only nudge selection probabilistically. They don't fix the reason the model can't tell the tools apart in the first place — descriptions that are too thin to differentiate them."
+      },
+      {
+        "id": "B",
+        "text": "Expand each tool's description to include input formats it handles, example queries, edge cases, and boundaries explaining when to use it versus similar tools.",
+        "explanation": "Tool descriptions are the primary signal an LLM uses for tool selection. Making the boundary between two near-identical tools explicit fixes the root cause directly, with low effort — the right first step."
+      },
+      {
+        "id": "C",
+        "text": "Implement a routing layer that parses user input before each turn and pre-selects the appropriate tool based on detected keywords and identifier patterns.",
+        "explanation": "Building a separate keyword-parsing routing layer is over-engineered for a first step, and it bypasses the model's own language understanding instead of fixing the descriptions that caused the misrouting."
+      },
+      {
+        "id": "D",
+        "text": "Consolidate both tools into a single `lookup_entity` tool that accepts any identifier and internally determines which backend to query.",
+        "explanation": "Merging the tools can be a reasonable longer-term redesign, but it requires more rework than the minimal, low-effort fix a first step calls for when the immediate problem is simply inadequate descriptions."
+      }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "Tool descriptions are the primary mechanism the model uses to choose between similar tools — fix ambiguous descriptions before adding routing infrastructure.",
+    "sourceRef": "Exam Guide §9 Q2; TS 2.1"
+  },
+  {
+    "id": "off-03",
+    "source": "official-sample",
+    "kind": "practice",
+    "domain": 5,
+    "taskStatements": ["5.2"],
+    "scenario": 1,
+    "difficulty": 3,
+    "stem": "Your agent achieves 55% first-contact resolution, well below the 80% target. Logs show it escalates straightforward cases (standard damage replacements with photo evidence) while attempting to autonomously handle complex situations requiring policy exceptions. What's the most effective way to improve escalation calibration?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Add explicit escalation criteria to your system prompt with few-shot examples demonstrating when to escalate versus resolve autonomously.",
+        "explanation": "The logs point to unclear decision boundaries, not missing infrastructure. Explicit criteria plus worked examples target that root cause directly and are the proportionate first response."
+      },
+      {
+        "id": "B",
+        "text": "Have the agent self-report a confidence score (1-10) before each response and automatically route requests to humans when confidence falls below a threshold.",
+        "explanation": "Self-reported LLM confidence is poorly calibrated, and the agent is already confidently wrong on the hard policy-exception cases. This approach leans on the very signal that is failing."
+      },
+      {
+        "id": "C",
+        "text": "Deploy a separate classifier model trained on historical tickets to predict which requests need escalation before the main agent begins processing.",
+        "explanation": "Standing up labeled data and a separate ML classifier is over-engineered when a prompt-level fix — explicit criteria and examples — hasn't been tried yet."
+      },
+      {
+        "id": "D",
+        "text": "Implement sentiment analysis to detect customer frustration levels and automatically escalate when negative sentiment exceeds a threshold.",
+        "explanation": "Sentiment doesn't correlate with case complexity, which is the actual issue here. This targets a different problem than the miscalibrated escalation boundaries the logs show."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Escalation calibration problems are usually a decision-boundary problem — fix it with explicit criteria and examples before adding confidence scores, classifiers, or sentiment signals.",
+    "sourceRef": "Exam Guide §9 Q3; TS 5.2"
+  },
+  {
+    "id": "off-04",
+    "source": "official-sample",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.2"],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "You want to create a custom `/review` slash command that runs your team's standard code review checklist. This command should be available to every developer when they clone or pull the repository. Where should you create this command file?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "In the `.claude/commands/` directory in the project repository",
+        "explanation": "Project-scoped commands stored inside the repository are version-controlled and automatically available to every developer who clones or pulls it — exactly the team-wide sharing this requires."
+      },
+      {
+        "id": "B",
+        "text": "In `~/.claude/commands/` in each developer's home directory",
+        "explanation": "A user-level directory holds personal commands that live outside version control, so each developer would have to recreate it manually and it would never be shared with teammates automatically."
+      },
+      {
+        "id": "C",
+        "text": "In the `CLAUDE.md` file at the project root",
+        "explanation": "`CLAUDE.md` supplies project instructions and context that get loaded into the conversation; it isn't the place to define an invocable slash command."
+      },
+      {
+        "id": "D",
+        "text": "In a `.claude/config.json` file with a commands array",
+        "explanation": "This configuration mechanism doesn't exist in Claude Code; commands are files in the commands directory, not entries in a JSON config."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Project-scoped slash commands belong in the repository's `.claude/commands/` directory so version control shares them with the whole team.",
+    "sourceRef": "Exam Guide §9 Q4; TS 3.2"
+  },
+  {
+    "id": "off-05",
+    "source": "official-sample",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.4"],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "You've been assigned to restructure the team's monolithic application into microservices. This will involve changes across dozens of files and requires decisions about service boundaries and module dependencies. Which approach should you take?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Enter plan mode to explore the codebase, understand dependencies, and design an implementation approach before making changes.",
+        "explanation": "Plan mode exists for exactly this kind of task — large-scale changes with multiple valid approaches and architectural decisions — and lets you explore and design safely before committing to changes."
+      },
+      {
+        "id": "B",
+        "text": "Start with direct execution and make changes incrementally, letting the implementation reveal the natural service boundaries.",
+        "explanation": "Discovering service boundaries only as you go risks costly rework once cross-file dependencies surface mid-implementation, instead of surfacing them upfront through exploration."
+      },
+      {
+        "id": "C",
+        "text": "Use direct execution with comprehensive upfront instructions detailing exactly how each service should be structured.",
+        "explanation": "Writing exhaustive upfront instructions assumes you already know the correct service structure without having explored the codebase's actual dependencies first."
+      },
+      {
+        "id": "D",
+        "text": "Begin in direct execution mode and only switch to plan mode if you encounter unexpected complexity during implementation.",
+        "explanation": "The complexity here is already known from the task description — dozens of files and architectural decisions — so waiting for complexity to \"emerge\" ignores information you already have."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Use plan mode when a task has architectural implications or multiple valid approaches; save direct execution for well-scoped, well-understood changes.",
+    "sourceRef": "Exam Guide §9 Q5; TS 3.4"
+  },
+  {
+    "id": "off-06",
+    "source": "official-sample",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.3"],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "Your codebase has distinct areas with different coding conventions: React components use functional style with hooks, API handlers use async/await with specific error handling, and database models follow a repository pattern. Test files are spread throughout the codebase alongside the code they test (e.g., `Button.test.tsx` next to `Button.tsx`), and you want all tests to follow the same conventions regardless of location. What's the most maintainable way to ensure Claude automatically applies the correct conventions when generating code?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Create rule files in `.claude/rules/` with YAML frontmatter specifying glob patterns to conditionally apply conventions based on file paths",
+        "explanation": "Glob-scoped rule files, matching a pattern like `**/*.test.tsx`, load automatically based on the file path being edited regardless of which directory it lives in — exactly what conventions scattered across the codebase need."
+      },
+      {
+        "id": "B",
+        "text": "Consolidate all conventions in the root `CLAUDE.md` file under headers for each area, relying on Claude to infer which section applies",
+        "explanation": "This depends on the model inferring which header is relevant rather than deterministically matching the file being edited, which makes application unreliable."
+      },
+      {
+        "id": "C",
+        "text": "Create skills in `.claude/skills/` for each code type that include the relevant conventions in their SKILL.md files",
+        "explanation": "Skills are invoked on demand rather than loaded automatically by file path, which contradicts the requirement that conventions apply automatically whenever a matching file is touched."
+      },
+      {
+        "id": "D",
+        "text": "Place a separate `CLAUDE.md` file in each subdirectory containing that area's specific conventions",
+        "explanation": "Directory-level `CLAUDE.md` files are bound to a single directory, so they can't cleanly cover test files that are spread across many directories throughout the codebase."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Prefer glob-scoped `.claude/rules/` files over directory-level CLAUDE.md when a convention applies to a file type scattered across many directories.",
+    "sourceRef": "Exam Guide §9 Q6; TS 3.3"
+  },
+  {
+    "id": "off-07",
+    "source": "official-sample",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.2"],
+    "scenario": 3,
+    "difficulty": 3,
+    "stem": "After running the system on the topic \"impact of AI on creative industries,\" you observe that each subagent completes successfully: the web search agent finds relevant articles, the document analysis agent summarizes papers correctly, and the synthesis agent produces coherent output. However, the final reports cover only visual arts, completely missing music, writing, and film production. When you examine the coordinator's logs, you see it decomposed the topic into three subtasks: \"AI in digital art creation,\" \"AI in graphic design,\" and \"AI in photography.\" What is the most likely root cause?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The synthesis agent lacks instructions for identifying coverage gaps in the findings it receives from other agents.",
+        "explanation": "The synthesis agent produced coherent output from what it was given; it can't be blamed for gaps that originate upstream, in which subtopics were ever assigned for research."
+      },
+      {
+        "id": "B",
+        "text": "The coordinator agent's task decomposition is too narrow, resulting in subagent assignments that don't cover all relevant domains of the topic.",
+        "explanation": "The coordinator's own logs show it split \"creative industries\" into only visual-arts subtasks, entirely omitting music, writing, and film. The subagents did their assigned jobs correctly — the assignment itself never covered the topic."
+      },
+      {
+        "id": "C",
+        "text": "The web search agent's queries are not comprehensive enough and need to be expanded to cover more creative industry sectors.",
+        "explanation": "The web search agent searched correctly within the subtopic it was assigned; the missing sectors were never assigned to it, so expanding its queries doesn't address the actual cause."
+      },
+      {
+        "id": "D",
+        "text": "The document analysis agent is filtering out sources related to non-visual creative industries due to overly restrictive relevance criteria.",
+        "explanation": "There is no evidence the document analysis agent filtered anything incorrectly — it worked correctly within its assigned scope, which itself never included non-visual sectors."
+      }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "When subagents each execute correctly but coverage is still incomplete, check the coordinator's task decomposition before blaming downstream agents.",
+    "sourceRef": "Exam Guide §9 Q7; TS 1.2"
+  },
+  {
+    "id": "off-08",
+    "source": "official-sample",
+    "kind": "practice",
+    "domain": 5,
+    "taskStatements": ["5.3"],
+    "scenario": 3,
+    "difficulty": 2,
+    "stem": "The web search subagent times out while researching a complex topic. You need to design how this failure information flows back to the coordinator agent. Which error propagation approach best enables intelligent recovery?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Return structured error context to the coordinator including the failure type, the attempted query, any partial results, and potential alternative approaches.",
+        "explanation": "Structured context gives the coordinator the specific information it needs to decide whether to retry with a modified query, try an alternative approach, or proceed with partial results."
+      },
+      {
+        "id": "B",
+        "text": "Implement automatic retry logic with exponential backoff within the subagent, returning a generic \"search unavailable\" status only after all retries are exhausted.",
+        "explanation": "Local retry for a transient failure is reasonable, but collapsing the eventual failure into a generic status hides the context the coordinator would need to choose a recovery strategy once retries are exhausted."
+      },
+      {
+        "id": "C",
+        "text": "Catch the timeout within the subagent and return an empty result set marked as successful.",
+        "explanation": "Marking a failed search as a successful empty result suppresses the error entirely, preventing any recovery and risking a research output that looks complete but silently isn't."
+      },
+      {
+        "id": "D",
+        "text": "Propagate the timeout exception directly to a top-level handler that terminates the entire research workflow.",
+        "explanation": "Terminating the whole workflow over a single subagent timeout is an overreaction when recovery strategies — retry, alternative approach, or partial results — could still succeed."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Propagate structured error context (failure type, what was attempted, partial results, alternatives) so the coordinator can make an informed recovery decision, instead of hiding it or overreacting.",
+    "sourceRef": "Exam Guide §9 Q8; TS 5.3"
+  },
+  {
+    "id": "off-09",
+    "source": "official-sample",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.3"],
+    "scenario": 3,
+    "difficulty": 3,
+    "stem": "During testing, you observe that the synthesis agent frequently needs to verify specific claims while combining findings. Currently, when verification is needed, the synthesis agent returns control to the coordinator, which invokes the web search agent, then re-invokes synthesis with results. This adds 2-3 round trips per task and increases latency by 40%. Your evaluation shows that 85% of these verifications are simple fact-checks (dates, names, statistics) while 15% require deeper investigation. What's the most effective approach to reduce overhead while maintaining system reliability?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Give the synthesis agent a scoped `verify_fact` tool for simple lookups, while complex verifications continue delegating to the web search agent through the coordinator.",
+        "explanation": "This applies least privilege: the synthesis agent gets just enough tool access to cover the common, simple case — 85% of verifications — directly, while the coordinator still handles the harder 15% that need deeper investigation."
+      },
+      {
+        "id": "B",
+        "text": "Have the synthesis agent accumulate all verification needs and return them as a batch to the coordinator at the end of its pass, which then sends them all to the web search agent at once.",
+        "explanation": "Batching verification requests creates a blocking dependency, since later synthesis steps may depend on facts that an earlier verification in the same pass would have confirmed."
+      },
+      {
+        "id": "C",
+        "text": "Give the synthesis agent access to all web search tools so it can handle any verification need directly without round-trips through the coordinator.",
+        "explanation": "Granting the full web search toolset over-provisions the synthesis agent beyond its role and violates separation of concerns, when only a narrow, scoped tool is needed for the common case."
+      },
+      {
+        "id": "D",
+        "text": "Have the web search agent proactively cache extra context around each source during initial research, anticipating what the synthesis agent might need to verify.",
+        "explanation": "This relies on speculatively guessing what will later need verification, which can't reliably predict the synthesis agent's actual needs and doesn't remove the round-trip for cases it fails to anticipate."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Give an agent a narrow, scoped tool for its high-frequency need instead of full tool access or coordinator round-trips for every case.",
+    "sourceRef": "Exam Guide §9 Q9; TS 2.3"
+  },
+  {
+    "id": "off-10",
+    "source": "official-sample",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.6"],
+    "scenario": 5,
+    "difficulty": 2,
+    "stem": "Your pipeline script runs `claude \"Analyze this pull request for security issues\"` but the job hangs indefinitely. Logs indicate Claude Code is waiting for interactive input. What's the correct approach to run Claude Code in an automated pipeline?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Add the `-p` flag: `claude -p \"Analyze this pull request for security issues\"`",
+        "explanation": "The `-p` (`--print`) flag is the documented way to run Claude Code non-interactively: it processes the prompt, prints the result to stdout, and exits without waiting for input — exactly what the hanging pipeline needs."
+      },
+      {
+        "id": "B",
+        "text": "Set the environment variable `CLAUDE_HEADLESS=true` before running the command",
+        "explanation": "This environment variable does not exist in Claude Code, so setting it has no effect on the hang."
+      },
+      {
+        "id": "C",
+        "text": "Redirect stdin from `/dev/null`: `claude \"Analyze this pull request for security issues\" < /dev/null`",
+        "explanation": "This is a Unix workaround rather than Claude Code's documented invocation method, and it doesn't reliably substitute for the intended non-interactive flag."
+      },
+      {
+        "id": "D",
+        "text": "Add the `--batch` flag: `claude --batch \"Analyze this pull request for security issues\"`",
+        "explanation": "No `--batch` flag exists on the Claude Code CLI, so this does not resolve the hang."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Run Claude Code in CI with `-p`/`--print` so it never waits on interactive input.",
+    "sourceRef": "Exam Guide §9 Q10; TS 3.6"
+  },
+  {
+    "id": "off-11",
+    "source": "official-sample",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": ["4.5"],
+    "scenario": 5,
+    "difficulty": 3,
+    "stem": "Your team wants to reduce API costs for automated analysis. Currently, real-time Claude calls power two workflows: (1) a blocking pre-merge check that must complete before developers can merge, and (2) a technical debt report generated overnight for review the next morning. Your manager proposes switching both to the Message Batches API for its 50% cost savings. How should you evaluate this proposal?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Use batch processing for the technical debt reports only; keep real-time calls for pre-merge checks.",
+        "explanation": "The Message Batches API can take up to 24 hours with no guaranteed latency SLA, which is fine for an overnight, latency-tolerant report but unsuitable for a check that blocks a developer's merge in real time."
+      },
+      {
+        "id": "B",
+        "text": "Switch both workflows to batch processing with status polling to check for completion.",
+        "explanation": "Relying on batches \"often\" completing quickly enough isn't acceptable for a blocking pre-merge workflow, since there is no guaranteed latency SLA that developers waiting to merge can depend on."
+      },
+      {
+        "id": "C",
+        "text": "Keep real-time calls for both workflows to avoid batch result ordering issues.",
+        "explanation": "This is based on a misconception: batch request/response pairs are correlated using `custom_id` fields, so ordering isn't actually a concern, and it forfeits the legitimate savings available for the overnight report."
+      },
+      {
+        "id": "D",
+        "text": "Switch both to batch processing with a timeout fallback to real-time if batches take too long.",
+        "explanation": "Adding a timeout-and-fallback mechanism for the pre-merge check is unnecessary complexity when simply matching each workflow to the API suited to its latency requirement is simpler and sufficient."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Match the API to the workflow's latency tolerance: batch API for non-blocking, latency-tolerant work; synchronous calls for anything blocking a human.",
+    "sourceRef": "Exam Guide §9 Q11; TS 4.5"
+  },
+  {
+    "id": "off-12",
+    "source": "official-sample",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": ["4.6"],
+    "scenario": 5,
+    "difficulty": 3,
+    "stem": "A pull request modifies 14 files across the stock tracking module. Your single-pass review analyzing all files together produces inconsistent results: detailed feedback for some files but superficial comments for others, obvious bugs missed, and contradictory feedback — flagging a pattern as problematic in one file while approving identical code elsewhere in the same PR. How should you restructure the review?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Split into focused passes: analyze each file individually for local issues, then run a separate integration-focused pass examining cross-file data flow.",
+        "explanation": "This directly targets the root cause, attention dilution from processing many files at once: per-file analysis gives each file consistent depth, and a dedicated integration pass still catches issues that span files."
+      },
+      {
+        "id": "B",
+        "text": "Require developers to split large PRs into smaller submissions of 3-4 files before the automated review runs.",
+        "explanation": "This pushes the burden onto developers' PR habits rather than fixing how the review system itself processes a large PR, and it doesn't help when a legitimately large change can't be split."
+      },
+      {
+        "id": "C",
+        "text": "Switch to a higher-tier model with a larger context window to give all 14 files adequate attention in one pass.",
+        "explanation": "A larger context window increases how much text fits, but it doesn't fix attention dilution — the quality problem observed, inconsistent depth and contradictory findings, is not solved by more capacity alone."
+      },
+      {
+        "id": "D",
+        "text": "Run three independent review passes on the full PR and only flag issues that appear in at least two of the three runs.",
+        "explanation": "Requiring consensus across repeated full-PR passes would suppress real bugs that are only caught intermittently, rather than fixing the underlying inconsistency in how each pass analyzes the files."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Split large multi-file reviews into per-file local passes plus a separate cross-file integration pass to avoid attention dilution, rather than relying on a bigger model or repeated full-PR passes.",
+    "sourceRef": "Exam Guide §9 Q12; TS 4.6"
+  }
+]

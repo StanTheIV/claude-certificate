@@ -1,0 +1,202 @@
+[
+  {
+    "id": "fc-2.1-1",
+    "domain": 2,
+    "taskStatement": "2.1",
+    "front": "What is the primary mechanism an LLM uses to select among tools?",
+    "back": "The tool's `description` — not its implementation, name order, or source comments. Minimal descriptions (\"Retrieves customer information\") lead to unreliable selection among similar tools.",
+    "sourceRef": "Exam Guide TS 2.1; guide_en.md §2.2"
+  },
+  {
+    "id": "fc-2.1-2",
+    "domain": 2,
+    "taskStatement": "2.1",
+    "front": "List the four things a strong tool description should include.",
+    "back": "1) What it does and returns. 2) Input formats and example values. 3) Edge cases and boundaries. 4) When to use it vs. similar alternatives.",
+    "sourceRef": "Exam Guide TS 2.1; guide_en.md §2.2"
+  },
+  {
+    "id": "fc-2.1-3",
+    "domain": 2,
+    "taskStatement": "2.1",
+    "front": "What is the exam guide's rename example for removing tool overlap?",
+    "back": "Rename `analyze_content` to `extract_web_results`, with a web-specific description, to remove overlap with `analyze_document`.",
+    "sourceRef": "Exam Guide TS 2.1"
+  },
+  {
+    "id": "fc-2.1-4",
+    "domain": 2,
+    "taskStatement": "2.1",
+    "front": "What is the exam guide's split example for a generic document tool?",
+    "back": "Split a generic `analyze_document` tool into `extract_data_points`, `summarize_content`, and `verify_claim_against_source`, each with a defined input/output contract.",
+    "sourceRef": "Exam Guide TS 2.1"
+  },
+  {
+    "id": "fc-2.1-5",
+    "domain": 2,
+    "taskStatement": "2.1",
+    "front": "What can override a well-written tool description?",
+    "back": "Keyword-sensitive system prompt wording — e.g. an instruction tied to the word \"verify\" can create an unintended tool association regardless of how precise the descriptions are.",
+    "sourceRef": "Exam Guide TS 2.1"
+  },
+  {
+    "id": "fc-2.2-1",
+    "domain": 2,
+    "taskStatement": "2.2",
+    "front": "What does `isError: true` mean in an MCP tool response?",
+    "back": "The call failed; the agent must not treat `content` as a successful result. It is the standard MCP pattern for communicating tool failures.",
+    "sourceRef": "Exam Guide TS 2.2; guide_en.md §4.4"
+  },
+  {
+    "id": "fc-2.2-2",
+    "domain": 2,
+    "taskStatement": "2.2",
+    "front": "Name the four MCP error categories and their retryability.",
+    "back": "Transient (retryable — timeouts, service unavailability), Validation (not retryable — invalid input, fix and retry), Business (not retryable — policy violation), Permission (not retryable — escalate).",
+    "sourceRef": "Exam Guide TS 2.2; guide_en.md §10.1"
+  },
+  {
+    "id": "fc-2.2-3",
+    "domain": 2,
+    "taskStatement": "2.2",
+    "front": "What two fields should structured MCP error metadata include, at minimum?",
+    "back": "`errorCategory` (transient/validation/business/permission) and `isRetryable` (boolean), plus a human-readable description the agent can relay.",
+    "sourceRef": "Exam Guide TS 2.2"
+  },
+  {
+    "id": "fc-2.2-4",
+    "domain": 2,
+    "taskStatement": "2.2",
+    "front": "How should a business-rule violation (e.g. a refund over the policy limit) be flagged?",
+    "back": "`isRetryable: false` (sometimes written `retriable: false`) with a customer-friendly explanation of the policy, so the agent communicates the reason instead of retrying or reporting a generic failure.",
+    "sourceRef": "Exam Guide TS 2.2"
+  },
+  {
+    "id": "fc-2.2-5",
+    "domain": 2,
+    "taskStatement": "2.2",
+    "front": "How do you distinguish an access failure from a valid empty result?",
+    "back": "A genuine zero-match query returns `isError:false` with an empty result. A failed/unreachable query must return `isError:true` with a category (e.g. transient) — never collapse both into the same empty-array shape.",
+    "sourceRef": "Exam Guide TS 2.2"
+  },
+  {
+    "id": "fc-2.3-1",
+    "domain": 2,
+    "taskStatement": "2.3",
+    "front": "What tool-count rule of thumb does the exam guide give for reliable tool selection?",
+    "back": "About 4-5 tools per agent selects reliably; giving an agent ~18 tools degrades selection reliability by increasing decision complexity, even for the tools it actually needs.",
+    "sourceRef": "Exam Guide TS 2.3"
+  },
+  {
+    "id": "fc-2.3-2",
+    "domain": 2,
+    "taskStatement": "2.3",
+    "front": "What are the three `tool_choice` values, and what does each guarantee?",
+    "back": "`{\"type\": \"auto\"}` — model decides freely (default). `{\"type\": \"any\"}` — model must call some tool (no plain-text reply). `{\"type\": \"tool\", \"name\": \"...\"}` — model must call that specific tool.",
+    "sourceRef": "Exam Guide TS 2.3; guide_en.md §2.3"
+  },
+  {
+    "id": "fc-2.3-3",
+    "domain": 2,
+    "taskStatement": "2.3",
+    "front": "What is the exam guide's constrained-tool example?",
+    "back": "Replace a generic `fetch_url` tool with `load_document`, which validates the document URL before fetching — same core capability, narrower surface area.",
+    "sourceRef": "Exam Guide TS 2.3"
+  },
+  {
+    "id": "fc-2.3-4",
+    "domain": 2,
+    "taskStatement": "2.3",
+    "front": "What is the scoped cross-role tool example from the sample questions?",
+    "back": "Give a synthesis agent a narrow `verify_fact` tool for simple lookups (the common, high-frequency case), while routing complex verification through the coordinator to the web-search agent.",
+    "sourceRef": "Exam Guide Sample Q9"
+  },
+  {
+    "id": "fc-2.3-5",
+    "domain": 2,
+    "taskStatement": "2.3",
+    "front": "When should you use forced tool_choice (`{\"type\": \"tool\", \"name\": \"...\"}`)?",
+    "back": "To guarantee a specific first action/order — e.g. forcing `extract_metadata` before enrichment tools run, then processing subsequent steps in a follow-up turn.",
+    "sourceRef": "Exam Guide TS 2.3; guide_en.md §2.3"
+  },
+  {
+    "id": "fc-2.4-1",
+    "domain": 2,
+    "taskStatement": "2.4",
+    "front": "Per the exam guide, which file holds project-shared MCP servers, and which holds personal/experimental ones?",
+    "back": "Project scope: `.mcp.json` at the project root (version-controlled, shared with the team). User scope: `~/.claude.json` (not shared via version control).",
+    "sourceRef": "Exam Guide TS 2.4; guide_en.md §4.3"
+  },
+  {
+    "id": "fc-2.4-2",
+    "domain": 2,
+    "taskStatement": "2.4",
+    "front": "How do you reference a secret like a GitHub token inside a committed `.mcp.json` without exposing it?",
+    "back": "Environment variable expansion, e.g. `\"GITHUB_TOKEN\": \"${GITHUB_TOKEN}\"` — the placeholder is substituted from the local environment at load time; the literal value is never committed.",
+    "sourceRef": "Exam Guide TS 2.4; guide_en.md §4.3"
+  },
+  {
+    "id": "fc-2.4-3",
+    "domain": 2,
+    "taskStatement": "2.4",
+    "front": "When multiple MCP servers are configured, which of their tools are available to the agent?",
+    "back": "Tools from all connected servers are discovered at connection time and are available simultaneously, alongside built-in tools.",
+    "sourceRef": "Exam Guide TS 2.4"
+  },
+  {
+    "id": "fc-2.4-4",
+    "domain": 2,
+    "taskStatement": "2.4",
+    "front": "What are MCP resources used for?",
+    "back": "Exposing content catalogs (issue summaries, documentation hierarchies, database schemas) so the agent can see what data exists without spending exploratory tool calls.",
+    "sourceRef": "Exam Guide TS 2.4; guide_en.md §4.5"
+  },
+  {
+    "id": "fc-2.4-5",
+    "domain": 2,
+    "taskStatement": "2.4",
+    "front": "When should you build a custom MCP server instead of using a community one?",
+    "back": "Only for genuinely team-specific workflows. For standard integrations (Jira, GitHub, Slack), prefer an existing, maintained community MCP server.",
+    "sourceRef": "Exam Guide TS 2.4"
+  },
+  {
+    "id": "fc-2.5-1",
+    "domain": 2,
+    "taskStatement": "2.5",
+    "front": "Grep vs. Glob — what does each search?",
+    "back": "Grep searches file *contents* (function names, error messages, imports). Glob matches file *paths/names* by pattern (e.g. `**/*.test.tsx`). Glob never looks inside files.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.1"
+  },
+  {
+    "id": "fc-2.5-2",
+    "domain": 2,
+    "taskStatement": "2.5",
+    "front": "What must be true of the text Edit targets?",
+    "back": "It must be a *unique* match within the file. If the same text appears more than once, Edit fails rather than guessing which occurrence to change.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.1"
+  },
+  {
+    "id": "fc-2.5-3",
+    "domain": 2,
+    "taskStatement": "2.5",
+    "front": "What is the documented fallback when Edit fails on a non-unique match?",
+    "back": "Read the full file content, modify it, then Write the updated version back — instead of guessing at a longer anchor string.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.3"
+  },
+  {
+    "id": "fc-2.5-4",
+    "domain": 2,
+    "taskStatement": "2.5",
+    "front": "What is the recommended incremental investigation order for an unfamiliar codebase?",
+    "back": "Grep for entry points -> Read the matches -> Grep for usages/imports -> Read the consumers -> repeat, rather than reading every file upfront.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.2"
+  },
+  {
+    "id": "fc-2.5-5",
+    "domain": 2,
+    "taskStatement": "2.5",
+    "front": "How do you reliably trace all callers of a function that's re-exported under another name from a wrapper/barrel module?",
+    "back": "First identify all of the wrapper module's exported names (including aliases), then Grep separately for each name — searching only the original definition name misses alias-only call sites.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.2"
+  }
+]

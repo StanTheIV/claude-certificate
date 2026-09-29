@@ -1,0 +1,362 @@
+[
+  {
+    "id": "cli-01",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.6"],
+    "scenario": 5,
+    "difficulty": 2,
+    "stem": "A CI pipeline runs `claude -p \"review this diff\"` non-interactively on every pull request. The team wants a hard guarantee that a single run never spends more than $2.00 in API costs, even if Claude enters a long tool-calling loop over a huge diff. Which flag enforces this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`--max-turns 2`, since fewer turns means less spend overall",
+        "explanation": "`--max-turns` bounds the number of agentic turns, not dollars. A handful of turns that each make expensive tool calls could still exceed $2.00 before the turn limit is reached."
+      },
+      {
+        "id": "B",
+        "text": "`--max-budget-usd 2.00`",
+        "explanation": "Correct. This print-mode flag stops the run once client-side spend reaches the USD cap; spend from any subagents the run spawns counts toward it too."
+      },
+      {
+        "id": "C",
+        "text": "`permissions.maxSpend: 2.00` in the shared `.claude/settings.json`",
+        "explanation": "Not a real settings.json key. There is no settings.json equivalent for a USD spending cap — it's a per-run flag or SDK option only."
+      },
+      {
+        "id": "D",
+        "text": "`--budget 2.00`",
+        "explanation": "Not a real Claude Code flag. The actual flag name is `--max-budget-usd`; `--budget` doesn't exist in the CLI flags table."
+      }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "`--max-budget-usd` is the print-mode flag that caps dollars directly; turn limits and tool restrictions are different knobs that don't guarantee a spend ceiling.",
+    "sourceRef": "code.claude.com/docs/en/cli-reference (current docs)"
+  },
+  {
+    "id": "cli-02",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.6"],
+    "scenario": 5,
+    "difficulty": 2,
+    "stem": "A CI job runs `claude -p \"...\" --max-budget-usd 3.00 --output-format json`. The run stops early, and the printed JSON result includes `\"subtype\": \"error_max_budget_usd\"`. What should the pipeline's error handler conclude and do?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Conclude the run hit an unrelated internal failure and retry the exact same command unchanged",
+        "explanation": "That reading matches the subtype `error_during_execution`, not the one printed here. Retrying unchanged just spends the same money and stops at the same point."
+      },
+      {
+        "id": "B",
+        "text": "Conclude the run reached its turn limit, and raise `--max-turns` for the next run",
+        "explanation": "That reading matches the subtype `error_max_turns`, not the one printed here. Raising the turn limit leaves the actual limiting resource — dollars — unchanged."
+      },
+      {
+        "id": "C",
+        "text": "Conclude the USD spending cap stopped the run before the task finished, and either raise `--max-budget-usd` or scope the task smaller",
+        "explanation": "Correct. `error_max_budget_usd` names the budget cap specifically, distinct from the turn-limit and generic-failure subtypes, so the fix targets the budget, not turns or retries."
+      },
+      {
+        "id": "D",
+        "text": "Treat the run as successful, since a well-formed JSON result was still printed to stdout",
+        "explanation": "Swallowing the distinct error subtype hides that the task didn't finish; downstream steps would consume a partial `result` as if the review or task were complete."
+      }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "The result message's `subtype` names exactly which limit stopped the run — read it before deciding which knob to adjust.",
+    "sourceRef": "code.claude.com/docs/en/agent-sdk/typescript (current docs)"
+  },
+  {
+    "id": "cli-03",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.6"],
+    "scenario": 5,
+    "difficulty": 2,
+    "stem": "Your CI review agent occasionally spends 40+ minutes on a single pull request, apparently stuck re-reading the same files and re-issuing near-identical tool calls without making progress. You want to cut off this specific runaway-loop pattern without setting a dollar cap so tight that normal, larger diffs get cut off too. Which flag most directly targets this symptom?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`--max-turns <N>`",
+        "explanation": "Correct. Turns bound the number of agentic round trips directly, so a loop of repeated tool calls is cut off after a fixed count regardless of how cheap each call is."
+      },
+      {
+        "id": "B",
+        "text": "`--max-budget-usd <N>`",
+        "explanation": "A loop of cheap, repeated calls can run for a long time under a generous dollar cap, and a cap tight enough to catch the loop reliably would also cut off legitimately large diffs."
+      },
+      {
+        "id": "C",
+        "text": "`--permission-prompts none`",
+        "explanation": "This controls who answers permission prompts in an unattended run; it has no effect on how many turns or how long a loop runs."
+      },
+      {
+        "id": "D",
+        "text": "`--tools \"\"`",
+        "explanation": "Disabling every built-in tool stops the agent from doing anything useful at all — far more disruptive than bounding a loop, and it doesn't target the loop specifically."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "A runaway loop of round trips is a turn-count problem; pick `--max-turns` over a spend cap when the symptom is 'stuck repeating,' not 'individual calls are expensive.'",
+    "sourceRef": "code.claude.com/docs/en/cli-reference (current docs)"
+  },
+  {
+    "id": "cli-04",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.6"],
+    "scenario": 5,
+    "difficulty": 3,
+    "stem": "A platform engineer wants every scripted `claude -p` invocation across the org to have a default per-run USD spending cap, and starts looking for a `permissions`-style key to add to the shared `.claude/settings.json` so it applies automatically without each script author remembering a flag. What should they conclude?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Add `permissions.maxSpend` to the shared project settings file, and every script that loads it will inherit the cap",
+        "explanation": "This key doesn't exist. The budget cap has no settings.json equivalent, so a key like this would silently do nothing."
+      },
+      {
+        "id": "B",
+        "text": "Set `defaultMode: \"auto\"` in settings.json, since Auto mode's classifier reviews and denies unusually expensive-looking tool calls",
+        "explanation": "Permission modes decide whether a tool call needs approval, not whether cumulative spend crosses a dollar total — Auto mode doesn't track or cap cost."
+      },
+      {
+        "id": "C",
+        "text": "Add a `\"budget\"` entry under `permissions.deny` in settings.json",
+        "explanation": "Deny rules match tool names and specifiers like `Bash(rm *)`, not a spend threshold — there's no such rule target, so this has no effect."
+      },
+      {
+        "id": "D",
+        "text": "There is no settings.json key for this; each script must pass `--max-budget-usd` (or an SDK caller must pass `maxBudgetUsd`) explicitly on every invocation",
+        "explanation": "Correct. The budget cap is a per-run flag/SDK option with no settings.json equivalent, unlike most other limits — a shared default has to live in a wrapper script or shared invocation template instead."
+      }
+    ],
+    "correct": ["D"],
+    "keyPrinciple": "Not every control lives in settings.json — the budget cap is session-scoped only, so org-wide enforcement means wrapping the flag, not adding a settings key.",
+    "sourceRef": "code.claude.com/docs/en/cli-reference (current docs)"
+  },
+  {
+    "id": "cli-05",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.4"],
+    "scenario": 3,
+    "difficulty": 3,
+    "stem": "Your multi-agent research system, built on the Claude Agent SDK, has a coordinator that delegates to four specialized subagents. You want to enforce both an overall dollar cap and a turn-count cap so that if delegated subagent work drives the total cost over budget, the whole run stops — not just the coordinator's own turns. Which options, set where, achieve this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Only `maxTurns` on the coordinator's options, since limiting turns indirectly limits spend too",
+        "explanation": "Turns cap the number of round trips, not dollars — a small number of very expensive tool calls could blow the budget well before a turn limit is reached."
+      },
+      {
+        "id": "B",
+        "text": "Both `maxBudgetUsd` and `maxTurns` on the coordinator's session options",
+        "explanation": "Correct. Spend from delegated subagents counts toward the coordinator's `maxBudgetUsd`, so a single cap set on the coordinator stops the whole run, including runaway subagent cost."
+      },
+      {
+        "id": "C",
+        "text": "`maxBudgetUsd` on the coordinator, plus a separate `maxBudgetUsd` repeated on each of the four subagents' own options",
+        "explanation": "Subagent spend already counts toward the coordinator's single cap, so duplicating a cap on every subagent is unnecessary — the coordinator-level cap alone already covers it."
+      },
+      {
+        "id": "D",
+        "text": "`permissionMode: \"bypassPermissions\"` combined with `maxTurns`",
+        "explanation": "Permission mode only controls whether tool calls need approval; it doesn't track or cap dollar spend at all, so it does nothing toward the stated goal."
+      }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "In the Agent SDK, a coordinator's `maxBudgetUsd` already covers delegated subagent spend — set the cap once, at the top of the delegation chain.",
+    "sourceRef": "code.claude.com/docs/en/agent-sdk/typescript (current docs)"
+  },
+  {
+    "id": "cli-06",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.6"],
+    "scenario": 5,
+    "difficulty": 2,
+    "stem": "A CI script runs `claude -p` as a non-coding compliance-report generator, with a persona and permission surface that has nothing to do with Claude Code's default coding-assistant identity. The maintainer wants to fully take responsibility for what's in the prompt rather than keep Claude Code's default tool guidance and safety instructions layered underneath. Which choice fits, and what's the trade-off?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`--system-prompt` (or `--system-prompt-file`), accepting that it drops the default tool guidance and safety instructions, which the script's own prompt text must now cover",
+        "explanation": "Correct. Replacing the whole prompt is the right call when the surface and identity genuinely diverge from Claude Code's default — but everything the default prompt used to provide is now the script author's responsibility."
+      },
+      {
+        "id": "B",
+        "text": "`--append-system-prompt`, since it lets the script add compliance-specific instructions on top",
+        "explanation": "Appending keeps Claude Code's default coding-assistant framing intact underneath the addition — the wrong fit when the whole persona and permission surface is meant to diverge, not extend."
+      },
+      {
+        "id": "C",
+        "text": "`--system-prompt-snapshot off`",
+        "explanation": "This only controls whether the system prompt is rebuilt on every request versus reused across `--continue`/`--resume`; it doesn't change what the prompt contains."
+      },
+      {
+        "id": "D",
+        "text": "A project-root `CLAUDE.md` describing the compliance persona",
+        "explanation": "CLAUDE.md content is added on top of whatever system prompt is already in effect — it doesn't replace the system prompt or remove the default tool guidance."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Append when Claude should stay a coding assistant plus extra rules; replace when the identity and permission surface genuinely diverge — and replacing means owning what the default prompt used to cover.",
+    "sourceRef": "code.claude.com/docs/en/cli-reference (current docs)"
+  },
+  {
+    "id": "cli-07",
+    "source": "original",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.4"],
+    "scenario": 5,
+    "difficulty": 2,
+    "stem": "A CI job runs `claude -p --mcp-config ./ci-mcp.json \"...\"` to load only the two MCP servers the pipeline needs. On a runner where a developer previously left extra project-level MCP servers configured in `.mcp.json`/`~/.claude.json`, the job unexpectedly also connects to those. What guarantees only the servers listed in `ci-mcp.json` ever load, regardless of what else is configured on the runner?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Add `--bare` to the invocation",
+        "explanation": "`--bare` skips MCP server auto-discovery entirely, which would also block the two servers `ci-mcp.json` is supposed to load, not just the unwanted extras."
+      },
+      {
+        "id": "B",
+        "text": "Pass a second `--mcp-config` pointing at an empty JSON file after the real one",
+        "explanation": "A second, empty `--mcp-config` doesn't suppress other configuration sources like `.mcp.json` or `~/.claude.json` — it just adds another (empty) source alongside them."
+      },
+      {
+        "id": "C",
+        "text": "Add `--strict-mcp-config` alongside `--mcp-config`",
+        "explanation": "Correct. `--strict-mcp-config` restricts the session to only the servers passed via `--mcp-config`, ignoring every other MCP configuration source on the machine."
+      },
+      {
+        "id": "D",
+        "text": "Add `--disallowedTools \"mcp__*\"`",
+        "explanation": "This removes every MCP tool from Claude's context entirely, including the two servers the job actually needs — it doesn't distinguish wanted servers from unwanted ones."
+      }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "For reproducible CI, `--mcp-config` alone only adds servers; `--strict-mcp-config` is what makes it the exclusive source.",
+    "sourceRef": "code.claude.com/docs/en/cli-reference (current docs)"
+  },
+  {
+    "id": "cli-08",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.1"],
+    "scenario": 3,
+    "difficulty": 3,
+    "stem": "A TypeScript Agent SDK pipeline runs the same task on developer laptops and in CI containers. To guarantee identical behavior everywhere, the team wants to make sure no developer's personal `~/.claude/settings.json`, project `.claude/settings.json`, local settings, or CLAUDE.md gets picked up — only options passed explicitly in code should apply. Which SDK option, set to which value, achieves this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Leave `settingSources` unset, at its default",
+        "explanation": "By default `settingSources` loads the same filesystem sources the CLI would — user, project, and local settings, plus CLAUDE.md — which is exactly the machine-specific behavior the team is trying to avoid."
+      },
+      {
+        "id": "B",
+        "text": "`permissionMode: 'bypassPermissions'`",
+        "explanation": "Permission mode decides whether tool calls need approval; it has no effect on whether `settings.json` files or CLAUDE.md get loaded at all."
+      },
+      {
+        "id": "C",
+        "text": "`strictMcpConfig: true`",
+        "explanation": "This restricts which MCP servers connect (only the ones passed in `mcpServers`); it doesn't touch `settings.json` or CLAUDE.md loading."
+      },
+      {
+        "id": "D",
+        "text": "`settingSources: []`",
+        "explanation": "Correct. Passing an empty array disables the user, project, and local settings sources, so only what's passed explicitly in code applies (endpoint-managed policy still loads regardless)."
+      }
+    ],
+    "correct": ["D"],
+    "keyPrinciple": "An SDK app's `settingSources` defaults to loading everything the CLI would, the same as an interactive session — pass `[]` explicitly to get a machine-independent, code-only configuration.",
+    "sourceRef": "code.claude.com/docs/en/agent-sdk/typescript (current docs)"
+  },
+  {
+    "id": "cli-09",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.6"],
+    "scenario": 5,
+    "difficulty": 2,
+    "stem": "A scheduled GitHub Actions workflow runs the Claude Code GitHub Action (`anthropics/claude-code-action`) daily to generate a commit/issue summary. Runs have occasionally taken far longer than expected and driven up API usage. The team wants to cap the number of agentic turns for the action's underlying Claude Code invocation, set directly in the workflow YAML. Where does this go?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "In the `claude_args` input, e.g. `claude_args: \"--max-turns 5\"`",
+        "explanation": "Correct. `claude_args` passes CLI arguments straight through to the action's underlying `claude -p` invocation, and `--max-turns` is one of the flags it commonly carries."
+      },
+      {
+        "id": "B",
+        "text": "As a top-level `max_turns: 5` input on the `anthropics/claude-code-action` step",
+        "explanation": "The action's own inputs don't include a same-name `max_turns` field; CLI options like this are passed through `claude_args`, not as a separate top-level input."
+      },
+      {
+        "id": "C",
+        "text": "As `timeout-minutes: 5` on the job in the workflow YAML",
+        "explanation": "`timeout-minutes` bounds the job's wall-clock time; it doesn't limit how many agentic turns the underlying `claude -p` run takes before it's cut off."
+      },
+      {
+        "id": "D",
+        "text": "As a line inside the `prompt` input text, e.g. prepending \"Use at most 5 turns\"",
+        "explanation": "Text inside the prompt is an instruction to the model, not an enforced limit — Claude can still drift past it, unlike the CLI flag which is enforced by the run itself."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "`claude_args` is the bridge from GitHub Actions workflow YAML to the CLI's own flags — cost- and turn-control flags go there, not into separate action inputs.",
+    "sourceRef": "code.claude.com/docs/en/github-actions (current docs)"
+  },
+  {
+    "id": "cli-10",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.6"],
+    "scenario": 5,
+    "difficulty": 3,
+    "stem": "An unattended nightly CI job runs `claude -p` to update dependency pins and run the test suite, with nobody available to answer permission prompts. The job needs Bash access for package-manager commands and Edit access for lockfiles, but must not be able to run arbitrary destructive shell commands or touch unrelated files. Which combination best matches least privilege for this job?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`--dangerously-skip-permissions`",
+        "explanation": "This is equivalent to `bypassPermissions` mode: it skips prompts entirely, including for destructive commands well outside the intended scope — the opposite of least privilege."
+      },
+      {
+        "id": "B",
+        "text": "`--permission-mode acceptEdits` alone, with no `--allowedTools`",
+        "explanation": "`acceptEdits` auto-approves file edits and common filesystem commands, but other Bash commands the job needs, like the package-manager install itself, would still need an `--allowedTools` entry or hang waiting on a prompt nobody can answer."
+      },
+      {
+        "id": "C",
+        "text": "`--allowedTools` naming scoped rules like `Bash(npm install *)` and `Edit`, plus `--permission-mode dontAsk` (or `--permission-prompts none`)",
+        "explanation": "Correct. Scoped `--allowedTools` rules grant exactly the package-manager and lockfile actions needed, and pairing that with `dontAsk`/`--permission-prompts none` denies anything else instead of silently escalating or hanging."
+      },
+      {
+        "id": "D",
+        "text": "`--tools \"Bash,Edit\"` alone",
+        "explanation": "`--tools` only restricts which built-in tools are available at all — any Bash command becomes usable once Bash is available, so it doesn't scope the job down to just package-manager commands and lockfile edits."
+      }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "Least privilege for an unattended run means scoping allow rules to exact commands and denying (not skipping or hanging on) everything else — not just picking a broad tool or permission-mode setting.",
+    "sourceRef": "code.claude.com/docs/en/cli-reference (current docs)"
+  }
+]

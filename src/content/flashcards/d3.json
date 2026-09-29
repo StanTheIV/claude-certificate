@@ -1,0 +1,194 @@
+[
+  {
+    "id": "fc-3.1-1",
+    "domain": 3,
+    "taskStatement": "3.1",
+    "front": "What are the three CLAUDE.md hierarchy locations, from personal to team-wide to directory-specific?",
+    "back": "`~/.claude/CLAUDE.md` (user-level, personal, not shared via VCS) → `.claude/CLAUDE.md` or root `CLAUDE.md` (project-level, shared via VCS) → a `CLAUDE.md` inside a subdirectory (directory-level, applies only within that directory).",
+    "sourceRef": "Exam Guide TS 3.1; guide_en.md §5.1"
+  },
+  {
+    "id": "fc-3.1-2",
+    "domain": 3,
+    "taskStatement": "3.1",
+    "front": "Correct `@` import syntax for pulling `standards/testing.md` into CLAUDE.md?",
+    "back": "`@standards/testing.md` — `@` goes immediately before the path, no space. Wrapping it in backticks (`` `@standards/testing.md` ``) keeps it literal instead of importing it.",
+    "sourceRef": "guide_en.md §5.2; code.claude.com/docs/en/memory (verified)"
+  },
+  {
+    "id": "fc-3.1-3",
+    "domain": 3,
+    "taskStatement": "3.1",
+    "front": "What directory organizes large CLAUDE.md content into topic-specific files (e.g. testing.md, api-conventions.md, deployment.md)?",
+    "back": "`.claude/rules/` — an alternative to one monolithic CLAUDE.md. Without `paths:` frontmatter, files here load unconditionally, same as CLAUDE.md.",
+    "sourceRef": "Exam Guide TS 3.1; guide_en.md §5.3"
+  },
+  {
+    "id": "fc-3.1-4",
+    "domain": 3,
+    "taskStatement": "3.1",
+    "front": "Which command lets you verify which CLAUDE.md/memory files are actually loaded in the current session?",
+    "back": "`/memory` — opens memory configuration and shows loaded files; the first diagnostic step before assuming an instruction is badly worded.",
+    "sourceRef": "Exam Guide TS 3.1; guide_en.md §5.8"
+  },
+  {
+    "id": "fc-3.2-1",
+    "domain": 3,
+    "taskStatement": "3.2",
+    "front": "Where do project-scoped vs. user-scoped slash commands live?",
+    "back": "`.claude/commands/` — project-scoped, in the repo, shared via VCS. `~/.claude/commands/` — user-scoped, personal, never shared via VCS.",
+    "sourceRef": "Exam Guide TS 3.2; guide_en.md §5.4; Official Sample Q4"
+  },
+  {
+    "id": "fc-3.2-2",
+    "domain": 3,
+    "taskStatement": "3.2",
+    "front": "What file, and inside which directory, defines a skill?",
+    "back": "`SKILL.md` inside `.claude/skills/<name>/` (project) or `~/.claude/skills/<name>/` (personal), with YAML frontmatter configuration.",
+    "sourceRef": "Exam Guide TS 3.2; guide_en.md §5.5"
+  },
+  {
+    "id": "fc-3.2-3",
+    "domain": 3,
+    "taskStatement": "3.2",
+    "front": "What does `context: fork` do in a SKILL.md frontmatter?",
+    "back": "Runs the skill in an isolated sub-agent context, so its verbose or exploratory output doesn't pollute the main conversation — only the final result returns.",
+    "sourceRef": "Exam Guide TS 3.2; guide_en.md §5.5"
+  },
+  {
+    "id": "fc-3.2-4",
+    "domain": 3,
+    "taskStatement": "3.2",
+    "front": "Two more SKILL.md frontmatter keys: what do `allowed-tools` and `argument-hint` each do?",
+    "back": "`allowed-tools`: restricts which tools the skill can use (e.g. `[\"Write\"]` only). `argument-hint`: shows a hint prompting for a required parameter when the skill is invoked without one.",
+    "sourceRef": "Exam Guide TS 3.2; guide_en.md §5.5"
+  },
+  {
+    "id": "fc-3.2-5",
+    "domain": 3,
+    "taskStatement": "3.2",
+    "front": "How do you customize a shared skill for personal use without affecting teammates?",
+    "back": "Create a personal variant under a different name in `~/.claude/skills/` (e.g. `review-strict` instead of `review`) — different name AND personal scope, both required.",
+    "sourceRef": "Exam Guide TS 3.2 Skills in"
+  },
+  {
+    "id": "fc-3.3-1",
+    "domain": 3,
+    "taskStatement": "3.3",
+    "front": "What frontmatter field makes a `.claude/rules/` file load only for files matching a pattern, and what's the syntax?",
+    "back": "`paths:`, a YAML list of glob patterns, e.g. `paths: [\"src/api/**/*\"]`. The rule loads only when Claude edits a matching file.",
+    "sourceRef": "Exam Guide TS 3.3; guide_en.md §5.3"
+  },
+  {
+    "id": "fc-3.3-2",
+    "domain": 3,
+    "taskStatement": "3.3",
+    "front": "Glob pattern to match every `.test.tsx` file anywhere in the repo, regardless of directory?",
+    "back": "`**/*.test.tsx` — the `**` wildcard matches any number of intermediate directories, so it follows the file type rather than a specific folder.",
+    "sourceRef": "Exam Guide TS 3.3; guide_en.md §5.3; Official Sample Q6"
+  },
+  {
+    "id": "fc-3.3-3",
+    "domain": 3,
+    "taskStatement": "3.3",
+    "front": "When should you use `.claude/rules/` with `paths:` instead of a directory-level CLAUDE.md?",
+    "back": "When a convention applies to files identified by type or naming pattern, spread across many directories (e.g. all test files) — a directory-level CLAUDE.md can't reach files outside its own folder.",
+    "sourceRef": "Exam Guide TS 3.3 Skills in"
+  },
+  {
+    "id": "fc-3.3-4",
+    "domain": 3,
+    "taskStatement": "3.3",
+    "front": "Which mechanisms are context (probabilistic) vs. enforcement (deterministic)?",
+    "back": "Context: CLAUDE.md, `.claude/rules/`, skills — Claude reads and tries to follow, no guarantee. Enforcement: hooks, settings `permissions.deny` — run as code, regardless of what Claude decides.",
+    "sourceRef": "guide_en.md §3.5; reddit_post.md; code.claude.com/docs/en/memory (verified)"
+  },
+  {
+    "id": "fc-3.4-1",
+    "domain": 3,
+    "taskStatement": "3.4",
+    "front": "What does plan mode do, and how does it differ from direct execution?",
+    "back": "Plan mode: read-only exploration (Read/Grep/Glob) producing an approved plan before any change is made. Direct execution: implements immediately, no separate planning phase.",
+    "sourceRef": "Exam Guide TS 3.4; guide_en.md §5.6"
+  },
+  {
+    "id": "fc-3.4-2",
+    "domain": 3,
+    "taskStatement": "3.4",
+    "front": "Give two signals that a task should use plan mode rather than direct execution.",
+    "back": "Large-scale changes (dozens of files, 45+ file migrations) OR multiple valid architectural approaches — vs. direct execution for a single-file fix with a clear stack trace.",
+    "sourceRef": "Exam Guide TS 3.4; Official Sample Q5"
+  },
+  {
+    "id": "fc-3.4-3",
+    "domain": 3,
+    "taskStatement": "3.4",
+    "front": "What does the Explore subagent do, and why use it?",
+    "back": "Isolates verbose codebase-discovery output in a sub-agent and returns only a summary — prevents context-window exhaustion during multi-phase tasks.",
+    "sourceRef": "Exam Guide TS 3.4; guide_en.md §5.6"
+  },
+  {
+    "id": "fc-3.5-1",
+    "domain": 3,
+    "taskStatement": "3.5",
+    "front": "A prose transformation description gives inconsistent results across runs. What's the fastest fix?",
+    "back": "Provide 2-3 concrete input/output examples — they pin down exactly what a prose description leaves ambiguous, including edge cases.",
+    "sourceRef": "Exam Guide TS 3.5"
+  },
+  {
+    "id": "fc-3.5-2",
+    "domain": 3,
+    "taskStatement": "3.5",
+    "front": "What is test-driven iteration, in one sentence?",
+    "back": "Write the test suite (expected behavior, edge cases, performance) before implementation, then iterate by sharing specific test failures rather than re-describing the requirement.",
+    "sourceRef": "Exam Guide TS 3.5"
+  },
+  {
+    "id": "fc-3.5-3",
+    "domain": 3,
+    "taskStatement": "3.5",
+    "front": "What is the 'interview pattern' and when is it most valuable?",
+    "back": "Claude asks clarifying questions before implementing (e.g. cache invalidation strategy, failure-mode behavior) — most valuable in unfamiliar domains or tasks with non-obvious implications.",
+    "sourceRef": "Exam Guide TS 3.5; guide_en.md §6.4"
+  },
+  {
+    "id": "fc-3.5-4",
+    "domain": 3,
+    "taskStatement": "3.5",
+    "front": "When should multiple issues be given to Claude in one message vs. fixed sequentially?",
+    "back": "One message: issues that interact (a fix to one affects the other). Sequentially: independent issues with no shared logic, so each fix is easy to verify in isolation.",
+    "sourceRef": "Exam Guide TS 3.5"
+  },
+  {
+    "id": "fc-3.6-1",
+    "domain": 3,
+    "taskStatement": "3.6",
+    "front": "What flag runs Claude Code non-interactively, and why is it needed in CI?",
+    "back": "`-p` (or `--print`) — processes the prompt, prints to stdout, and exits without waiting for input. Without it, a CI job hangs waiting for interactive input.",
+    "sourceRef": "Exam Guide TS 3.6; Official Sample Q10"
+  },
+  {
+    "id": "fc-3.6-2",
+    "domain": 3,
+    "taskStatement": "3.6",
+    "front": "What two flags together guarantee machine-parseable, schema-validated CI output?",
+    "back": "`--output-format json` (structured JSON output) + `--json-schema` (validates the JSON against a given schema) — used together for automated PR comment posting.",
+    "sourceRef": "Exam Guide TS 3.6; code.claude.com/docs/en/headless (verified)"
+  },
+  {
+    "id": "fc-3.6-3",
+    "domain": 3,
+    "taskStatement": "3.6",
+    "front": "Why is the same Claude Code session that generated a change less effective at reviewing it?",
+    "back": "Session context isolation: the generating session already has a reasoning trail justifying its choices and is less likely to challenge them — use an independent instance for review instead.",
+    "sourceRef": "Exam Guide TS 3.6; guide_en.md §5.9"
+  },
+  {
+    "id": "fc-3.6-4",
+    "domain": 3,
+    "taskStatement": "3.6",
+    "front": "How do you stop a re-run PR review from re-reporting already-fixed issues, and stop test generation from suggesting duplicate tests?",
+    "back": "Include prior review findings in context and ask for only new/unresolved issues. Include existing test files in context so generation sees what's already covered.",
+    "sourceRef": "Exam Guide TS 3.6 Skills in"
+  }
+]

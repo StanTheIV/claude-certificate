@@ -1,0 +1,2485 @@
+[
+  {
+    "id": "d1-1.1-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.1"
+    ],
+    "lesson": "1.1",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A support rep pastes Claude's reply into a ticket, decides on their own what to ask next, and types in a follow-up — repeating this by hand eight times before the ticket closes. Does this count as the agentic loop from this lesson?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Yes — eight repetitions of asking and getting an answer is exactly the loop this lesson describes.",
+        "explanation": "Repetition count isn't the test; nothing here has an outcome routed back automatically for another model decision without a person restarting the exchange."
+      },
+      {
+        "id": "B",
+        "text": "Yes — since the rep is relaying information between turns, this plays the same role a tool result would play in the loop.",
+        "explanation": "A person copying text by hand isn't the same as a result being carried back for another automatic decision — the loop needs continuation the system drives itself."
+      },
+      {
+        "id": "C",
+        "text": "No — each next step is chosen and started by the rep, not by Claude receiving an outcome and continuing on its own, so there's no self-driven cycle here.",
+        "explanation": "Correct: the loop's repetition has to happen without a person manually re-prompting each turn; here a human restarts every step."
+      },
+      {
+        "id": "D",
+        "text": "No — a loop can only involve a ticketing system, and this scenario never mentions one being updated automatically.",
+        "explanation": "The recording mechanism isn't what decides this; the issue is who initiates each next step, not what system happens to store the outcome."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "An agentic loop's repetition is driven by the system carrying an outcome forward automatically, not by a person manually restarting each exchange.",
+    "sourceRef": "Exam Guide TS 1.1; guide_en.md §1.3"
+  },
+  {
+    "id": "d1-1.1-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.1"
+    ],
+    "lesson": "1.1",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "Turn 7's response has `stop_reason: \"tool_use\"`; your code runs the tool and sends the result back. Turn 8's response has `stop_reason: \"end_turn\"`. What should the controller do after turn 8?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Stop looping and return turn 8's response as final — `end_turn` means nothing more is needed.",
+        "explanation": "Correct: end_turn is the documented signal that the task is complete."
+      },
+      {
+        "id": "B",
+        "text": "Send turn 8's response back to Claude once more to double-check it before showing the user, even though nothing further was requested.",
+        "explanation": "An extra confirmation round isn't part of the loop contract and adds no reliability."
+      },
+      {
+        "id": "C",
+        "text": "Execute another tool call anyway, since two rounds is rarely enough to be thorough.",
+        "explanation": "There's no tool call to execute — nothing requested one, and end_turn means none is needed."
+      },
+      {
+        "id": "D",
+        "text": "Wait for a turn 9 before deciding anything, since one `end_turn` alone is never sufficient.",
+        "explanation": "end_turn alone is sufficient; waiting for more turns ignores the documented signal."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "stop_reason \"end_turn\" is sufficient on its own to end the loop; no extra confirmation round is needed.",
+    "sourceRef": "Exam Guide TS 1.1; guide_en.md §1.3, §3.1"
+  },
+  {
+    "id": "d1-1.1-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.1"
+    ],
+    "lesson": "1.1",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "A one-shot chatbot answers a question and stops. A coding assistant sends a request, gets `tool_use`, runs the tool, sends the result back, and repeats until `end_turn`. Which one implements the agentic-loop pattern?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Both — each eventually produces a final answer for the user.",
+        "explanation": "Producing a final answer isn't the distinguishing feature; the repeated act-and-decide cycle is."
+      },
+      {
+        "id": "B",
+        "text": "The coding assistant — it repeats the send/act/feed-back cycle across calls until completion is signaled, unlike the one-shot chatbot.",
+        "explanation": "Correct: the repeated cycle across multiple calls is exactly what makes it agentic."
+      },
+      {
+        "id": "C",
+        "text": "The chatbot — it needed no tool orchestration and answered faster.",
+        "explanation": "Speed and simplicity aren't the criteria; the absence of any loop is why the chatbot doesn't qualify."
+      },
+      {
+        "id": "D",
+        "text": "Neither — a loop requires more than one kind of tool, and only one is confirmed here, so this can't be an agentic loop by that count alone.",
+        "explanation": "Tool variety isn't required; a loop can run with a single tool repeated as needed."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "The defining trait of an agentic loop is the repeated cycle across calls, not speed or tool variety.",
+    "sourceRef": "Exam Guide TS 1.1; guide_en.md §1.3"
+  },
+  {
+    "id": "d1-1.1-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.1"
+    ],
+    "lesson": "1.1",
+    "chunk": 2,
+    "difficulty": 1,
+    "stem": "A bug causes a tool's result to never be appended to the message history before the next request goes out. What will Claude most likely do next?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Return an error stating the expected tool result is missing from context.",
+        "explanation": "Claude has no way to know a result was expected but omitted — it simply doesn't see it, it doesn't detect the omission."
+      },
+      {
+        "id": "B",
+        "text": "Retrieve the missing result automatically from its own internal log of past calls.",
+        "explanation": "There is no internal log Claude can draw on; each call only knows the history it's sent."
+      },
+      {
+        "id": "C",
+        "text": "Have no memory the tool ran at all, since it only knows what's in the sent history — it may repeat the call or guess at an outcome.",
+        "explanation": "Correct: statelessness means an omitted result is simply gone from Claude's view."
+      },
+      {
+        "id": "D",
+        "text": "Proceed correctly anyway, since tool results are cached separately from message history and are always retrievable whenever the model needs them again.",
+        "explanation": "There is no separate cache; message history is the only channel for tool results."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Each API call is stateless; a dropped tool result is simply gone from Claude's view.",
+    "sourceRef": "Exam Guide TS 1.1; guide_en.md §1.1, §1.2"
+  },
+  {
+    "id": "d1-1.1-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.1"
+    ],
+    "lesson": "1.1",
+    "chunk": 3,
+    "difficulty": 2,
+    "stem": "A coordinator's code inspects the user's message and always calls tool A, then tool B, then tool C in that fixed order regardless of intermediate results. Is this the model-driven agentic-loop pattern the exam tests?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "No — the tool sequence is chosen by hard-coded logic, not by Claude reasoning about `stop_reason` and context on each iteration.",
+        "explanation": "Correct: model-driven means Claude decides the next tool from context, not a pre-fixed script."
+      },
+      {
+        "id": "B",
+        "text": "Yes — any sequence of tool calls executed in a loop counts as an agentic loop, since the key requirement is simply that some looping occurs.",
+        "explanation": "Looping alone isn't sufficient; a fixed decision tree wrapped in a loop is still not model-driven."
+      },
+      {
+        "id": "C",
+        "text": "Yes, as long as the loop terminates on `stop_reason == \"end_turn\"`.",
+        "explanation": "Correct termination handling doesn't change the fact that the tool order itself was predetermined by code, not chosen by the model."
+      },
+      {
+        "id": "D",
+        "text": "No — because the sequence only uses three tools, it's too short to be agentic.",
+        "explanation": "The number of tools used isn't the deciding factor; the issue is who chooses the sequence."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Model-driven decision-making means Claude chooses the next action, not a hard-coded sequence.",
+    "sourceRef": "Exam Guide TS 1.1; guide_en.md §3.1"
+  },
+  {
+    "id": "d1-1.1-qc6",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.1"
+    ],
+    "lesson": "1.1",
+    "chunk": 4,
+    "difficulty": 2,
+    "stem": "A team sets `max_iterations = 5` as the primary mechanism for ending its agentic loop. What's the risk?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The loop will never terminate because iteration caps don't interact with `stop_reason` at all, so the two mechanisms can never combine to stop execution under any circumstances.",
+        "explanation": "The cap does terminate the loop — the risk is that it terminates it at the wrong point, not that it never fires."
+      },
+      {
+        "id": "B",
+        "text": "A task that legitimately needs six tool calls gets cut off before finishing, while a task that finished after two calls keeps looping unnecessarily until the cap.",
+        "explanation": "This is the real risk: an arbitrary cap doesn't align with the actual point of completion."
+      },
+      {
+        "id": "C",
+        "text": "The API will reject requests once the cap is reached.",
+        "explanation": "The API has no knowledge of your application-level iteration cap; it won't reject anything because of it."
+      },
+      {
+        "id": "D",
+        "text": "It has no real risk — an iteration cap is the documented way to end an agentic loop.",
+        "explanation": "An iteration cap is at best a safety backstop; using it as the primary mechanism is an explicitly called-out anti-pattern."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "An iteration cap is a safety net, never the primary loop-termination signal.",
+    "sourceRef": "Exam Guide TS 1.1; guide_en.md §3.1"
+  },
+  {
+    "id": "d1-1.1-qc7",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.1"
+    ],
+    "lesson": "1.1",
+    "chunk": 4,
+    "difficulty": 1,
+    "stem": "A review agent's loop treats any response containing a full sentence as \"finished\" and stops. On one turn, Claude writes \"I'll check the second file now.\" alongside a `tool_use` block requesting that file. What goes wrong?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Nothing — a one-sentence response is too short to be mistaken for a finished task.",
+        "explanation": "Length doesn't matter here; the flawed rule triggers on any complete sentence, however short."
+      },
+      {
+        "id": "B",
+        "text": "The loop correctly waits for a longer response before stopping.",
+        "explanation": "The described rule stops on any sentence with a period, so it does not wait for more text."
+      },
+      {
+        "id": "C",
+        "text": "The tool_use block runs twice, once before and once after the sentence.",
+        "explanation": "Nothing causes the tool call to run twice; the actual failure is that it never runs at all."
+      },
+      {
+        "id": "D",
+        "text": "The loop stops immediately and skips the file read, because text presence — not `stop_reason` — decided the turn was over.",
+        "explanation": "Correct: any text-content heuristic can misfire regardless of the specific wording it looks for."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Any text-based completion heuristic is unreliable; only stop_reason should gate the loop.",
+    "sourceRef": "Exam Guide TS 1.1; guide_en.md §3.1"
+  },
+  {
+    "id": "d1-1.2-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.2"
+    ],
+    "lesson": "1.2",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "During a research task, the analysis subagent finishes early and sends its findings straight to the synthesis subagent to save a round trip, instead of returning them to the coordinator. What's the problem?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "It bypasses the coordinator, which is supposed to route every exchange — losing observability and consistent error handling over that step.",
+        "explanation": "Correct: hub-and-spoke requires all inter-subagent communication to flow through the coordinator."
+      },
+      {
+        "id": "B",
+        "text": "The analysis subagent finished too early, before using its full budget of tool calls.",
+        "explanation": "Finishing early isn't the issue; how the finding was routed afterward is."
+      },
+      {
+        "id": "C",
+        "text": "Synthesis should have initiated the exchange, not received it passively.",
+        "explanation": "Which side initiates isn't the point — direct subagent-to-subagent contact is the problem either way."
+      },
+      {
+        "id": "D",
+        "text": "There's no problem — it saves a round trip and gets synthesis the same information faster.",
+        "explanation": "The apparent efficiency gain costs the coordinator's observability and error-handling role over that step."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "All inter-subagent communication should route through the coordinator, even when a direct shortcut seems more efficient.",
+    "sourceRef": "Exam Guide TS 1.2; guide_en.md §3.3"
+  },
+  {
+    "id": "d1-1.2-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.2"
+    ],
+    "lesson": "1.2",
+    "chunk": 1,
+    "difficulty": 2,
+    "stem": "A coordinator invokes all four of its subagents (search, analysis, synthesis, report-generation) for every single query, including a simple one-line factual question. What's the issue?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The coordinator should dynamically select only the subagents a given query actually needs, instead of always running the full pipeline regardless of complexity.",
+        "explanation": "Correct: dynamic selection based on query complexity avoids wasted latency and cost."
+      },
+      {
+        "id": "B",
+        "text": "There is no issue — running the full pipeline every time guarantees the most complete answer, even for the simplest one-line factual questions that clearly need nothing else.",
+        "explanation": "Completeness for a simple factual question doesn't require the full pipeline; this wastes resources without improving the answer."
+      },
+      {
+        "id": "C",
+        "text": "The issue is that subagents should be invoked sequentially, not that all four ran.",
+        "explanation": "Sequencing isn't the core problem here — invoking unnecessary subagents at all is the issue."
+      },
+      {
+        "id": "D",
+        "text": "The issue is that the coordinator's `allowedTools` is missing `\"Task\"`.",
+        "explanation": "The scenario shows subagents ARE being invoked successfully, so `\"Task\"` is clearly present; that's not the problem described."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "A coordinator should dynamically select subagents based on query complexity, not always run the full pipeline.",
+    "sourceRef": "Exam Guide TS 1.2; guide_en.md §3.3"
+  },
+  {
+    "id": "d1-1.2-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.2"
+    ],
+    "lesson": "1.2",
+    "chunk": 2,
+    "difficulty": 2,
+    "stem": "A coordinator splits \"impact of remote work on urban housing\" into subtasks covering only rent prices in three US cities. Every subagent executes its assigned subtask correctly, but the final report misses commercial real estate, migration patterns, and non-US markets entirely. Where does the root cause lie?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "In the analysis subagent's relevance filtering criteria.",
+        "explanation": "The analysis subagent did its assigned job correctly on the given subtopics; filtering isn't the issue."
+      },
+      {
+        "id": "B",
+        "text": "In the coordinator's task decomposition — the subtask list itself was too narrow, regardless of how well each subagent executed its assignment.",
+        "explanation": "Correct: the subagents executed correctly; the subtask list itself never covered the missing areas."
+      },
+      {
+        "id": "C",
+        "text": "In the synthesis subagent, which should have detected the coverage gap on its own and gone back to request more research from the other agents before finalizing anything.",
+        "explanation": "Synthesis only sees what it's given; it can't invent coverage of topics no subagent ever researched."
+      },
+      {
+        "id": "D",
+        "text": "In the search subagent, whose queries should have been broader.",
+        "explanation": "The search subagent correctly researched what it was assigned; the assignment itself was the narrow part."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "When subagents execute correctly but coverage is incomplete, the root cause is the coordinator's decomposition.",
+    "sourceRef": "Exam Guide TS 1.2; Exam Guide §9 Q7; guide_en.md Ch.10"
+  },
+  {
+    "id": "d1-1.2-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.2"
+    ],
+    "lesson": "1.2",
+    "chunk": 2,
+    "difficulty": 2,
+    "stem": "The coordinator's logs show it decomposed \"global supply chain disruptions\" into exactly one subtask: \"semiconductor shortages.\" All subagents perform well on that subtask, yet the resulting report is judged incomplete. What should be reconsidered first?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The subagents' tool permissions, which may be too restrictive to let them research adjacent parts of the broader topic at all.",
+        "explanation": "Tool permissions aren't implicated — the subagents performed their one assigned subtask well."
+      },
+      {
+        "id": "B",
+        "text": "The synthesis subagent's writing style.",
+        "explanation": "Writing style doesn't affect topic coverage; the gap is about what was researched, not how it was written up."
+      },
+      {
+        "id": "C",
+        "text": "The coordinator's decomposition step — one narrow subtask can't represent a broad topic, regardless of execution quality.",
+        "explanation": "Correct: a single narrow subtask structurally cannot cover a broad topic, no matter how well it's executed."
+      },
+      {
+        "id": "D",
+        "text": "The number of parallel Task calls the coordinator is allowed to make.",
+        "explanation": "Parallelism limits don't explain a single, narrowly-scoped subtask — this is a decomposition breadth issue, not a concurrency one."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Narrow decomposition — even a single subtask — caps how much of a broad topic can ever be covered.",
+    "sourceRef": "Exam Guide TS 1.2; guide_en.md Ch.10"
+  },
+  {
+    "id": "d1-1.2-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.2"
+    ],
+    "lesson": "1.2",
+    "chunk": 3,
+    "difficulty": 2,
+    "stem": "The coordinator's evaluation step finds four of five requested subtopics are well covered by the first synthesis draft, but 'battery recycling costs' has no supporting data at all. What should it do next, consistent with iterative refinement?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Discard the whole draft and start decomposition over from zero for all five subtopics.",
+        "explanation": "This discards four subtopics that are already well covered, far more costly than a targeted follow-up."
+      },
+      {
+        "id": "B",
+        "text": "Send a new, narrowly-scoped request to search and/or analysis about just the recycling-costs gap, then run synthesis again with that addition.",
+        "explanation": "Correct: this is the targeted re-delegation plus re-synthesis pattern."
+      },
+      {
+        "id": "C",
+        "text": "Leave the gap in place and publish the draft as final, since four out of five is a strong majority.",
+        "explanation": "Accepting a known gap skips the refinement step the coordinator is positioned to run."
+      },
+      {
+        "id": "D",
+        "text": "Ask a synthesis subagent to invent placeholder figures for the missing subtopic so the report reads as complete without anyone noticing the gap.",
+        "explanation": "Inventing figures produces an inaccurate report instead of closing the gap with real research."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Iterative refinement means a targeted follow-up on the specific gap, then re-synthesis — not a full restart or an accepted omission.",
+    "sourceRef": "Exam Guide TS 1.2; guide_en.md §3.3"
+  },
+  {
+    "id": "d1-1.2-qc6",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.2"
+    ],
+    "lesson": "1.2",
+    "chunk": 4,
+    "difficulty": 1,
+    "stem": "The coordinator assigns both of its two search subagents the same instruction, 'find information about renewable energy policy,' with no other scoping. What's the likely result?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The subagents will negotiate between themselves and split the topic evenly, without any coordinator involvement, since they can infer the overlap and adjust their own scope automatically.",
+        "explanation": "Subagents don't communicate with each other to divide work; that would also violate the hub-and-spoke pattern."
+      },
+      {
+        "id": "B",
+        "text": "The results will automatically merge into non-overlapping findings before reaching synthesis.",
+        "explanation": "There is no automatic deduplication between subagent invocations."
+      },
+      {
+        "id": "C",
+        "text": "Both subagents research overlapping ground, wasting the parallel capacity that distinct scopes — e.g. one on solar subsidies, one on wind permitting — would have covered.",
+        "explanation": "Correct: identical vague scoping causes redundant work instead of wider coverage."
+      },
+      {
+        "id": "D",
+        "text": "This is fine, since sending the same instruction twice increases confidence in whatever both subagents find.",
+        "explanation": "Redundant coverage here wastes parallel capacity rather than adding confidence."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Partition distinct subtopics or source types across subagents; identical vague scopes waste parallel capacity.",
+    "sourceRef": "Exam Guide TS 1.2; guide_en.md §3.3"
+  },
+  {
+    "id": "d1-1.3-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.3"
+    ],
+    "lesson": "1.3",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "Production logs show a coordinator has never once spawned a subagent, even though its system prompt says to delegate refund investigations to a specialist. Its `allowed_tools` list is `[\"get_customer\", \"lookup_order\", \"process_refund\"]`. What's the most likely explanation?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The specialist subagent's own `allowed_tools` list must be empty.",
+        "explanation": "An empty list on the specialist wouldn't stop the coordinator from attempting to spawn it in the first place."
+      },
+      {
+        "id": "B",
+        "text": "The coordinator needs `\"lookup_order\"` and `\"process_refund\"` removed from its own list before it will delegate to any subagent at all.",
+        "explanation": "Having its own tools doesn't prevent a coordinator from also delegating; that's not the blocker here."
+      },
+      {
+        "id": "C",
+        "text": "Delegation only happens automatically once traffic crosses a certain volume threshold.",
+        "explanation": "There is no such volume-based mechanism governing delegation."
+      },
+      {
+        "id": "D",
+        "text": "`\"Task\"` isn't in the coordinator's `allowed_tools`, so it has no mechanism to spawn any subagent no matter what the prompt says.",
+        "explanation": "Correct: without \"Task\" permitted, delegation is structurally impossible regardless of prompt wording."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "A coordinator can only spawn subagents if \"Task\" is explicitly in its own allowedTools — a configuration prerequisite, not a prompting one.",
+    "sourceRef": "Exam Guide TS 1.3; guide_en.md §3.4"
+  },
+  {
+    "id": "d1-1.3-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.3"
+    ],
+    "lesson": "1.3",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "A `document_analysis` subagent's `AgentDefinition` sets `allowed_tools=[\"read_file\", \"Task\", \"process_refund\"]`, even though it only ever needs to read and summarize documents. What's the concern?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "It violates least privilege — `Task` and `process_refund` give it more capability (spawning subagents, issuing refunds) than its job requires.",
+        "explanation": "Correct: allowed_tools should match the subagent's actual role, not exceed it."
+      },
+      {
+        "id": "B",
+        "text": "It's invalid — a subagent's `allowed_tools` can list at most two tools.",
+        "explanation": "There is no such limit on the number of tools a subagent can be allowed."
+      },
+      {
+        "id": "C",
+        "text": "It's fine, since `system_prompt` determines behavior, not `allowed_tools`.",
+        "explanation": "allowed_tools enforces what the subagent can actually call, regardless of what the prompt describes."
+      },
+      {
+        "id": "D",
+        "text": "It's a problem only because `read_file` is listed first instead of alphabetically, which shouldn't affect anything the subagent actually ends up doing.",
+        "explanation": "List ordering has no bearing on the subagent's actual capabilities."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "allowed_tools should be scoped to exactly what a subagent's role needs — nothing more.",
+    "sourceRef": "Exam Guide TS 1.3; guide_en.md §3.2"
+  },
+  {
+    "id": "d1-1.3-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.3"
+    ],
+    "lesson": "1.3",
+    "chunk": 2,
+    "difficulty": 1,
+    "stem": "A `pricing_subagent` earlier determined that only orders placed after March 1 qualify for a discount. The coordinator now spawns a `refund_subagent` with the prompt \"Calculate the refund for this order.\" Will the refund_subagent know about the March 1 cutoff?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Yes — both subagents run under the same coordinator session, so facts one establishes are automatically visible to the other throughout.",
+        "explanation": "Subagent context is isolated; nothing is shared automatically between separate invocations."
+      },
+      {
+        "id": "B",
+        "text": "No — subagent context isn't shared automatically; the coordinator must copy the cutoff rule explicitly into the refund_subagent's prompt.",
+        "explanation": "Correct: only what's explicitly written into a Task prompt is available to that subagent."
+      },
+      {
+        "id": "C",
+        "text": "Yes, but only if both subagents were spawned in the same batch of parallel `Task` calls.",
+        "explanation": "Batching Task calls together doesn't create shared context between the spawned subagents."
+      },
+      {
+        "id": "D",
+        "text": "No — subagents can never receive rules of this kind, only raw data like order IDs and amounts.",
+        "explanation": "Subagents can receive any content, including rules, as long as it's explicitly included in the prompt."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Nothing is inherited between subagents automatically; every needed fact must be explicitly written into the Task prompt.",
+    "sourceRef": "Exam Guide TS 1.3; guide_en.md §3.3, §3.4"
+  },
+  {
+    "id": "d1-1.3-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.3"
+    ],
+    "lesson": "1.3",
+    "chunk": 2,
+    "difficulty": 2,
+    "stem": "A `refund_verification` subagent's `AgentDefinition` sets `allowed_tools=[\"get_customer\", \"process_refund\", \"Task\"]` so it can verify identity and issue refunds on its own. Months later, someone notices it also sometimes spawns its own subagents, well outside its intended scope. What's the most likely cause?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The `system_prompt` field was left blank, which by default is assumed to grant every possible tool the platform makes available to any subagent it defines.",
+        "explanation": "A blank system_prompt doesn't grant tools; allowed_tools alone controls what's callable."
+      },
+      {
+        "id": "B",
+        "text": "The coordinator's own `allowed_tools` list is missing `\"Task\"`.",
+        "explanation": "The coordinator's own list isn't at issue here — this subagent's own tool list is what's oversized."
+      },
+      {
+        "id": "C",
+        "text": "`Task` was included in its `allowed_tools` even though this subagent's role never needed to spawn subagents of its own — a least-privilege oversight.",
+        "explanation": "Correct: granting Task here goes beyond what a refund-verification role requires."
+      },
+      {
+        "id": "D",
+        "text": "`get_customer` and `process_refund` together implicitly enable subagent spawning as a side effect.",
+        "explanation": "Those tools have no bearing on Task access; only explicitly listing Task enables spawning."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "A subagent's allowed_tools should include only what its assigned role needs; unused capabilities are a least-privilege gap, not a convenience.",
+    "sourceRef": "Exam Guide TS 1.3; guide_en.md §3.4"
+  },
+  {
+    "id": "d1-1.3-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.3"
+    ],
+    "lesson": "1.3",
+    "chunk": 3,
+    "difficulty": 2,
+    "stem": "A coordinator passes this into a synthesis subagent's prompt: \"Analysts found that adoption grew fast last year, according to a report I skimmed.\" What's the main problem with this handoff for a report that needs accurate citations?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The sentence is too short — handoffs must always be at least several full paragraphs long before they can count as a complete, citable finding for synthesis.",
+        "explanation": "Length isn't the issue; the missing specificity of the source is."
+      },
+      {
+        "id": "B",
+        "text": "It should have been sent as a `PostToolUse` hook result instead of as prompt text.",
+        "explanation": "A hook wouldn't fix the missing attribution; the content itself needs a structured claim-plus-source format."
+      },
+      {
+        "id": "C",
+        "text": "Nothing is wrong, as long as the finding itself is accurate.",
+        "explanation": "Even an accurate claim is useless for citation if its specific source can't be traced."
+      },
+      {
+        "id": "D",
+        "text": "The claim and its source are collapsed into one vague sentence — no specific URL, document name, or figure — so synthesis can't cite it accurately.",
+        "explanation": "Correct: without a structured, separated source, downstream citation is unreliable."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Pass findings as structured content separated from their metadata, not as a paraphrased blob, so attribution survives into synthesis.",
+    "sourceRef": "Exam Guide TS 1.3; guide_en.md §3.4"
+  },
+  {
+    "id": "d1-1.3-qc6",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.3"
+    ],
+    "lesson": "1.3",
+    "chunk": 4,
+    "difficulty": 1,
+    "stem": "A coordinator's code currently issues one `Task` call, waits for the full result, then issues the next — for three subtasks that don't depend on each other's output at all. A teammate wants to cut wall-clock latency without reducing the number of subagents used. What should they change?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Emit all three `Task` calls within a single coordinator response so they execute concurrently, instead of one call per turn.",
+        "explanation": "Correct: batching independent Task calls into one response lets them run in parallel."
+      },
+      {
+        "id": "B",
+        "text": "Switch the three subtasks to run inside one subagent instead of three.",
+        "explanation": "This reduces the subagent count, which the teammate explicitly wants to avoid, and loses specialization."
+      },
+      {
+        "id": "C",
+        "text": "Reduce the number of subtasks from three to two, since fewer calls always finish faster no matter what each one actually covers.",
+        "explanation": "Dropping a subtask loses coverage rather than fixing the sequential-latency problem."
+      },
+      {
+        "id": "D",
+        "text": "Add a fourth `Task` call that periodically polls the other three for a status update.",
+        "explanation": "Polling adds overhead without addressing why the three calls run one after another."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Independent subtasks should be batched into multiple Task calls within one coordinator response to run concurrently.",
+    "sourceRef": "Exam Guide TS 1.3; guide_en.md §3.4"
+  },
+  {
+    "id": "d1-1.3-qc7",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.3"
+    ],
+    "lesson": "1.3",
+    "chunk": 5,
+    "difficulty": 2,
+    "stem": "A coordinator gives a research subagent this prompt: \"Step 1: search for exactly 3 sources. Step 2: summarize each in exactly 2 sentences. Step 3: stop.\" Midway through, one of the three sources turns out to be a dead link. What's the likely consequence of this prompt style?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "No consequence — rigid, numbered prompts always produce more reliable behavior than open-ended ones.",
+        "explanation": "Rigid prompts aren't more reliable when reality deviates from the anticipated steps, as it does here."
+      },
+      {
+        "id": "B",
+        "text": "The subagent has little room to adapt — its instructions are a rigid step count and format rather than a goal, so it may struggle to substitute a working source.",
+        "explanation": "Correct: procedural, fixed-count instructions leave no room to adapt to the dead link."
+      },
+      {
+        "id": "C",
+        "text": "The subagent will automatically switch to a goal-oriented interpretation once it detects the dead link.",
+        "explanation": "Subagents don't reinterpret their own prompt style on the fly."
+      },
+      {
+        "id": "D",
+        "text": "The dead link will cause the `Task` call itself to fail validation before the subagent starts.",
+        "explanation": "A dead link discovered during research doesn't invalidate the Task call itself."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Goal-and-criteria prompts let a subagent adapt when reality doesn't match the plan; rigid step lists don't.",
+    "sourceRef": "Exam Guide TS 1.3; guide_en.md §3.4"
+  },
+  {
+    "id": "d1-1.4-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.4"
+    ],
+    "lesson": "1.4",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A system prompt says: \"Always confirm the shipping address before calling `update_address`.\" Over six months this works in the vast majority of cases, but three incidents show the model updating the address without asking first. What does this pattern best illustrate?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The system prompt must have been silently overwritten by a later message in the conversation, since a correctly worded instruction can never actually be skipped.",
+        "explanation": "System prompts stay in effect; the incidents don't require any overwrite to explain them."
+      },
+      {
+        "id": "B",
+        "text": "The three incidents indicate a bug in `update_address` itself, not in how compliance was enforced.",
+        "explanation": "The tool executing as called isn't the issue; whether the prerequisite check always runs first is."
+      },
+      {
+        "id": "C",
+        "text": "Prompt-based compliance can approach but never reach a guaranteed 100% — a well-written instruction still has a nonzero chance of being skipped.",
+        "explanation": "Correct: this is exactly the nonzero-failure-rate property of prompt-based guidance."
+      },
+      {
+        "id": "D",
+        "text": "The model ignores system prompts entirely after several turns have passed.",
+        "explanation": "System prompts don't expire after a number of turns; that isn't why compliance is imperfect."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Prompt instructions provide probabilistic compliance, never a guaranteed 100% success rate.",
+    "sourceRef": "Exam Guide TS 1.4; guide_en.md §1.4 Part II"
+  },
+  {
+    "id": "d1-1.4-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.4"
+    ],
+    "lesson": "1.4",
+    "chunk": 1,
+    "difficulty": 2,
+    "stem": "A gate blocks `approve_loan` until `verify_income` has returned a confirmed figure. During a demo, the model's reasoning text insists it has \"already effectively verified income from context clues\" and tries to call `approve_loan` anyway. What happens?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The call succeeds, since the gate only checks the model's stated reasoning, not tool-call history.",
+        "explanation": "A programmatic gate checks whether the prerequisite tool actually ran, not what the model claims."
+      },
+      {
+        "id": "B",
+        "text": "The gate asks the user to confirm the model's claim before deciding.",
+        "explanation": "A deterministic gate doesn't defer to a user confirmation of the model's own reasoning."
+      },
+      {
+        "id": "C",
+        "text": "The gate disables itself the first time it's triggered, on the assumption that blocking the same conversation repeatedly would be excessive and unhelpful for the customer waiting on a decision.",
+        "explanation": "A gate enforces the prerequisite every time, not just until it's first triggered."
+      },
+      {
+        "id": "D",
+        "text": "The call is still refused — the gate checks whether `verify_income` actually ran and returned a result, not whether the model believes verification happened.",
+        "explanation": "Correct: the gate's guarantee comes from checking actual tool-call history, not model intent."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "A programmatic gate checks whether a prerequisite tool actually ran, ignoring whatever the model claims in its own reasoning.",
+    "sourceRef": "Exam Guide TS 1.4; Exam Guide §9 Q1; guide_en.md §1.4 Part II"
+  },
+  {
+    "id": "d1-1.4-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.4"
+    ],
+    "lesson": "1.4",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "Which of these steps most clearly needs a programmatic gate rather than a system-prompt instruction?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Blocking `wire_transfer` until a second employee's tool-based approval has been recorded.",
+        "explanation": "Correct: a financial operation with a required precondition needs a deterministic gate."
+      },
+      {
+        "id": "B",
+        "text": "Formatting refund confirmation emails with the company's preferred greeting.",
+        "explanation": "A formatting preference has no real consequence if occasionally missed, so a prompt suffices."
+      },
+      {
+        "id": "C",
+        "text": "Choosing which emoji, if any, to include in a casual chat reply.",
+        "explanation": "This is a low-stakes stylistic choice well suited to prompt guidance."
+      },
+      {
+        "id": "D",
+        "text": "Ordering the bullet points in a summary from most to least recent.",
+        "explanation": "Ordering a summary's bullets has no financial, identity, or safety consequence."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Reserve programmatic gates for steps with financial, identity, or safety consequences; prompts suffice for style choices.",
+    "sourceRef": "Exam Guide TS 1.4; guide_en.md §1.4 Part II"
+  },
+  {
+    "id": "d1-1.4-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.4"
+    ],
+    "lesson": "1.4",
+    "chunk": 2,
+    "difficulty": 1,
+    "stem": "A message reads: \"My package arrived damaged, I'd like a $650 refund, and please update my email on file.\" The $650 refund exceeds the $500 threshold that requires a gate before `process_refund` can run. How should the agent handle this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Skip the gate this once, since the customer also has two other legitimate requests bundled in the same message.",
+        "explanation": "Bundling unrelated requests together is never a reason to bypass a required gate."
+      },
+      {
+        "id": "B",
+        "text": "Decompose into the three concerns, let the gate block/redirect the over-threshold refund to escalation while resolving the other two directly, then reply with one synthesized update.",
+        "explanation": "Correct: decomposition handles all three concerns while the gate still governs the refund concern on its own terms."
+      },
+      {
+        "id": "C",
+        "text": "Escalate all three concerns to a human, since one of them involves a gate.",
+        "explanation": "The other two concerns don't need escalation; only the gated refund does."
+      },
+      {
+        "id": "D",
+        "text": "Process the refund first since it's clearly the highest-value concern of the three, then handle the other two afterward in a completely separate follow-up message sent to the customer later.",
+        "explanation": "The refund can't simply be processed — it's above the threshold and must go through the gate regardless of order."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Decomposing multi-concern requests doesn't override a gate — the gated concern still gets blocked/redirected while the rest proceed and are synthesized together.",
+    "sourceRef": "Exam Guide TS 1.4; guide_en.md §1.4 Part II"
+  },
+  {
+    "id": "d1-1.4-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.4"
+    ],
+    "lesson": "1.4",
+    "chunk": 3,
+    "difficulty": 1,
+    "stem": "A handoff note reads: \"Customer is upset about a late order. Escalating to manager.\" What's missing that would let the human reviewer act immediately without re-reading the conversation?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "A timestamp showing exactly when the escalation was triggered, so the reviewer knows how urgent the case might be.",
+        "explanation": "A timestamp alone doesn't tell the reviewer what happened or what to do next."
+      },
+      {
+        "id": "B",
+        "text": "The customer's preferred contact method for the reviewer's reply.",
+        "explanation": "Contact method doesn't help the reviewer understand the case or decide an action."
+      },
+      {
+        "id": "C",
+        "text": "Specifics like the customer's ID, what's already been checked or done, and a concrete recommended action.",
+        "explanation": "Correct: these are exactly the fields that let a human act without re-investigating."
+      },
+      {
+        "id": "D",
+        "text": "A count of how many messages the customer sent before escalation.",
+        "explanation": "A message count says nothing about the actual issue, cause, or recommended resolution."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "A structured handoff needs the specific facts a human would otherwise have to re-investigate: ID, root cause, actions taken, recommendation.",
+    "sourceRef": "Exam Guide TS 1.4; guide_en.md §9.3"
+  },
+  {
+    "id": "d1-1.5-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.5"
+    ],
+    "lesson": "1.5",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A team wants to stop a `send_email` tool from ever firing when the recipient domain is on a blocklist, catching it before any email leaves the system. Which hook point fits, and why?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`PostToolUse`, because it can inspect what the tool already sent and log it for review.",
+        "explanation": "By the time PostToolUse fires, the email has already been sent — too late to prevent it."
+      },
+      {
+        "id": "B",
+        "text": "The system prompt, because it can instruct the model never to email blocklisted domains.",
+        "explanation": "A prompt instruction is probabilistic and can't guarantee the email is never sent."
+      },
+      {
+        "id": "C",
+        "text": "`stop_reason`, because it reports whether the model intended to send an email.",
+        "explanation": "stop_reason indicates why the model stopped generating; it doesn't intercept or block a specific call."
+      },
+      {
+        "id": "D",
+        "text": "A pre-execution interception hook, because it runs before the tool call executes and can block it outright.",
+        "explanation": "Correct: only a pre-execution hook can stop the call before it ever runs."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Blocking a call before it happens requires a pre-execution interception hook, not a post-hoc check or a prompt instruction.",
+    "sourceRef": "Exam Guide TS 1.5; guide_en.md §3.5"
+  },
+  {
+    "id": "d1-1.5-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.5"
+    ],
+    "lesson": "1.5",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "A hook is meant to reformat a tool's raw output before Claude reasons over it, but a developer attaches it as a pre-execution interception hook instead of `PostToolUse`. What goes wrong?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "There's no result yet to reformat at that point — a pre-execution hook runs before the call, so the output isn't available until afterward.",
+        "explanation": "Correct: a pre-execution hook fires before the tool runs, so there's nothing to reformat yet."
+      },
+      {
+        "id": "B",
+        "text": "Nothing goes wrong, since both hook points see identical data regardless of timing.",
+        "explanation": "The two hook points see different things: one sees the proposed call, the other sees the result."
+      },
+      {
+        "id": "C",
+        "text": "The reformatting hook will instead modify the tool call's input arguments rather than transforming the output it was actually meant to normalize.",
+        "explanation": "A pre-execution hook can inspect or block a call, but there's no output for a reformatting hook to act on there."
+      },
+      {
+        "id": "D",
+        "text": "The mistake only matters for tools that return numeric data, not text.",
+        "explanation": "The timing mismatch affects any output type, not just numeric data."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "PostToolUse and pre-execution interception hooks fire at different points; a result only exists to transform after execution.",
+    "sourceRef": "Exam Guide TS 1.5; guide_en.md §3.5"
+  },
+  {
+    "id": "d1-1.5-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.5"
+    ],
+    "lesson": "1.5",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "Two backend tools return order status differently: one uses `\"shipped\"`/`\"delivered\"`, another uses numeric codes `1`/`2`. In 5% of conversations, the agent treats code `2` as if it meant `\"shipped\"` instead of `\"delivered\"`. What's the most reliable fix?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "A system-prompt note listing what each numeric code means, trusting the model to apply the mapping correctly every single time.",
+        "explanation": "This is the same probabilistic approach that already produced the 5% error rate."
+      },
+      {
+        "id": "B",
+        "text": "A `PostToolUse` hook that maps both formats to one consistent label before the model ever sees the result.",
+        "explanation": "Correct: normalizing once in code removes the need for the model to reinterpret formats each time."
+      },
+      {
+        "id": "C",
+        "text": "A `PreToolUse` hook that rejects any tool call whose result would use numeric codes.",
+        "explanation": "Rejecting the call removes needed functionality instead of transforming the data into a usable form."
+      },
+      {
+        "id": "D",
+        "text": "Asking the customer to state the order status themselves in their message.",
+        "explanation": "This doesn't address the underlying inconsistency between the two backend tools' own formats."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Normalize heterogeneous tool output once, in a PostToolUse hook, rather than relying on the model to reinterpret it correctly every turn.",
+    "sourceRef": "Exam Guide TS 1.5; guide_en.md §3.5, §11.2"
+  },
+  {
+    "id": "d1-1.5-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.5"
+    ],
+    "lesson": "1.5",
+    "chunk": 2,
+    "difficulty": 2,
+    "stem": "A business rule requires blocking any `wire_transfer` call above $10,000 and redirecting it to a compliance-review queue instead. Where should this check live?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "In a `PostToolUse` hook, after the transfer has already completed and funds have moved.",
+        "explanation": "By the time PostToolUse fires, the over-limit transfer has already gone through — too late."
+      },
+      {
+        "id": "B",
+        "text": "In the tool's description field, asking the model not to exceed $10,000.",
+        "explanation": "A description is only guidance to the model, not an enforced guarantee."
+      },
+      {
+        "id": "C",
+        "text": "In an interception hook on the outgoing `wire_transfer` call, which can block or redirect before the transfer ever executes.",
+        "explanation": "Correct: this is the pre-execution pattern needed to guarantee the limit is never exceeded."
+      },
+      {
+        "id": "D",
+        "text": "In a comment in the tool's source code explaining the $10,000 limit.",
+        "explanation": "A comment has no runtime effect on whether the call executes."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "A hard compliance limit needs a pre-execution interception hook — a post-hoc check or a description note doesn't prevent the violation.",
+    "sourceRef": "Exam Guide TS 1.5; Exam Guide §9 Q1; guide_en.md §3.5"
+  },
+  {
+    "id": "d1-1.5-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.5"
+    ],
+    "lesson": "1.5",
+    "chunk": 3,
+    "difficulty": 1,
+    "stem": "A team is deciding how to enforce two rules: (1) always sign off messages with the agent's name, and (2) never let a discount exceed 20% without manager sign-off. Which pairing of enforcement mechanisms fits best?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "A hook for both rules, since hooks are strictly better whenever available.",
+        "explanation": "Using a hook for the low-stakes signature rule is unnecessary engineering overhead."
+      },
+      {
+        "id": "B",
+        "text": "A hook for the signature rule, a system-prompt line for the discount rule.",
+        "explanation": "This is backwards — the discount rule has real financial stakes and the signature rule doesn't."
+      },
+      {
+        "id": "C",
+        "text": "A system-prompt line for both rules, since both are just formatting preferences.",
+        "explanation": "The discount cap isn't a formatting preference — it has a real financial consequence if skipped."
+      },
+      {
+        "id": "D",
+        "text": "A system-prompt line for the signature rule, a hook for the discount rule.",
+        "explanation": "Correct: match the low-stakes rule to a prompt and the guaranteed numeric limit to a hook."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Match the mechanism to the stakes: low-stakes style preferences suit a prompt; guaranteed numeric limits need a hook.",
+    "sourceRef": "Exam Guide TS 1.5; guide_en.md §3.5"
+  },
+  {
+    "id": "d1-1.6-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.6"
+    ],
+    "lesson": "1.6",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A team already knows the fixed sequence for \"migrate our REST API to GraphQL\" (schema design, resolver implementation, endpoint deprecation), but has no idea yet why checkout conversion dropped 8% last week. What should determine which decomposition strategy fits each task?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Whether the task's full set of steps is already known versus needing to be discovered as you investigate.",
+        "explanation": "Correct: this predictability is exactly what separates a fixed pipeline from adaptive decomposition."
+      },
+      {
+        "id": "B",
+        "text": "Whether the task is customer-facing or internal-only.",
+        "explanation": "Being customer-facing doesn't determine whether the task's structure is known in advance."
+      },
+      {
+        "id": "C",
+        "text": "How many people on the team are available to work on it.",
+        "explanation": "Team size doesn't affect whether the steps are predictable ahead of time."
+      },
+      {
+        "id": "D",
+        "text": "Whether the task can be finished within one business day, regardless of how much of its structure is already known.",
+        "explanation": "Duration isn't the deciding factor; predictability of the steps is."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Choose fixed pipelines for known task structure, dynamic decomposition for genuine unknowns.",
+    "sourceRef": "Exam Guide TS 1.6; guide_en.md §8.1-8.2"
+  },
+  {
+    "id": "d1-1.6-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.6"
+    ],
+    "lesson": "1.6",
+    "chunk": 1,
+    "difficulty": 2,
+    "stem": "An agent reviews 20 support tickets in one single pass to flag policy violations. It flags a phrase as a violation in ticket #3 but approves the identical phrase in ticket #17, and tickets near the end get much shorter analysis than tickets near the start. What's the underlying cause?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The tickets were processed in the wrong order — reviewing them alphabetically would fix it.",
+        "explanation": "Reordering doesn't fix the underlying inconsistency in attention across many items in one pass."
+      },
+      {
+        "id": "B",
+        "text": "Attention dilution — reviewing many items together in one pass produces inconsistent depth and contradictory judgments.",
+        "explanation": "Correct: this is the named failure mode for too many items processed together."
+      },
+      {
+        "id": "C",
+        "text": "The support-ticket tool's description was too vague for the model to reliably know what a violation actually looks like across every ticket in the batch.",
+        "explanation": "Tool description quality is a different concern and doesn't explain contradictory judgments on the same phrase."
+      },
+      {
+        "id": "D",
+        "text": "The context window was too small to hold all 20 tickets, so several were silently dropped.",
+        "explanation": "The issue isn't capacity — the tickets weren't dropped, they were reviewed inconsistently."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Attention dilution across many items in one pass causes inconsistent depth and contradictory judgments.",
+    "sourceRef": "Exam Guide TS 1.6; Exam Guide §9 Q12; guide_en.md §8.3"
+  },
+  {
+    "id": "d1-1.6-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.6"
+    ],
+    "lesson": "1.6",
+    "chunk": 1,
+    "difficulty": 2,
+    "stem": "For the 20-ticket review above, a colleague proposes fixing the contradictory judgments by switching to a model with a much bigger context window so all 20 tickets \"fit more comfortably.\" Will this fix it?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Yes — once everything fits without truncation, attention is automatically uniform across all 20 tickets.",
+        "explanation": "Fitting in the window doesn't guarantee uniform depth of attention across every item."
+      },
+      {
+        "id": "B",
+        "text": "Yes, but only if the tickets are also sorted by length before being submitted.",
+        "explanation": "Sorting by length doesn't address the underlying dilution across many items in one pass."
+      },
+      {
+        "id": "C",
+        "text": "No — the problem is inconsistent depth of attention across many items, not whether they technically fit; splitting into per-item passes plus a separate cross-item pass is the actual fix.",
+        "explanation": "Correct: dilution is a quality-of-attention issue that a bigger window doesn't solve."
+      },
+      {
+        "id": "D",
+        "text": "No — bigger context windows always make attention dilution worse, never better.",
+        "explanation": "A bigger window isn't guaranteed to make things worse either; it simply doesn't address the actual cause."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Attention dilution is a quality-of-attention problem, not a capacity problem; a bigger window doesn't fix it.",
+    "sourceRef": "Exam Guide TS 1.6; Exam Guide §9 Q12; guide_en.md §8.3"
+  },
+  {
+    "id": "d1-1.6-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.6"
+    ],
+    "lesson": "1.6",
+    "chunk": 2,
+    "difficulty": 1,
+    "stem": "A team is asked to \"harden our authentication system against common vulnerabilities,\" without yet knowing which specific weaknesses exist. A manager proposes writing the full task list up front: \"Step 1: add rate limiting. Step 2: rotate secrets. Step 3: write the report.\" What's the risk of committing to this before any investigation?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Rate limiting should never be step 1, since it's the least effective defense in general.",
+        "explanation": "The specific ordering isn't the issue; committing to any fixed order before investigating is."
+      },
+      {
+        "id": "B",
+        "text": "The plan is too short — a proper hardening task always needs at least five clearly predefined steps written out well before any real work begins.",
+        "explanation": "Step count isn't the problem; the plan's steps aren't grounded in what's actually found."
+      },
+      {
+        "id": "C",
+        "text": "Fixed plans can't be executed by Claude Code, only followed by a human security engineer.",
+        "explanation": "Fixed plans can absolutely be executed; the issue is whether a fixed plan fits this kind of task."
+      },
+      {
+        "id": "D",
+        "text": "The real vulnerabilities are still unknown, so a plan written before investigating can't reflect what actually needs fixing or in what order.",
+        "explanation": "Correct: this is exactly why open-ended investigative tasks need adaptive decomposition."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Open-ended, investigation-dependent tasks need adaptive decomposition; a plan fixed before looking can't reflect what's actually found.",
+    "sourceRef": "Exam Guide TS 1.6; guide_en.md §8.2"
+  },
+  {
+    "id": "d1-1.6-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.6"
+    ],
+    "lesson": "1.6",
+    "chunk": 3,
+    "difficulty": 1,
+    "stem": "Every Monday, a workflow pulls last week's merged PRs, categorizes each by type (feature/fix/chore), and generates a changelog entry — always in that exact order, every week, regardless of what the PRs contain. Which decomposition strategy fits, and why?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Prompt chaining (a fixed pipeline), since the steps and their order are already fully known and repeat unchanged every run.",
+        "explanation": "Correct: a predictable, repeating structure is exactly what a fixed pipeline suits."
+      },
+      {
+        "id": "B",
+        "text": "Dynamic adaptive decomposition, so the workflow can discover new categorization schemes as it goes.",
+        "explanation": "The categorization scheme is already fixed and known; there's nothing here to discover mid-run."
+      },
+      {
+        "id": "C",
+        "text": "No decomposition at all, since a weekly task is simple enough for a single unstructured pass.",
+        "explanation": "Even a predictable task benefits from being broken into defined stages for stability and reproducibility."
+      },
+      {
+        "id": "D",
+        "text": "Assign the task to two subagents in parallel, one for search and one for categorization, regardless of the task's predictability.",
+        "explanation": "Subagent parallelism is a separate concern from which decomposition philosophy fits a predictable task."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "A predictable, repeating task structure is exactly what a fixed prompt-chaining pipeline is designed for.",
+    "sourceRef": "Exam Guide TS 1.6; guide_en.md §8.1"
+  },
+  {
+    "id": "d1-1.7-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.7"
+    ],
+    "lesson": "1.7",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A developer runs `claude --resume refund-race-condition` after two days away from that investigation. What does this do?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Starts a brand-new session that happens to be named \"refund-race-condition\".",
+        "explanation": "This describes creating a new session, not resuming a specific prior one by name."
+      },
+      {
+        "id": "B",
+        "text": "Continues that specific named session, bringing back its accumulated context from two days ago.",
+        "explanation": "Correct: --resume with a session name continues that exact prior conversation."
+      },
+      {
+        "id": "C",
+        "text": "Forks whichever session was most recently active into a new branch.",
+        "explanation": "This describes fork_session behavior, not named resumption of a specific session."
+      },
+      {
+        "id": "D",
+        "text": "Deletes the session's prior history and starts the investigation over again from scratch under the same session name.",
+        "explanation": "Resuming preserves the session's context; it doesn't delete anything."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "--resume <session-name> continues a specific named prior session, not just the last conversation.",
+    "sourceRef": "Exam Guide TS 1.7; guide_en.md §5.10"
+  },
+  {
+    "id": "d1-1.7-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.7"
+    ],
+    "lesson": "1.7",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "After a shared investigation into why nightly builds are slow, a developer wants to try two independent fixes — caching build artifacts vs. parallelizing test shards — without redoing the shared profiling work, and wants to be able to abandon either path independently later. What should they do?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Start two brand-new sessions and redo the build-slowness profiling separately in each.",
+        "explanation": "This discards the entire benefit of the shared baseline by redoing identical work twice."
+      },
+      {
+        "id": "B",
+        "text": "Use `--resume` on the same session twice in two terminals, keeping track manually of which explores which fix.",
+        "explanation": "This doesn't create two independent, divergent histories — both would write into the same session state."
+      },
+      {
+        "id": "C",
+        "text": "Use `fork_session` to branch two independent sessions from the completed profiling investigation, one per fix idea.",
+        "explanation": "Correct: fork_session branches independent sessions from a shared baseline without duplicating the groundwork."
+      },
+      {
+        "id": "D",
+        "text": "Merge both fix ideas into a single session and implement them one after another.",
+        "explanation": "Doing both sequentially in one session bakes the first approach's decisions into the second instead of diverging cleanly."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "fork_session branches independent explorations from a shared baseline without redoing the shared groundwork.",
+    "sourceRef": "Exam Guide TS 1.7; guide_en.md §5.10"
+  },
+  {
+    "id": "d1-1.7-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.7"
+    ],
+    "lesson": "1.7",
+    "chunk": 2,
+    "difficulty": 2,
+    "stem": "You resume a two-week-old named session to finish a pricing-logic refactor. Since then, a teammate renamed several functions in the file you'd been editing. You just say \"continue the refactor\" without mentioning this. What's the likely outcome?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The session will refuse to continue until you re-run the command with a `--refresh` flag.",
+        "explanation": "Resuming doesn't check file state or refuse to start; no such flag governs this."
+      },
+      {
+        "id": "B",
+        "text": "The session automatically diffs the file against its last-known version and adapts on its own.",
+        "explanation": "Resuming does not automatically detect file changes; prior tool results are simply carried forward as-is."
+      },
+      {
+        "id": "C",
+        "text": "The refactor will proceed correctly, since resuming always re-fetches the latest file contents from disk before continuing any further work at all.",
+        "explanation": "Resuming does not automatically re-read files; it relies on what was previously read unless told otherwise."
+      },
+      {
+        "id": "D",
+        "text": "The agent may act on the old function names it saw before, since it still trusts what it read two weeks ago rather than the file's current state.",
+        "explanation": "Correct: without being told what changed, the resumed agent risks reasoning from stale results."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Resuming after files changed risks the agent trusting its old, now-outdated view of those files.",
+    "sourceRef": "Exam Guide TS 1.7; guide_en.md §5.10"
+  },
+  {
+    "id": "d1-1.7-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.7"
+    ],
+    "lesson": "1.7",
+    "chunk": 2,
+    "difficulty": 1,
+    "stem": "Before resuming a week-old session to continue debugging a checkout timeout, a developer adds one line to their prompt: \"Note: `payment_gateway.ts` and `retry_logic.ts` were both rewritten since we last worked on this — re-check those two before continuing.\" What does this achieve?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "It lets the agent re-analyze just the two changed files while still relying on the rest of its preserved context.",
+        "explanation": "Correct: naming the specific changed files enables targeted, efficient re-analysis."
+      },
+      {
+        "id": "B",
+        "text": "It forces the agent to re-read every file in the entire project before doing anything else.",
+        "explanation": "The note names only two files; it doesn't trigger a full-project re-read."
+      },
+      {
+        "id": "C",
+        "text": "It has no real effect, since resuming already re-reads all previously-read files automatically every single time it's invoked.",
+        "explanation": "Resuming does not automatically re-read files; that's exactly why naming the changes matters."
+      },
+      {
+        "id": "D",
+        "text": "It converts the resume into a fork, since naming specific files triggers branching behavior.",
+        "explanation": "Naming changed files doesn't trigger forking; resume and fork remain distinct, separately-invoked behaviors."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Naming the specific files that changed enables targeted re-analysis without discarding the rest of the preserved context.",
+    "sourceRef": "Exam Guide TS 1.7; guide_en.md §5.10"
+  },
+  {
+    "id": "d1-1.7-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 1,
+    "taskStatements": [
+      "1.7"
+    ],
+    "lesson": "1.7",
+    "chunk": 3,
+    "difficulty": 2,
+    "stem": "A migration-planning session hasn't been touched in six weeks, and in that time roughly half the files it investigated were rewritten by other work. The developer wants to continue planning today. What's generally the more reliable approach?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Resume the old session exactly as-is — six full weeks of accumulated investigation outweighs any partial file changes that happened since it was last active weeks ago.",
+        "explanation": "With roughly half the investigated files changed, much of that accumulated context is now unreliable regardless of its volume."
+      },
+      {
+        "id": "B",
+        "text": "Start a fresh session and give it a concise, accurate summary of the prior findings, rather than carrying forward the old session's now-largely-stale context.",
+        "explanation": "Correct: with substantial staleness and significant time elapsed, a fresh session with an accurate summary is more reliable."
+      },
+      {
+        "id": "C",
+        "text": "Resume the old session, then ask it to re-read every file it ever touched before doing anything else.",
+        "explanation": "This discards the efficiency of the prior investigation by re-doing full exploration when only some files changed."
+      },
+      {
+        "id": "D",
+        "text": "Fork the old session, treating the fork as equivalent to a fresh, up-to-date context.",
+        "explanation": "Forking still carries forward the same stale tool-call history from the shared baseline; it doesn't refresh anything."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "When much of a session's prior tool state is stale, a fresh session with an accurate summary beats resuming or forking that stale context.",
+    "sourceRef": "Exam Guide TS 1.7; guide_en.md §5.10"
+  },
+  {
+    "id": "d1-1.1-p1",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.1"
+    ],
+    "scenario": 3,
+    "difficulty": 3,
+    "stem": "Your multi-agent research coordinator's loop controller currently short-circuits: if the model's response contains *any* text content, the controller treats the turn as final and stops, without checking `stop_reason`. Logs show that in 8% of turns, Claude returns both a short explanatory sentence *and* a `tool_use` block requesting a web search — and the controller wrongly ends the loop before the search ever runs, leaving the research incomplete. What is the most effective fix?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a rule that treats any response under 200 characters of text as non-final, then fall back to the existing text-based check for longer responses.",
+        "explanation": "A length threshold is still a natural-language heuristic, not the documented stop_reason field, and some tool_use turns include longer explanatory text that would still be misclassified."
+      },
+      {
+        "id": "B",
+        "text": "Keep the text-based short-circuit, but only apply it after first checking that the response contains no more than one sentence of text.",
+        "explanation": "This still relies on text-content heuristics (sentence count) rather than the structured field; a tool_use block can still accompany exactly one short sentence."
+      },
+      {
+        "id": "C",
+        "text": "Remove the text-based short-circuit and gate loop continuation on `stop_reason` alone: continue while it is `\"tool_use\"`, stop only on `\"end_turn\"`.",
+        "explanation": "This is correct: stop_reason is the only reliable signal, and text content presence or length says nothing about whether the turn is actually complete."
+      },
+      {
+        "id": "D",
+        "text": "Increase the iteration cap, on the assumption that giving the loop more total turns will eventually let a delayed tool_use turn execute before the conversation ends.",
+        "explanation": "A higher iteration cap doesn't fix a loop that already terminated early on the very turn where the tool call was missed — the loop never reaches a later turn."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Loop continuation must be gated on stop_reason, not on the presence, length, or content of assistant text.",
+    "sourceRef": "Exam Guide TS 1.1; guide_en.md §3.1"
+  },
+  {
+    "id": "d1-1.1-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.1"
+    ],
+    "scenario": 1,
+    "difficulty": 3,
+    "stem": "Your customer support agent's loop implementation logs `stop_reason` for every turn. Over one week, you see 40 turns where `stop_reason` is `\"tool_use\"` but the loop terminated anyway, because a secondary safeguard flagged the tool call as a 'likely duplicate' of the previous turn's call and silently skipped execution, ending the conversation without a result. Which change most directly restores correct loop behavior while keeping the duplicate-detection safeguard?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Remove the duplicate-detection safeguard entirely, so every `tool_use` turn always executes the tool exactly as requested, even genuine repeats.",
+        "explanation": "This removes a possibly-useful safeguard entirely rather than fixing how it interacts with the loop — it overcorrects instead of targeting the actual bug."
+      },
+      {
+        "id": "B",
+        "text": "Keep detecting likely-duplicate calls, but return a tool result explaining the duplicate instead of skipping execution, so the loop still continues on `stop_reason`.",
+        "explanation": "This is correct: it preserves both the deterministic continue-on-tool_use rule and the safeguard, by feeding a result back instead of silently breaking the request-response contract."
+      },
+      {
+        "id": "C",
+        "text": "When a duplicate is detected, immediately set `stop_reason` to `\"end_turn\"` so the loop exits cleanly instead of skipping silently.",
+        "explanation": "stop_reason is a field on Claude's own API response, not something application code should fabricate to force termination — doing so ends the conversation instead of letting Claude see a result and decide the next step."
+      },
+      {
+        "id": "D",
+        "text": "When a duplicate is detected, retry the exact same tool call up to 3 times before giving up, on the assumption that a repeated attempt will eventually be treated as non-duplicate.",
+        "explanation": "Retrying doesn't address the actual bug — that the safeguard was silently skipping tool execution rather than informing the loop or the model of what happened."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "When a tool_use turn is intercepted for a valid reason, feed a result back into context rather than silently breaking the continue-on-tool_use contract.",
+    "sourceRef": "Exam Guide TS 1.1; guide_en.md §1.3, §3.1"
+  },
+  {
+    "id": "d1-1.1-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.1"
+    ],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "You're building a coding agent that explores an unfamiliar repository. Its loop currently continues until the assistant's response contains the literal phrase \"exploration complete\", which you added because early testing showed the model reliably said this when done. After shipping, support tickets report the agent sometimes stops after reading just two files (having casually written \"the exploration is now complete enough\" mid-explanation while still planning further Reads), and other times runs 40+ tool calls without ever producing that exact phrase. What should replace this termination check?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Broaden the phrase match to include synonyms like \"done exploring\" and \"finished investigating\" to catch more valid completions.",
+        "explanation": "This is still a text-matching heuristic, just with a bigger list — it doesn't fix the false-positive case where similar wording appears mid-explanation."
+      },
+      {
+        "id": "B",
+        "text": "Require the phrase to appear as the very last sentence of the response, rather than anywhere in the text.",
+        "explanation": "Position-based matching is still fragile text parsing, and it doesn't address the 40+-call case where the phrase never appears at all."
+      },
+      {
+        "id": "C",
+        "text": "Lower the model's temperature setting for exploration turns, on the theory that a less varied, more deterministic model will phrase its completion sentence the same way every time.",
+        "explanation": "Temperature doesn't make a structured API field like stop_reason more reliable, and it fixes neither failure mode described."
+      },
+      {
+        "id": "D",
+        "text": "Check `stop_reason` instead: continue on `\"tool_use\"`, stop on `\"end_turn\"` — regardless of any wording in the assistant's text.",
+        "explanation": "This is correct: the structured field is unaffected by whatever wording happens to appear in the assistant's text."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "No amount of refining a text-matching heuristic replaces checking the structured stop_reason field.",
+    "sourceRef": "Exam Guide TS 1.1; guide_en.md §3.1"
+  },
+  {
+    "id": "d1-1.2-p1",
+    "source": "original",
+    "duplicateOf": "off-07",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.2"
+    ],
+    "scenario": 3,
+    "difficulty": 3,
+    "stem": "Your research coordinator handles the query \"How has climate change affected global fisheries?\" It decomposes the topic into three subtasks: \"ocean acidification effects on coral reefs,\" \"coral reef fish population decline,\" and \"coral bleaching economic impact on tourism.\" Each subagent completes its subtask well, and synthesis produces a coherent, well-cited report — entirely about coral reef ecosystems. The report never mentions open-ocean fisheries, aquaculture, or fishing-industry economics, which were the actual core of the question. What's the most effective fix?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The coordinator's decomposition was too narrow (fixated on one fishery type); revise it so subtasks span the topic's major sub-areas before delegating.",
+        "explanation": "This is correct: every subagent executed its assignment well, so the root cause is the narrow subtask list itself, not any downstream execution."
+      },
+      {
+        "id": "B",
+        "text": "The synthesis subagent failed to broaden the scope of what it was given; add instructions telling synthesis to independently research missing angles.",
+        "explanation": "Synthesis subagents don't have independent authority to expand research scope beyond what they were fed — that responsibility sits with the coordinator's decomposition."
+      },
+      {
+        "id": "C",
+        "text": "The web-search subagent's queries were too narrow for the subtasks it received; the fix is to give it access to a broader set of search tools and databases.",
+        "explanation": "The search subagent executed exactly the (narrow) subtasks it was assigned; broader tool access doesn't help if it was never asked about open-ocean fisheries."
+      },
+      {
+        "id": "D",
+        "text": "The document-analysis subagent applied overly strict relevance filtering on the sources it was handed; loosen its filtering criteria so fewer sources get excluded.",
+        "explanation": "Analysis filtering out irrelevant sources is a separate failure mode from never being asked about the missing topic at all."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "When every subagent executes its assignment well but the aggregate output is incomplete, the fix belongs in the coordinator's decomposition, not in a downstream agent's instructions or tools.",
+    "sourceRef": "Exam Guide TS 1.2; Exam Guide §9 Q7; guide_en.md Ch.10"
+  },
+  {
+    "id": "d1-1.2-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.2"
+    ],
+    "scenario": 3,
+    "difficulty": 3,
+    "stem": "Your coordinator's evaluation step reviews the first synthesis draft and detects that one requested comparison (\"cost per query: vector search vs. keyword search\") is missing supporting data, while the rest of the report is solid. The current implementation, on detecting any gap, restarts the entire pipeline: it re-invokes the web-search subagent with the original broad query and re-runs analysis and synthesis from scratch. This roughly doubles latency and cost for every minor gap. What change best preserves the iterative-refinement pattern while fixing this inefficiency?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Stop re-running the pipeline on every gap detection; instead have synthesis note the gap as an acknowledged limitation in the final report and move on.",
+        "explanation": "This abandons iterative refinement in favor of accepting incomplete coverage, whereas the pattern explicitly calls for re-delegation to close a detected gap."
+      },
+      {
+        "id": "B",
+        "text": "Cache the first synthesis draft and merge it with a second, independently regenerated full report generated from scratch, to try to fill any remaining gaps.",
+        "explanation": "Regenerating an entire second full report to fill one narrow gap is far more expensive than a targeted re-delegation, defeating the purpose of the fix."
+      },
+      {
+        "id": "C",
+        "text": "On detecting a gap, re-delegate only the subagents needed for that specific gap with a targeted query, then re-invoke synthesis.",
+        "explanation": "This is correct: targeted re-delegation for the specific gap, followed by re-synthesis, is the iterative-refinement pattern without the cost of a full restart."
+      },
+      {
+        "id": "D",
+        "text": "Increase the specificity of the original broad query up front, so future runs of this same research topic are less likely to surface any gaps at all.",
+        "explanation": "This optimizes the original query for future runs but doesn't address how the current run's pipeline should respond when a gap is actually detected."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Iterative refinement means the coordinator re-delegates a targeted follow-up query for the specific gap, not a full pipeline restart or an accepted omission.",
+    "sourceRef": "Exam Guide TS 1.2; guide_en.md §3.3"
+  },
+  {
+    "id": "d1-1.2-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.2"
+    ],
+    "scenario": 1,
+    "difficulty": 3,
+    "stem": "You're adding a coordinator-subagent pattern to your customer support agent so complex, multi-part cases can be split across a billing-investigation subagent and a shipping-investigation subagent. In your first implementation, both subagents are given `allowedTools` including `escalate_to_human`, and both independently decide whether to escalate, sending their escalation directly to the human queue without going through the coordinator. In testing, a single customer case results in two separate, inconsistent escalation tickets — one from each subagent — confusing the human reviewer. What's the most effective structural fix?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Remove `escalate_to_human` from both subagents' `allowedTools`, and give the tool only to whichever of the two subagents happens to run first in a given case.",
+        "explanation": "Arbitrarily privileging whichever subagent runs first doesn't reflect which one actually has the more urgent finding, and still bypasses the coordinator's aggregation role."
+      },
+      {
+        "id": "B",
+        "text": "Route all escalation decisions through the coordinator, which aggregates both subagents' findings into a single escalation when needed.",
+        "explanation": "This is correct: routing all communication, including escalation, through the coordinator restores observability and produces one consistent outcome."
+      },
+      {
+        "id": "C",
+        "text": "Keep both subagents able to escalate independently, but require each to first check a shared \"already escalated\" flag stored somewhere before doing so.",
+        "explanation": "A shared flag is an ad-hoc coordination mechanism outside the coordinator; subagents don't share memory or state with each other in this architecture."
+      },
+      {
+        "id": "D",
+        "text": "Merge the billing and shipping subagents into a single subagent, so there is structurally only one place in the system where escalation can ever be triggered.",
+        "explanation": "Collapsing the specialized subagents removes the benefit of delegation entirely, when routing communication through the existing coordinator solves the actual problem."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "All subagent communication — including escalation decisions — should route through the coordinator so it can aggregate and produce one consistent outcome.",
+    "sourceRef": "Exam Guide TS 1.2; guide_en.md §3.3"
+  },
+  {
+    "id": "d1-1.3-p1",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.3"
+    ],
+    "scenario": 3,
+    "difficulty": 3,
+    "stem": "Your coordinator spawns a synthesis subagent with the prompt: \"Write the final report on renewable energy adoption trends.\" The synthesis subagent has no search results, no analysis output, and no citations included in its prompt — the coordinator assumed that because all three subagents ran within the same overall session, synthesis would have access to what search and analysis already found. In practice, the synthesis subagent produces a generic report with no citations, because none of the prior findings ever reached it. What's the correct fix?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Increase the synthesis subagent's `allowed_tools` to include the same web-search tool the search subagent used, so it can look up the findings itself.",
+        "explanation": "Giving synthesis its own search tool doesn't reconstruct the specific findings analysis already produced; it would just have synthesis redo research, likely producing different, unvetted results."
+      },
+      {
+        "id": "B",
+        "text": "Merge the search, analysis, and synthesis subagents into a single subagent, so that whatever one step finds is automatically available to the next step.",
+        "explanation": "Collapsing the specialized subagents removes the parallelization and separation-of-concerns benefits the pattern exists for, when a targeted prompt fix solves the actual problem."
+      },
+      {
+        "id": "C",
+        "text": "Resume the coordinator's own session with `--resume` immediately before invoking the synthesis subagent, so it inherits the full prior session history.",
+        "explanation": "--resume operates on CLI/SDK sessions as a whole, not on passing specific findings into one particular subagent's Task prompt — subagent invocations don't automatically inherit coordinator history even within one session."
+      },
+      {
+        "id": "D",
+        "text": "Explicitly include the full findings from the search and analysis subagents in the synthesis subagent's `Task` prompt — nothing is inherited automatically.",
+        "explanation": "This is correct: subagent context is exactly what's explicitly written into its Task prompt, and nothing is inherited automatically."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Subagent context is exactly what's explicitly written into its Task prompt — nothing is inherited automatically, even from sibling subagents in the same session.",
+    "sourceRef": "Exam Guide TS 1.3; guide_en.md §3.3, §3.4"
+  },
+  {
+    "id": "d1-1.3-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.3"
+    ],
+    "scenario": 3,
+    "difficulty": 2,
+    "stem": "Three independent subtopics need research: \"policy incentives,\" \"battery storage costs,\" and \"grid infrastructure investment.\" Your coordinator currently emits one `Task` call, waits for its result, then emits the next `Task` call, and so on — three sequential round trips. A teammate proposes emitting all three `Task` calls within a single coordinator response instead. Assuming the three subtopics don't depend on each other's findings, what is the main benefit of the teammate's proposal?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The three subagents run concurrently, so the coordinator only waits roughly as long as the slowest one, instead of the sum of all three.",
+        "explanation": "This is correct: parallel Task calls in one response let independent subtasks execute concurrently, cutting total latency."
+      },
+      {
+        "id": "B",
+        "text": "It reduces the number of tokens each subagent's prompt needs, because parallel `Task` calls automatically share one combined context across all three subagents.",
+        "explanation": "Parallel Task calls don't share context between the spawned subagents — each still needs its own explicit prompt content."
+      },
+      {
+        "id": "C",
+        "text": "It guarantees the three subagents' outputs will be perfectly consistent with each other, unlike sequential calls.",
+        "explanation": "Parallelism doesn't guarantee output consistency between independent subagents; that's a separate concern typically resolved during synthesis."
+      },
+      {
+        "id": "D",
+        "text": "It allows the three subagents to communicate directly with each other mid-execution to cross-check findings, which improves the accuracy of each one's output.",
+        "explanation": "Subagents communicate only through the coordinator in this architecture, whether spawned in parallel or sequentially — parallel spawning doesn't change that."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Parallel Task calls in a single coordinator response cut latency for independent subtasks to roughly the slowest one; they don't create shared context or direct inter-subagent communication.",
+    "sourceRef": "Exam Guide TS 1.3; guide_en.md §3.4"
+  },
+  {
+    "id": "d1-1.3-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.3"
+    ],
+    "scenario": 1,
+    "difficulty": 2,
+    "stem": "You configure a `refund_specialist` subagent with `AgentDefinition(name=\"refund_specialist\", description=\"Handles refund eligibility checks\", system_prompt=\"...\", allowed_tools=[\"lookup_order\", \"process_refund\"])`. QA flags that the coordinator never actually invokes this subagent even for clear refund requests, always handling refunds itself instead. Reviewing the config, the coordinator's own `allowed_tools` list is `[\"get_customer\", \"lookup_order\", \"process_refund\", \"escalate_to_human\"]`. What's missing?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The `refund_specialist`'s `description` field is too thin and is missing detail about refund policy thresholds that the coordinator would need to route on.",
+        "explanation": "A thinner description could affect which subagent gets chosen among several options, but here the coordinator isn't delegating to any subagent at all — pointing to a missing capability, not a description-quality issue."
+      },
+      {
+        "id": "B",
+        "text": "The coordinator's `system_prompt` doesn't explicitly name the `refund_specialist` subagent.",
+        "explanation": "Naming a subagent explicitly can help guide automatic selection, but it doesn't explain a coordinator that structurally cannot delegate; without \"Task\" in its own allowed_tools, no prompt wording enables spawning."
+      },
+      {
+        "id": "C",
+        "text": "`\"Task\"` is missing from the coordinator's `allowed_tools`, so it has no mechanism to spawn the `refund_specialist` subagent at all.",
+        "explanation": "This is correct: without \"Task\" explicitly included, the coordinator cannot invoke any subagent, regardless of how well-described the subagent is."
+      },
+      {
+        "id": "D",
+        "text": "The `refund_specialist`'s own `allowed_tools` list is missing `\"get_customer\"`, which it would need before it could verify identity for a refund.",
+        "explanation": "This subagent's own tool list is unrelated to whether the coordinator can invoke it in the first place."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "A coordinator can only spawn subagents if \"Task\" is explicitly included in its own allowedTools — this is a configuration prerequisite, not a prompting concern.",
+    "sourceRef": "Exam Guide TS 1.3; guide_en.md §3.4"
+  },
+  {
+    "id": "d1-1.4-p1",
+    "source": "original",
+    "duplicateOf": "off-01",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.4"
+    ],
+    "scenario": 1,
+    "difficulty": 3,
+    "stem": "Production logs for your customer support agent show that in 9% of refund conversations, the agent calls `process_refund` before calling `get_customer`, occasionally processing a refund against the wrong account because it relied on a name the customer typed in chat rather than a verified ID. Your system prompt already states clearly: \"Always call get_customer to verify identity before calling process_refund.\" What should you add to close this gap?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Additional few-shot examples in the system prompt demonstrating the agent calling `get_customer` first, across many different phrasings of a refund request and edge cases.",
+        "explanation": "More few-shot examples can raise compliance further but is still prompt-based and leaves a nonzero failure rate — the category of fix already in place and shown to be insufficient."
+      },
+      {
+        "id": "B",
+        "text": "A programmatic prerequisite check that blocks `process_refund` from executing unless `get_customer` has already returned a verified customer ID in this conversation.",
+        "explanation": "This is correct: with a documented nonzero failure rate and real misidentification consequences already occurring, only a programmatic gate closes the gap deterministically."
+      },
+      {
+        "id": "C",
+        "text": "A follow-up reminder message injected into the conversation before every refund-related turn, restating the identity-verification requirement one more time.",
+        "explanation": "An injected reminder is still a prompt-level nudge, not a guarantee; the agent can still proceed to process_refund despite the reminder."
+      },
+      {
+        "id": "D",
+        "text": "A stricter temperature setting applied specifically to refund-related turns, intended to make the agent's tool-call ordering more internally consistent.",
+        "explanation": "Temperature affects response variability generally; it doesn't enforce a specific required tool-call ordering."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Once a required step has a documented nonzero prompt-compliance failure rate and real consequences (misidentified accounts, wrong refunds), only a programmatic gate closes it.",
+    "sourceRef": "Exam Guide TS 1.4; Exam Guide §9 Q1; guide_en.md §1.4 Part II"
+  },
+  {
+    "id": "d1-1.4-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.4"
+    ],
+    "scenario": 1,
+    "difficulty": 2,
+    "stem": "A customer's message reads: \"My package arrived damaged, AND your website charged my card twice for the same order.\" Your agent currently processes only the first concern it detects (the damaged package), replies with a resolution, and ends the turn — the duplicate charge is never addressed unless the customer writes back separately. Investigation shows both concerns could be resolved using the same verified customer record. What's the most effective change?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Ask the customer a clarifying question, asking them to state which of the two concerns — the damaged package or the duplicate charge — is more urgent before the agent proceeds.",
+        "explanation": "The message is not actually ambiguous — both concerns are clearly stated; asking the customer to pick one adds a needless round trip instead of handling both."
+      },
+      {
+        "id": "B",
+        "text": "Escalate the entire message to a human agent, since it contains more than one issue.",
+        "explanation": "Multi-concern alone isn't grounds for escalation — the agent should decompose and handle both issues itself before escalation is warranted."
+      },
+      {
+        "id": "C",
+        "text": "Process the two concerns strictly in the order they were written, replying to the damaged package first and ending the turn before addressing the charge.",
+        "explanation": "Replying separately and ending after the first reply reproduces the original bug — only one concern reaches the customer — instead of fixing it."
+      },
+      {
+        "id": "D",
+        "text": "Decompose the message into its distinct concerns, investigate each using the already-verified customer context, then synthesize both resolutions into one unified reply.",
+        "explanation": "This is correct: decomposing, investigating with shared context, and synthesizing one unified reply is the recommended pattern for multi-concern requests."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Multi-concern requests should be decomposed, investigated with shared context, and resolved together in one synthesized response — not answered one issue at a time or bounced to a human by default.",
+    "sourceRef": "Exam Guide TS 1.4; guide_en.md §1.4 Part II"
+  },
+  {
+    "id": "d1-1.4-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.4"
+    ],
+    "scenario": 1,
+    "difficulty": 2,
+    "stem": "When your support agent escalates a complex case, the human reviewer currently receives only the message: \"Customer needs manager review — case escalated.\" Reviewers report needing an average of six extra minutes per case re-reading the conversation to figure out what happened before they can act, and occasionally re-asking the customer for information the agent already collected. What should the escalation payload include instead?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "A structured summary: customer ID, root cause, actions already taken, refund amount if applicable, and a recommended action.",
+        "explanation": "This is correct: a structured, self-contained summary lets the reviewer act immediately without re-investigating."
+      },
+      {
+        "id": "B",
+        "text": "The complete raw conversation transcript, so the reviewer has every detail available.",
+        "explanation": "The raw transcript contains the information but isn't structured — the reviewer still has to read and extract root cause, actions taken, and a recommendation, which is exactly the time being lost."
+      },
+      {
+        "id": "C",
+        "text": "A confidence score from the agent, expressed as a number from 1-10, indicating how certain it is that escalating this particular case was the right call.",
+        "explanation": "A confidence score about the escalation decision itself doesn't give the reviewer the case details (root cause, actions taken, amounts) needed to act."
+      },
+      {
+        "id": "D",
+        "text": "A link to the customer's account dashboard, so the reviewer can independently look up the order and the customer's history themselves before deciding.",
+        "explanation": "A dashboard link lets the reviewer re-derive order details, but still requires them to redo the investigation (root cause, actions already taken) the agent already completed."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "A structured handoff summary — not a raw transcript or a bare escalation flag — is what lets a human act immediately without re-investigating.",
+    "sourceRef": "Exam Guide TS 1.4; guide_en.md §9.3"
+  },
+  {
+    "id": "d1-1.5-p1",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.5"
+    ],
+    "scenario": 1,
+    "difficulty": 3,
+    "stem": "Your refund policy caps agent-approved refunds at $500; anything above must go to a human. The system prompt states this limit clearly, and testing showed 97% compliance. Over one quarter, however, audit logs show 14 refunds over $500 were approved directly by the agent, several during unusually persuasive customer messages. Which change guarantees the limit is never exceeded again, regardless of how the conversation is worded?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Rewrite the system prompt with stronger language (e.g., \"under no circumstances approve refunds over $500\") and add three few-shot examples of correctly refusing large refunds.",
+        "explanation": "This is the same category of fix already in place — the 97% compliance came from prompt wording; strengthening it further reduces but does not eliminate the nonzero failure rate the audit already demonstrated."
+      },
+      {
+        "id": "B",
+        "text": "Add a `PostToolUse` hook that flags any `process_refund` result over $500 in a log for a human to retroactively review during the next audit cycle.",
+        "explanation": "A PostToolUse hook fires after the refund has already been processed — it can flag the violation for audit, but by then the over-limit refund has already gone through, which doesn't satisfy \"never exceeded.\""
+      },
+      {
+        "id": "C",
+        "text": "An interception hook on the outgoing `process_refund` call that blocks any request with `amount > 500` and redirects to escalation before the tool executes.",
+        "explanation": "This is correct: a pre-execution interception hook is the only option here that deterministically prevents the over-limit refund from ever being processed."
+      },
+      {
+        "id": "D",
+        "text": "Lower the model's temperature specifically for refund-related turns, on the theory that less varied outputs will make the $500 rule easier to follow.",
+        "explanation": "Temperature doesn't provide a deterministic guarantee on a specific numeric business rule; it only nudges general response variability."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "A hard numeric compliance limit needs a pre-execution interception hook, not a stronger prompt or a post-hoc audit hook — those only observe or reduce, not prevent, the violation.",
+    "sourceRef": "Exam Guide TS 1.5; Exam Guide §9 Q1; guide_en.md §3.5"
+  },
+  {
+    "id": "d1-1.5-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.5"
+    ],
+    "scenario": 1,
+    "difficulty": 3,
+    "stem": "Your support agent integrates three backend systems. `get_customer` returns `account_status` as an integer code (`0`, `1`, `2`), `lookup_order` returns `order_status` as a string (`\"pending\"`, `\"shipped\"`, `\"delivered\"`), and a third legacy system returns timestamps as raw Unix epoch integers. In 6% of conversations, the agent misreads `account_status: 2` as if it meant the same thing as a shipped-order status from a different system, giving customers wrong information. What's the most effective fix?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "A system-prompt glossary explaining what each numeric status code and timestamp format means, so the model can translate them itself each time.",
+        "explanation": "A glossary in the prompt still relies on the model correctly applying it fresh on every single turn — the same probabilistic-compliance problem that produced the 6% error rate in the first place."
+      },
+      {
+        "id": "B",
+        "text": "A `PostToolUse` hook that normalizes each tool's output into a consistent, clearly labeled format before the model processes any of it.",
+        "explanation": "This is correct: a PostToolUse hook normalizes the data once, deterministically, in code, removing the need for the model to reinterpret formats on every turn."
+      },
+      {
+        "id": "C",
+        "text": "A `PreToolUse` hook that blocks any tool call whose result would return a raw integer status code instead of a human-readable string.",
+        "explanation": "Blocking the calls entirely removes functionality the agent needs; the actual need is to transform the data, not prevent it from being returned."
+      },
+      {
+        "id": "D",
+        "text": "Consolidate `get_customer` and `lookup_order` into a single combined tool, so agents only ever have to interpret one unified status field.",
+        "explanation": "Merging two backend systems' tools is a larger architectural change than the problem requires, and it doesn't address the third system's raw-timestamp issue at all."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Heterogeneous data formats across tools should be normalized once in a PostToolUse hook, not re-interpreted by the model from a prompt glossary on every turn.",
+    "sourceRef": "Exam Guide TS 1.5; guide_en.md §3.5, §11.2"
+  },
+  {
+    "id": "d1-1.5-p3",
+    "source": "original",
+    "duplicateOf": "d1-1.5-p1",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.5"
+    ],
+    "scenario": 3,
+    "difficulty": 3,
+    "stem": "Your research coordinator's synthesis subagent occasionally cites sources that were already flagged as retracted or unreliable by an internal source-quality list, because the flag only lives in a spreadsheet a human checks after the report is drafted. You want any subagent's request to fetch content from a flagged source blocked automatically, with the subagent redirected to search for an alternative source instead. Which mechanism fits, and at which point should it act?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "A `PostToolUse` hook that removes flagged sources from search results after they've already been fetched and shown to the subagent.",
+        "explanation": "By the time PostToolUse runs, the fetch has already happened — this is reactive rather than preventing the wasted fetch, and doesn't redirect the subagent to an alternative before it acts on the flagged source."
+      },
+      {
+        "id": "B",
+        "text": "A note added to each subagent's `system_prompt` instructing it never to cite sources that appear on the internal retracted/unreliable list.",
+        "explanation": "A prompt instruction is probabilistic; a subagent can still miss it occasionally, and the flagged-source list needs to be checked deterministically against a maintained list, not recalled correctly by the model."
+      },
+      {
+        "id": "C",
+        "text": "A human review step placed at the very end of the pipeline that strips citations to flagged sources out of the final report just before it is sent.",
+        "explanation": "Catching this only at final review means flagged citations may already have shaped the subagent's reasoning and the synthesis draft, and doesn't prevent the wasted fetch or downstream reliance on the source."
+      },
+      {
+        "id": "D",
+        "text": "An interception hook on the outgoing fetch call that checks the source against the flagged list and blocks or redirects before it executes.",
+        "explanation": "This is correct: a pre-execution interception hook can deterministically block the request and redirect to an alternative before the subagent ever acts on the flagged source."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Blocking a specific outgoing tool call before it executes requires a pre-execution interception hook — a post-hoc cleanup step or a prompt reminder only reduces or delays the problem.",
+    "sourceRef": "Exam Guide TS 1.5; guide_en.md §3.5"
+  },
+  {
+    "id": "d1-1.6-p1",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.6"
+    ],
+    "scenario": 4,
+    "difficulty": 3,
+    "stem": "You're building a Claude Code workflow that reviews pull requests of varying sizes: some touch 2 files, others touch 20+. Your current implementation always runs a single review pass over the entire diff regardless of size. On PRs with 15+ files, reviewers report that obvious bugs are missed in files reviewed \"later\" in the pass, and the same pattern is flagged as an issue in one file but approved in another file in the same PR. What restructuring most directly addresses this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Split the review into a per-file local-analysis pass for each changed file, plus a separate cross-file integration pass for consistency.",
+        "explanation": "This is correct: separating per-file depth from a dedicated integration pass directly fixes attention dilution while still catching cross-file issues."
+      },
+      {
+        "id": "B",
+        "text": "Switch the review to a model with a much larger context window, so the entire diff, however many files it touches, fits comfortably in one single pass.",
+        "explanation": "Attention dilution is about consistency of attention across many files, not whether they technically fit in the context window — a bigger window doesn't guarantee uniform depth of analysis per file."
+      },
+      {
+        "id": "C",
+        "text": "Run three independent full-diff review passes and keep only the issues that appear in at least two of the three runs.",
+        "explanation": "Running the same flawed single-pass approach multiple times and requiring consensus can actually suppress real bugs that are only caught intermittently, rather than fixing the underlying dilution."
+      },
+      {
+        "id": "D",
+        "text": "Require contributors to split any pull request touching more than 8 files into two or more smaller pull requests before the automated review even runs.",
+        "explanation": "This pushes the problem onto contributors rather than improving the review system itself, and doesn't help for PRs already at or under any chosen threshold that still show inconsistency."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Attention dilution across many files is fixed by splitting into a per-file pass plus a separate integration pass — not by a bigger context window or by requiring smaller inputs upstream.",
+    "sourceRef": "Exam Guide TS 1.6; Exam Guide §9 Q12; guide_en.md §8.3"
+  },
+  {
+    "id": "d1-1.6-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.6"
+    ],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "You're asked to \"add comprehensive tests to our 8-year-old billing service, which has almost no test coverage.\" Before writing any code, a colleague proposes writing a complete, fixed task list up front: \"Step 1: write tests for `invoice.py`. Step 2: write tests for `payment.py`. Step 3: write tests for `subscription.py`,\" listing every file in the module alphabetically. What's the main risk of committing to this fixed plan before investigating the codebase?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Alphabetical file ordering is a worse choice than starting from the most recently modified file, since recent changes are more likely to still be fresh in mind.",
+        "explanation": "The issue isn't the specific ordering chosen — reordering alphabetically vs. any other fixed order doesn't fix the deeper problem of planning before investigating."
+      },
+      {
+        "id": "B",
+        "text": "Fixed, pre-written task lists like this one cannot actually be executed by Claude Code at all — only an interactively-guided human developer can follow one.",
+        "explanation": "This is false — fixed task lists can absolutely be executed; the real issue is whether a fixed list is the right strategy for a task whose scope is unknown up front."
+      },
+      {
+        "id": "C",
+        "text": "The plan doesn't reflect actual risk or coverage gaps, and can't adapt to hidden dependencies discovered only once you start investigating.",
+        "explanation": "This is correct: a fixed pre-investigation plan can't reflect risk priority or adapt to dependencies discovered only once you actually explore the codebase."
+      },
+      {
+        "id": "D",
+        "text": "The plan violates the principle that all subagent prompts must specify goals rather than steps.",
+        "explanation": "That principle applies to subagent delegation prompts, not to whether a top-level task itself should be decomposed adaptively vs. via a fixed pipeline."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Open-ended, investigation-dependent work (like adding tests to an unfamiliar legacy codebase) needs dynamic adaptive decomposition — map structure and risk first, then build and adjust a prioritized plan — not a fixed list committed to before any exploration.",
+    "sourceRef": "Exam Guide TS 1.6; guide_en.md §8.1-8.2"
+  },
+  {
+    "id": "d1-1.6-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.6"
+    ],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "Your team runs two different kinds of Claude Code automation: (1) a weekly \"generate the changelog from merged PRs\" task that always follows the same five steps in the same order, and (2) an ad hoc \"investigate why the checkout flow got slower this release\" task, where the actual cause is unknown and each finding determines where to look next. A new team member proposes using dynamic adaptive decomposition for both, arguing consistency is good practice everywhere. What's the issue with applying it to the changelog task?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Dynamic adaptive decomposition cannot be applied to any task that runs on a fixed schedule, since scheduled automation requires a fully pre-written plan.",
+        "explanation": "This is false — a task's schedule (weekly vs. ad hoc) doesn't determine which decomposition strategy fits; the deciding factor is whether the task's structure is predictable."
+      },
+      {
+        "id": "B",
+        "text": "The changelog task's steps are fully predictable and identical every run, so a fixed pipeline is simpler than adaptively re-planning each run.",
+        "explanation": "This is correct: a task with fully known, repeating structure is exactly what a fixed pipeline is designed for, without the overhead of adaptive re-planning."
+      },
+      {
+        "id": "C",
+        "text": "Fixed pipelines always produce higher-quality output than dynamic decomposition, regardless of task type.",
+        "explanation": "Neither pattern is universally higher quality; the right choice is about matching the pattern to the task's predictability, not a blanket ranking of one over the other."
+      },
+      {
+        "id": "D",
+        "text": "Applying dynamic decomposition to the changelog task would require giving it access to the `Task` tool so it could spawn subagents to investigate each PR.",
+        "explanation": "Adaptive decomposition is a planning strategy applied in code or prompting, not something that inherently requires subagent spawning via Task."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Match the decomposition strategy to how predictable the task's structure is — a fixed, repeating task doesn't benefit from dynamic re-planning overhead.",
+    "sourceRef": "Exam Guide TS 1.6; guide_en.md §8.1-8.2"
+  },
+  {
+    "id": "d1-1.7-p1",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.7"
+    ],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "You spent yesterday investigating a flaky checkout test using a named session: `claude --resume checkout-flake-investigation`. You found the root cause was a race condition in `cart_sync.ts` and documented the fix approach, but didn't implement it. Overnight, a teammate's unrelated PR merged and modified `cart_sync.ts` (changing unrelated logic higher in the file) and two other files you had read during the investigation. This morning you resume the same named session and simply say \"go ahead and implement the fix we discussed.\" What's the main risk of doing this without saying more?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`--resume` with a session name only works once; using it a second time on the same session name will silently start a brand-new, empty session.",
+        "explanation": "This is false — named sessions can be resumed multiple times; this isn't a real limitation of --resume."
+      },
+      {
+        "id": "B",
+        "text": "Resuming a named session after any file anywhere in the repository has changed will cause the CLI to detect the mismatch and refuse to resume, throwing an error.",
+        "explanation": "This is false — resuming doesn't automatically detect or block on file changes; the CLI proceeds with prior context regardless, which is exactly the risk."
+      },
+      {
+        "id": "C",
+        "text": "The fix approach documented yesterday will be automatically discarded the moment a resumed session detects new git commits since the session was last active.",
+        "explanation": "This is false — nothing about resuming automatically discards prior findings based on git activity; the actual risk is the opposite, stale results being silently trusted rather than discarded."
+      },
+      {
+        "id": "D",
+        "text": "The agent may reason from its earlier `Read` results for `cart_sync.ts`, which no longer reflect the file's current contents after the merge.",
+        "explanation": "This is correct: without being told what changed, the resumed agent may trust stale Read results and implement the fix against outdated file contents."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Resuming a session after underlying files changed risks the agent reasoning from stale prior tool results unless you explicitly tell it what changed.",
+    "sourceRef": "Exam Guide TS 1.7; guide_en.md §5.10"
+  },
+  {
+    "id": "d1-1.7-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.7"
+    ],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "After a shared codebase investigation (mapping the state-management module and its dependents), you want to compare two different refactor approaches — one using Redux, one using React Context — without redoing the shared mapping work twice, and while keeping both explorations available to return to independently. Which approach fits best?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Use `fork_session` to branch two independent sessions from the completed investigation's shared context, one per refactor approach.",
+        "explanation": "This is correct: fork_session branches independent sessions from a shared baseline, avoiding duplicated groundwork while keeping both paths available separately."
+      },
+      {
+        "id": "B",
+        "text": "Resume the same named session twice, in two separate terminal windows at once, giving each window a different approach in mind but never actually forking.",
+        "explanation": "Resuming the identical session in parallel doesn't create two independent, divergent histories — both \"branches\" would be writing into the same session state rather than diverging cleanly the way a fork does."
+      },
+      {
+        "id": "C",
+        "text": "Start two entirely new sessions from scratch, each re-running the full codebase investigation before exploring its respective approach.",
+        "explanation": "This discards the entire benefit of the shared baseline by re-running the identical investigation work twice, which is exactly what forking from a shared baseline avoids."
+      },
+      {
+        "id": "D",
+        "text": "Use `--resume` once, complete the Redux approach fully end to end, then resume that same session again afterward to explore the Context API approach.",
+        "explanation": "Doing the approaches sequentially in the same session means the Context API exploration happens with the Redux approach's decisions already baked in, rather than diverging cleanly from the shared baseline, and loses the ability to keep both explorations available independently."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "fork_session branches two independent explorations from one shared analysis baseline, avoiding duplicated groundwork while keeping both paths available separately.",
+    "sourceRef": "Exam Guide TS 1.7; guide_en.md §5.10"
+  },
+  {
+    "id": "d1-1.7-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": [
+      "1.7"
+    ],
+    "scenario": 4,
+    "difficulty": 3,
+    "stem": "Three weeks ago, you used Claude Code to do a deep investigation of a legacy monolith's module boundaries in preparation for a microservices migration, spanning many `Read` and `Grep` calls across dozens of files, saved as a named session. Since then, roughly 30% of the files you investigated have been modified by ongoing feature work, and the investigation session has grown very long. You now need to resume the migration planning. What's generally the more reliable approach at this point?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Resume the old named session exactly as-is, on the reasoning that three full weeks of accumulated investigation context outweighs the risk from a partial set of file changes.",
+        "explanation": "With roughly a third of the investigated files changed and significant time elapsed, much of that accumulated context is now stale tool output the agent could mistakenly trust — quantity of context isn't the deciding factor, accuracy is."
+      },
+      {
+        "id": "B",
+        "text": "Resume the old named session, but before doing anything else ask the agent to re-read every single file it ever touched across the entire session.",
+        "explanation": "Re-reading every file discards the efficiency benefit of the prior investigation entirely, re-doing full exploration when only some files actually changed and a structured summary could convey what's still valid far more cheaply."
+      },
+      {
+        "id": "C",
+        "text": "Start a fresh session and inject a concise, accurate summary of the prior findings into the first prompt, instead of resuming the full stale history.",
+        "explanation": "This is correct: with substantial staleness and a long elapsed time, a fresh session with an accurate summary is more reliable than carrying forward a large amount of now-partly-outdated context."
+      },
+      {
+        "id": "D",
+        "text": "Fork the old session into a new branch, then treat the fork as equivalent to a fresh session with accurate current context.",
+        "explanation": "Forking still carries forward the same stale tool-call history from the shared baseline — it doesn't refresh anything or resolve staleness, since both the fork and the original inherit the same partly outdated prior context."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "When a large share of prior tool results are stale after significant time and file changes, starting fresh with an accurate structured summary is more reliable than resuming or forking a session carrying that stale context forward.",
+    "sourceRef": "Exam Guide TS 1.7; guide_en.md §5.10"
+  }
+]

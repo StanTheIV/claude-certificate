@@ -1,0 +1,362 @@
+[
+  {
+    "id": "cfg-01",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.5"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "Your team's Claude Code `settings.json` for a developer-productivity workflow has a deny rule `Bash(git push *)` to stop accidental pushes, and a separate allow rule `Bash(git push origin feature/*)` meant to let Claude push to feature branches without prompting. When Claude tries `git push origin feature/login-fix`, what happens?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The push is still blocked — deny rules are checked before allow rules, and a narrower allow rule can't carve an exception out of a broader matching deny rule.",
+        "explanation": "Correct. Rules are evaluated in a fixed order — deny, then ask, then allow — and the first match in that order wins; how specific a rule is doesn't change that order, so the broad deny rule still blocks this push."
+      },
+      {
+        "id": "B",
+        "text": "The push is allowed, because the more specific rule — the one naming the branch pattern — takes precedence over the broader one.",
+        "explanation": "Specificity doesn't override the evaluation order — a broad deny rule blocks every matching call, including one that also matches a narrower allow rule."
+      },
+      {
+        "id": "C",
+        "text": "Claude is prompted to confirm, since the two rules conflict and an unresolved conflict falls back to asking.",
+        "explanation": "Permission checks don't fall back to a prompt when a deny rule already matches; the deny rule decides the outcome directly, with no ask step reached."
+      },
+      {
+        "id": "D",
+        "text": "The outcome depends on which rule appears first in the JSON file, so moving the allow rule above the deny rule would let the push through.",
+        "explanation": "Rule evaluation order is deny, then ask, then allow, regardless of where each rule appears in the settings file — reordering the JSON wouldn't change the outcome."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Permission rules are evaluated deny → ask → allow, first match wins; a narrower allow rule can never override a broader matching deny rule.",
+    "sourceRef": "code.claude.com/docs/en/permissions (current docs)"
+  },
+  {
+    "id": "cfg-02",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.5"],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "A team wants Claude Code, while generating and refactoring code, to never be able to run `rm` at all, but should still freely use Bash for builds, tests, and other shell commands. Which `deny` rule achieves this without also disabling Bash entirely?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`\"deny\": [\"Bash\"]`",
+        "explanation": "A bare tool name removes the tool from Claude's context entirely, so Claude could never run Bash again for builds or tests either — far more than what's wanted."
+      },
+      {
+        "id": "B",
+        "text": "`\"deny\": [\"Bash(rm *)\"]`",
+        "explanation": "Correct. A scoped rule like this leaves the Bash tool available and blocks only calls matching the `rm` pattern, so builds and tests keep working normally."
+      },
+      {
+        "id": "C",
+        "text": "`\"deny\": [\"Bash(rm)\"]`, without a trailing wildcard",
+        "explanation": "Without a wildcard, this is a literal match on the bare `rm` command, not on invocations with flags or paths like `rm -rf build/` — most real delete commands would still slip through."
+      },
+      {
+        "id": "D",
+        "text": "`\"deny\": [\"Bash\", \"Bash(rm *)\"]`",
+        "explanation": "Including the bare tool name alongside the scoped one still removes Bash from Claude's context entirely — adding the scoped rule doesn't undo that."
+      }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "A bare tool name in a deny rule removes the whole tool from context; a scoped rule like Bash(rm *) leaves the tool available and blocks only matching calls.",
+    "sourceRef": "code.claude.com/docs/en/permissions (current docs)"
+  },
+  {
+    "id": "cfg-03",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.1"],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "A team's committed `.claude/settings.json` has `\"permissions\": {\"allow\": [\"Bash(npm test *)\"]}`. A developer adds `\"permissions\": {\"allow\": [\"Bash(npm run lint *)\"]}` to their own `.claude/settings.local.json` in the same repo. When that developer runs Claude Code, which Bash commands are auto-approved?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Only `npm run lint`, because project local settings sit above shared project settings in precedence, so the local file's value replaces the shared file's value for that key.",
+        "explanation": "Project local settings do sit above shared project settings for a key defined in both, but `permissions.allow` is a list-type key — those merge across scopes rather than one replacing the other."
+      },
+      {
+        "id": "B",
+        "text": "Only `npm test`, because settings files load in the order they were written and don't merge with each other.",
+        "explanation": "Settings files aren't resolved by write order, and a higher-precedence file isn't silently ignored — the actual mechanism here is that list keys like this one combine across every scope that sets them."
+      },
+      {
+        "id": "C",
+        "text": "Both `npm test` and `npm run lint`, since list-type keys like `permissions.allow` merge across scopes instead of one file overriding the other.",
+        "explanation": "Correct. List-type keys such as `permissions.allow` merge instead of overriding when set in more than one settings file, so both entries end up allowed together."
+      },
+      {
+        "id": "D",
+        "text": "Neither command, since a `.claude/settings.local.json` only takes effect once a matching entry already exists in the shared `.claude/settings.json`.",
+        "explanation": "There's no such requirement — a project's `.claude/settings.local.json` is read and applied on its own, independent of whether the shared file already lists the same command."
+      }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "Most settings keys use highest-precedence-wins, but list-type keys like permissions.allow merge across every scope that sets them.",
+    "sourceRef": "code.claude.com/docs/en/settings (current docs)"
+  },
+  {
+    "id": "cfg-04",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.1"],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "A team lead wants every developer on a project blocked from running `git push --force` on any branch, enforced even if an individual disagrees with it. Separately, one developer personally wants Claude Code to always run tests in watch mode — a preference nobody else on the team needs. Where should each of these two settings go?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Both in `.claude/settings.json`, since that's the only file Claude Code reads at the project level.",
+        "explanation": "That would share the personal watch-mode preference with the whole team through version control, forcing it on developers who never asked for it."
+      },
+      {
+        "id": "B",
+        "text": "The force-push rule in `~/.claude/settings.json`, and the watch-mode preference in `.claude/settings.json`.",
+        "explanation": "This swaps the two: a rule in a personal user-level file never reaches the rest of the team, and a personal preference dropped into the shared project file gets forced onto everyone."
+      },
+      {
+        "id": "C",
+        "text": "Both in `.claude/settings.local.json`.",
+        "explanation": "That file is personal to one developer in one project by default, so the team-wide force-push rule would never reach anyone else on the team."
+      },
+      {
+        "id": "D",
+        "text": "The force-push deny rule in `.claude/settings.json` (committed, shared with the team); the watch-mode preference in that developer's own `.claude/settings.local.json` or `~/.claude/settings.json`.",
+        "explanation": "Correct. Shared, version-controlled project settings is the scope for a rule everyone must get; personal project-local or user-level settings is the scope for one developer's own preference, without affecting teammates."
+      }
+    ],
+    "correct": ["D"],
+    "keyPrinciple": "Team-wide rules belong in the shared, committed .claude/settings.json; personal preferences belong in .claude/settings.local.json (per project) or ~/.claude/settings.json (across projects).",
+    "sourceRef": "code.claude.com/docs/en/settings (current docs)"
+  },
+  {
+    "id": "cfg-05",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.5"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "You're building a developer-productivity agent with the Agent SDK. You want a `PreToolUse` hook to inspect every Bash call and automatically approve the read-only commands it recognizes, without prompting the developer, while leaving every other Bash call to Claude Code's normal permission flow. Which hook output achieves this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Return `hookSpecificOutput.permissionDecision: \"allow\"` for the read-only commands the hook recognizes, and no explicit decision for the rest.",
+        "explanation": "Correct. A `PreToolUse` hook can return this to skip the prompt for calls it recognizes as safe, while leaving other calls to the normal permission flow."
+      },
+      {
+        "id": "B",
+        "text": "Exit with code 2 and a message listing the safe commands.",
+        "explanation": "Exit code 2 is how a `PreToolUse` hook blocks a call outright — that's the opposite of skipping the prompt to let a recognized safe call proceed."
+      },
+      {
+        "id": "C",
+        "text": "Return `hookSpecificOutput.permissionDecision: \"ask\"` for the read-only commands.",
+        "explanation": "\"ask\" forces the normal prompt to appear, which is exactly the behavior this hook is meant to skip for the recognized read-only commands."
+      },
+      {
+        "id": "D",
+        "text": "Write the list of safe commands into CLAUDE.md so Claude prefers running them without asking.",
+        "explanation": "CLAUDE.md instructions are context Claude reads and can still deviate from; they can't programmatically make an approval decision the way a hook's output can."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "A PreToolUse hook's hookSpecificOutput.permissionDecision (allow/deny/ask) is the deterministic mechanism for gating or skipping a tool call, unlike a CLAUDE.md instruction.",
+    "sourceRef": "code.claude.com/docs/en/hooks (current docs)"
+  },
+  {
+    "id": "cfg-06",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.5"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "A `PostToolUse` hook inspects the output of every `Write` call and exits with code 2 whenever the written file contains a hardcoded API key, hoping to stop the write from happening. In testing, the file still ends up on disk with the key in it. Why?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Exit code 2 only takes effect for hooks registered with a matcher of `\"*\"`, and this hook must be using a specific tool-name matcher instead.",
+        "explanation": "Matcher choice doesn't change what exit code 2 does; the real issue is which lifecycle event the hook is attached to, not which calls it matches."
+      },
+      {
+        "id": "B",
+        "text": "By the time a `PostToolUse` hook runs, the tool has already executed — exit code 2 there can't undo the write, it only surfaces stderr to Claude as feedback about what already happened.",
+        "explanation": "Correct. Exit code 2 blocks a call on `PreToolUse`, before the tool runs; on `PostToolUse` the write is already done, so the same exit code just adds feedback rather than preventing anything."
+      },
+      {
+        "id": "C",
+        "text": "`PostToolUse` hooks can't return non-zero exit codes at all; the process silently ignores them.",
+        "explanation": "`PostToolUse` hooks can return any exit code; a non-zero code just doesn't block anything at that point, it surfaces as feedback instead."
+      },
+      {
+        "id": "D",
+        "text": "The hook also needs to set `permissionDecision: \"deny\"` in its JSON output alongside exit code 2 for the block to take effect on `PostToolUse`.",
+        "explanation": "`permissionDecision` is part of the `PreToolUse` gating mechanism; it doesn't retroactively block a tool call that has already finished running."
+      }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "Exit code 2 blocks a PreToolUse call before it runs; on PostToolUse the tool has already executed, so the same exit code can only add feedback, not undo it.",
+    "sourceRef": "code.claude.com/docs/en/hooks (current docs)"
+  },
+  {
+    "id": "cfg-07",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.5"],
+    "scenario": 2,
+    "difficulty": 3,
+    "stem": "A project's `.claude/settings.json` has `\"deny\": [\"Bash(curl *)\"]` to stop outbound network calls from Claude Code. A `PreToolUse` hook is later added that inspects Bash calls and returns `hookSpecificOutput.permissionDecision: \"allow\"` for any `curl` call to the team's internal API domain, intending to carve out an exception. What actually happens when Claude tries `curl https://internal-api.team.dev/health`?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The call goes through, because a hook's explicit \"allow\" decision is checked before settings permission rules and can override them.",
+        "explanation": "A hook's returned decision doesn't bypass permission rules — Claude Code still evaluates deny and ask rules regardless of what a `PreToolUse` hook returns, so a matching deny rule still applies."
+      },
+      {
+        "id": "B",
+        "text": "The call goes through the first time, then gets blocked on every later attempt once Claude Code caches the deny rule.",
+        "explanation": "There's no caching behavior like this; a matching deny rule is evaluated the same way on every call, not just after some number of successful ones."
+      },
+      {
+        "id": "C",
+        "text": "The call is still blocked — Claude Code evaluates the deny rule regardless of what the hook returned, so a matching deny rule wins even over a hook that returned \"allow\".",
+        "explanation": "Correct. A matching deny rule blocks the call even when a `PreToolUse` hook explicitly returned an \"allow\" decision — deny-first precedence holds no matter what the hook decided."
+      },
+      {
+        "id": "D",
+        "text": "Claude Code refuses to start the session, since a hook and a deny rule both referencing Bash is treated as a configuration conflict.",
+        "explanation": "Having both a deny rule and a hook target the same tool isn't a startup configuration conflict — they're independent layers, and the deny rule simply wins when both apply."
+      }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "A PreToolUse hook's allow decision doesn't bypass a matching permission deny rule — deny-first precedence holds regardless of the hook's output.",
+    "sourceRef": "code.claude.com/docs/en/permissions (current docs)"
+  },
+  {
+    "id": "cfg-08",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.5"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "You want to automatically inject a short project-status summary — open PR count, current branch, failing tests — into Claude's context at the very start of every Claude Code session, without depending on Claude first calling a tool. Which hook event is designed for this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`PreToolUse`",
+        "explanation": "`PreToolUse` only fires once Claude decides to call a specific tool — it can't guarantee the summary is injected before any tool call happens."
+      },
+      {
+        "id": "B",
+        "text": "`UserPromptSubmit`",
+        "explanation": "`UserPromptSubmit` waits for the developer to type and submit a prompt; it doesn't run at the moment a new session opens, before anything has been typed."
+      },
+      {
+        "id": "C",
+        "text": "`Stop`",
+        "explanation": "`Stop` fires at the end of a turn, not the start of a session — the opposite point in the lifecycle from where this summary needs to appear."
+      },
+      {
+        "id": "D",
+        "text": "`SessionStart`",
+        "explanation": "Correct. `SessionStart` fires when a new session begins or is resumed, which is exactly the point to inject a status summary before Claude has taken any action."
+      }
+    ],
+    "correct": ["D"],
+    "keyPrinciple": "Each lifecycle hook event fires at a specific point; SessionStart is for context needed at the very beginning of a session, not PreToolUse, UserPromptSubmit, or Stop.",
+    "sourceRef": "code.claude.com/docs/en/hooks (current docs)"
+  },
+  {
+    "id": "cfg-09",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.3"],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "A developer writes `.claude/rules/security.md`, hoping it loads only for backend files and takes priority over other rules:\n```\n---\npaths: [\"src/backend/**/*\"]\npriority: 10\nenabled: true\n---\n```\nWhat do the `priority` and `enabled` frontmatter fields actually do?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Nothing — `paths` is the only frontmatter field Claude Code reads from a rule file; any other field is ignored without an error, so the rule behaves exactly as if only `paths` had been written.",
+        "explanation": "Correct. `paths` is the only frontmatter field Claude Code reads from a rule file — any other field, including `priority` or `enabled`, is silently ignored, so this rule behaves exactly as if those two keys weren't there."
+      },
+      {
+        "id": "B",
+        "text": "`priority` changes the order rules are concatenated into context, and `enabled` lets the rule be toggled off without deleting the file.",
+        "explanation": "No such fields exist — Claude Code doesn't read a `priority` or `enabled` key from rule frontmatter at all, so neither has any effect on ordering or toggling."
+      },
+      {
+        "id": "C",
+        "text": "Claude Code fails to load the whole rule file at startup because of the unrecognized keys, and logs a visible warning.",
+        "explanation": "An unrecognized frontmatter field doesn't stop the file from loading or produce a warning — it's silently ignored, and the rule still loads using whatever `paths` value is present."
+      },
+      {
+        "id": "D",
+        "text": "`enabled: true` is required for `paths` to take effect — without it, the file would load unconditionally regardless of the `paths` pattern.",
+        "explanation": "`enabled` isn't a real dependency for `paths` — `paths` scopes the rule on its own, and this fictional key has no effect either way."
+      }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "The only frontmatter field a .claude/rules/ file reads is paths; any other key is silently ignored, with no error and no effect.",
+    "sourceRef": "code.claude.com/docs/en/memory (current docs)"
+  },
+  {
+    "id": "cfg-10",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.2"],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "A team has a `/deploy` skill that runs a real production deployment, and a separate `legacy-system-context` skill that just explains how an old subsystem works so Claude can draw on that knowledge when relevant. They want `/deploy` to run only when a developer explicitly types it, never triggered by Claude on its own; and they want `legacy-system-context` to never appear as something a developer can type as a command, while Claude can still pull it in automatically. Which frontmatter settings achieve this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`user-invocable: false` on the `/deploy` skill; `disable-model-invocation: true` on the `legacy-system-context` skill.",
+        "explanation": "This swaps the two controls — `user-invocable: false` on the deploy skill would only hide it from the `/` menu while Claude could still trigger a real deployment on its own, and `disable-model-invocation: true` on the context skill would stop Claude from pulling it in automatically, the opposite of what's wanted."
+      },
+      {
+        "id": "B",
+        "text": "`disable-model-invocation: true` on the `/deploy` skill; `user-invocable: false` on the `legacy-system-context` skill.",
+        "explanation": "Correct. `disable-model-invocation: true` stops Claude from auto-triggering the deploy skill, leaving only manual `/deploy` invocation; `user-invocable: false` hides the context skill from manual invocation while Claude can still load it automatically when relevant."
+      },
+      {
+        "id": "C",
+        "text": "`disable-model-invocation: true` on both skills.",
+        "explanation": "Setting `disable-model-invocation: true` on the context skill would stop Claude from ever pulling it in automatically — the whole point of that skill is for Claude to use it on its own when relevant."
+      },
+      {
+        "id": "D",
+        "text": "`context: fork` on the `/deploy` skill; `argument-hint` on the `legacy-system-context` skill.",
+        "explanation": "`context: fork` controls execution isolation and `argument-hint` only shows a hint for a missing argument — neither one controls who is allowed to invoke a skill."
+      }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "disable-model-invocation: true blocks Claude from auto-triggering a skill (manual-only); user-invocable: false hides a skill from manual invocation while Claude can still use it (Claude-only).",
+    "sourceRef": "code.claude.com/docs/en/skills (current docs)"
+  }
+]

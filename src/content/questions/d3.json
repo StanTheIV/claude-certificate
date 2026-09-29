@@ -1,0 +1,2573 @@
+[
+  {
+    "id": "d3-3.1-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.1"
+    ],
+    "lesson": "3.1",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A contractor works across three unrelated client repos on the same laptop and wants a personal habit — always double-checking file permissions before running a destructive command — to follow them into all three, without being forced onto any client's other engineers. Which scope should hold this instruction?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Project-level `.claude/CLAUDE.md` in each of the three repos",
+        "explanation": "Shared via version control in each repo — every other engineer on those projects would get it too, not just the contractor."
+      },
+      {
+        "id": "B",
+        "text": "`~/.claude/CLAUDE.md`",
+        "explanation": "Correct. User-level lives outside any repo, applies across every project the contractor opens, and is never committed for other engineers to see."
+      },
+      {
+        "id": "C",
+        "text": "A directory-level CLAUDE.md in one folder shared across the three repos",
+        "explanation": "Directory-level files live inside one project's tree; there's no folder shared by three separate repos for this to sit in."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "User-level CLAUDE.md is the only scope that's both personal and cross-project.",
+    "sourceRef": "Exam Guide TS 3.1; guide_en.md §5.1"
+  },
+  {
+    "id": "d3-3.1-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.1"
+    ],
+    "lesson": "3.1",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A developer mistakenly writes a project-wide logging-format requirement into `~/.claude/CLAUDE.md` on their own laptop, then tells the team it's 'now enforced.' What actually happens?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Only the developer's own sessions apply it",
+        "explanation": "Correct. User-level CLAUDE.md never leaves that developer's machine, so nothing changes for teammates."
+      },
+      {
+        "id": "B",
+        "text": "Every teammate's session applies it automatically, project-wide",
+        "explanation": "CLAUDE.md instructions are scoped by which file they live in; user-level is the opposite of project-wide."
+      },
+      {
+        "id": "C",
+        "text": "It merges automatically into the nearest directory-level file",
+        "explanation": "User-level and directory-level files don't merge into each other — they're separate scopes with no automatic promotion."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Placing an instruction at the wrong scope doesn't just weaken it — it changes who, if anyone, actually sees it.",
+    "sourceRef": "Exam Guide TS 3.1; guide_en.md §5.1"
+  },
+  {
+    "id": "d3-3.1-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.1"
+    ],
+    "lesson": "3.1",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "Two engineers on the same team see different Claude Code behavior: Engineer A's Claude always uses the required log-message format; Engineer B's never does. Engineer A set the convention up personally; Engineer B just cloned the repo and assumed the convention would already be there. What's the most likely explanation?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Engineer B first needs to run the `/compact` command",
+        "explanation": "`/compact` summarizes a long session's history; it doesn't load a missing CLAUDE.md file."
+      },
+      {
+        "id": "B",
+        "text": "CLAUDE.md instructions automatically stop applying after roughly an hour into any session",
+        "explanation": "Not a real limitation of how CLAUDE.md loads or stays active."
+      },
+      {
+        "id": "C",
+        "text": "Engineer A put the convention in their own user-level `~/.claude/CLAUDE.md`; it was never added to the project-level file Engineer B's clone actually loads",
+        "explanation": "Correct. A user-level file only loads for its own author — it's never shared via version control, so Engineer B's clone never received the convention at all."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Scope confusion — user-level instead of project-level — is the classic cause of 'it works for me but not the team.'",
+    "sourceRef": "Exam Guide TS 3.1 Skills in"
+  },
+  {
+    "id": "d3-3.1-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.1"
+    ],
+    "lesson": "3.1",
+    "chunk": 2,
+    "difficulty": 1,
+    "stem": "A maintainer writes `@ ./docs/security-checklist.md` at the top of the project's CLAUDE.md, expecting it to pull the checklist in. It doesn't. What's wrong with the line?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "A space between `@` and the path breaks the import",
+        "explanation": "Correct. `@` must sit immediately before the path with no space to trigger an import."
+      },
+      {
+        "id": "B",
+        "text": "The path should be absolute instead of relative",
+        "explanation": "Relative paths work fine for imports; the actual problem here is the space, not the path type."
+      },
+      {
+        "id": "C",
+        "text": "CLAUDE.md doesn't support importing other files at all",
+        "explanation": "Imports are a real CLAUDE.md feature; the line just isn't written correctly."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "`@` must sit immediately before the path, with no space, to trigger an import.",
+    "sourceRef": "Exam Guide TS 3.1; guide_en.md §5.2"
+  },
+  {
+    "id": "d3-3.1-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.1"
+    ],
+    "lesson": "3.1",
+    "chunk": 2,
+    "difficulty": 2,
+    "stem": "In a repo, the root `CLAUDE.md` doesn't import anything itself, but `packages/api/CLAUDE.md` contains the line `@./conventions.md`. Where does `conventions.md` need to live for this import to resolve?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "At the repository root, regardless of which file contains the import",
+        "explanation": "That would only be true if the importing file itself were at the root — here it's inside `packages/api/`."
+      },
+      {
+        "id": "B",
+        "text": "Inside `packages/api/`, next to the importing CLAUDE.md file",
+        "explanation": "Correct. A relative import path resolves relative to the file that contains it, not the repo root or the working directory."
+      },
+      {
+        "id": "C",
+        "text": "Wherever the developer's terminal happens to be open at launch",
+        "explanation": "The working directory at launch time isn't the reference point for resolving a relative import."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Relative `@` import paths resolve relative to the file containing the import, not the working directory or repo root.",
+    "sourceRef": "guide_en.md §5.2"
+  },
+  {
+    "id": "d3-3.1-qc6",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.1"
+    ],
+    "lesson": "3.1",
+    "chunk": 3,
+    "difficulty": 1,
+    "stem": "A team splits a growing CLAUDE.md into `.claude/rules/frontend.md`, `backend.md`, and `security.md`, with no `paths:` field in any of them. A developer asks whether `backend.md` now only loads while editing backend files. What's the correct answer?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Yes — splitting into `.claude/rules/` automatically scopes each file to a matching directory",
+        "explanation": "No such automatic name-based scoping exists; conditional loading only happens through an explicit `paths:` field."
+      },
+      {
+        "id": "B",
+        "text": "Only if the file name contains a recognized keyword like 'backend'",
+        "explanation": "File names don't drive conditional loading on their own — that requires the `paths:` field, which none of these files have."
+      },
+      {
+        "id": "C",
+        "text": "No — all three files still load unconditionally, exactly as before the split",
+        "explanation": "Correct. Splitting a file is purely organizational unless a `paths:` field is added."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Splitting into `.claude/rules/` without `paths:` frontmatter is an organizational change, not a conditional-loading one.",
+    "sourceRef": "Exam Guide TS 3.1 Skills in; guide_en.md §5.3"
+  },
+  {
+    "id": "d3-3.1-qc7",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.1"
+    ],
+    "lesson": "3.1",
+    "chunk": 4,
+    "difficulty": 1,
+    "stem": "A developer runs `/memory` and sees only a user-level CLAUDE.md listed for the current session — no project-level file — even though the repository has a root `CLAUDE.md` checked into git. What does this most likely mean?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Something is stopping the project-level file from loading this session",
+        "explanation": "Correct. `/memory` shows what's actually loaded, letting you catch a missing project-level file instead of assuming it's there."
+      },
+      {
+        "id": "B",
+        "text": "The token budget is nearly exhausted, so project-level files stop loading",
+        "explanation": "`/memory` reports which files are loaded, not remaining tokens — this isn't a token-budget symptom."
+      },
+      {
+        "id": "C",
+        "text": "The project-level file only appears in `/memory` after the first hook fires",
+        "explanation": "Not a real behavior — `/memory` reflects what's loaded from the start of the session."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "/memory lets you confirm which files are actually loaded, catching scope or loading problems before assuming an instruction's wording is at fault.",
+    "sourceRef": "Exam Guide TS 3.1 Skills in; guide_en.md §5.8"
+  },
+  {
+    "id": "d3-3.2-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.2"
+    ],
+    "lesson": "3.2",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A developer creates `.claude/commands/release.md` inside the repository, intending it as a quick personal shortcut nobody else needs, then commits it along with an unrelated feature and pushes. What happens to `/release` for teammates who pull the branch?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "They get it only if they also copy the file into their own `~/.claude/commands/`",
+        "explanation": "No manual copy step is needed — committing the file to the repo already distributes it through version control."
+      },
+      {
+        "id": "B",
+        "text": "Nothing changes — `.claude/commands/` is always personal to whoever created the file",
+        "explanation": "The opposite is true: `.claude/commands/` is project-scoped and shared; `~/.claude/commands/` is the personal location."
+      },
+      {
+        "id": "C",
+        "text": "They get it too — anything committed under `.claude/commands/` ships to every clone",
+        "explanation": "Correct. Project-scoped commands are shared the moment they're committed, regardless of the developer's intent."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Where a command file lives decides who gets it — a project-scoped path shares it the moment it's committed, whatever the author intended.",
+    "sourceRef": "Exam Guide TS 3.2 Knowledge of; Official Sample Q4"
+  },
+  {
+    "id": "d3-3.2-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.2"
+    ],
+    "lesson": "3.2",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A developer adds a `/scratch` command under `~/.claude/commands/` to test an idea quickly, then pushes their feature branch, which a teammate pulls. Does the teammate now have `/scratch` too?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Yes, because any slash command becomes available to the whole team once pushed",
+        "explanation": "Not how scoping works — only files inside the repository itself travel with a push."
+      },
+      {
+        "id": "B",
+        "text": "Yes, but only if the teammate also has a `.claude/` folder in their home directory",
+        "explanation": "Invents a requirement that doesn't apply — `~/.claude/commands/` isn't part of the repo at all."
+      },
+      {
+        "id": "C",
+        "text": "No — `~/.claude/commands/` lives outside the repo, untouched by a push",
+        "explanation": "Correct. User-scoped commands are never part of what version control tracks or distributes."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "~/.claude/commands/ is personal and outside version control; .claude/commands/ in the repo is what travels with a push.",
+    "sourceRef": "Exam Guide TS 3.2 Knowledge of"
+  },
+  {
+    "id": "d3-3.2-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.2"
+    ],
+    "lesson": "3.2",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "A developer defines a skill at `~/.claude/skills/review/SKILL.md`, intending it as the project's shared `/review` skill so every teammate gets it after cloning. After several teammates clone the repo, none of them can run `/review`. What's the most likely reason?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "It sits in a personal, user-scoped location, not the project's shared one",
+        "explanation": "Correct. A skill under `~/.claude/skills/` is personal and never travels via version control."
+      },
+      {
+        "id": "B",
+        "text": "The file should have been named `review.md` instead of `SKILL.md`",
+        "explanation": "`SKILL.md` is the correct required filename — renaming it wouldn't fix a scoping problem."
+      },
+      {
+        "id": "C",
+        "text": "Skills always need `context: fork` before anyone besides their author can invoke them",
+        "explanation": "`context: fork` controls context isolation, not who can invoke a skill or whether it's shared."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "A skill only reaches teammates through version control when it sits in the project-scoped `.claude/skills/`, not the personal `~/.claude/skills/`.",
+    "sourceRef": "Exam Guide TS 3.2 Knowledge of; guide_en.md §5.5"
+  },
+  {
+    "id": "d3-3.2-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.2"
+    ],
+    "lesson": "3.2",
+    "chunk": 2,
+    "difficulty": 1,
+    "stem": "A `research-summarize` skill fetches and reads 40 web pages before producing a two-paragraph summary. After running it, a developer notices the main conversation's context is nearly full, even though the visible reply was short. Which frontmatter key would prevent that?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`argument-hint`, so the skill prompts for which pages to fetch",
+        "explanation": "Only shows a hint for a missing argument; it doesn't isolate anything the skill reads or produces."
+      },
+      {
+        "id": "B",
+        "text": "`context: fork`, isolating the page-reading in a sub-agent",
+        "explanation": "Correct. Only the sub-agent's final summary flows back into the main conversation."
+      },
+      {
+        "id": "C",
+        "text": "`allowed-tools`, restricted to just the tools needed to fetch pages",
+        "explanation": "Controls which tools the skill may use, not whether its output pollutes the main conversation's context."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "context: fork isolates a skill's noisy intermediate work, whatever form it takes, so only the final output reaches the main session.",
+    "sourceRef": "Exam Guide TS 3.2 Knowledge of/Skills in; guide_en.md §5.5"
+  },
+  {
+    "id": "d3-3.2-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.2"
+    ],
+    "lesson": "3.2",
+    "chunk": 3,
+    "difficulty": 1,
+    "stem": "A `format-code` skill should only ever run the project's formatter — never touch git, never reach the network. Which frontmatter key turns that into a structural guarantee rather than a hopeful instruction?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`argument-hint`, listing the formatter command as the expected argument",
+        "explanation": "Only displays a hint for a missing argument; it places no actual limit on what the skill can do."
+      },
+      {
+        "id": "B",
+        "text": "`context: fork`, so formatting runs in an isolated sub-agent",
+        "explanation": "Isolates context, but a forked sub-agent can still call any tool the parent session allows."
+      },
+      {
+        "id": "C",
+        "text": "`allowed-tools`, limited to just the tool the formatter needs",
+        "explanation": "Correct. This structurally prevents the skill from using any other tool, regardless of a crafted input."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "allowed-tools restricts a skill's tool access as a structural, least-privilege guarantee.",
+    "sourceRef": "Exam Guide TS 3.2 Skills in; guide_en.md §5.5"
+  },
+  {
+    "id": "d3-3.2-qc6",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.2"
+    ],
+    "lesson": "3.2",
+    "chunk": 3,
+    "difficulty": 1,
+    "stem": "A `/deploy` skill requires a version number, but a developer just types `/deploy` with nothing after it. Which frontmatter field, if set in that skill's `SKILL.md`, shows them what's missing instead of failing silently?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`argument-hint`",
+        "explanation": "Correct. It surfaces a visible hint of what's required instead of the skill failing with no explanation."
+      },
+      {
+        "id": "B",
+        "text": "`allowed-tools` field",
+        "explanation": "Restricts which tools the skill can use — unrelated to prompting for a missing argument."
+      },
+      {
+        "id": "C",
+        "text": "`context: fork` setting",
+        "explanation": "Controls execution isolation, not whether the developer is prompted for a missing argument."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "argument-hint gives developers a visible hint instead of a silent failure when a required argument is missing.",
+    "sourceRef": "Exam Guide TS 3.2 Skills in; guide_en.md §5.5"
+  },
+  {
+    "id": "d3-3.2-qc7",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.2"
+    ],
+    "lesson": "3.2",
+    "chunk": 4,
+    "difficulty": 2,
+    "stem": "Your team decides every PR must include a one-line summary of testing performed, no matter which command or skill produced the change. Where should this expectation live so it's never missed?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "As a skill developers invoke at the end of writing a PR description",
+        "explanation": "A skill only runs when someone remembers to invoke it — an always-needed requirement is easy to skip this way."
+      },
+      {
+        "id": "B",
+        "text": "In CLAUDE.md, already loaded no matter what triggered the change",
+        "explanation": "Correct. An always-needed expectation belongs where it's in context from the start of every session."
+      },
+      {
+        "id": "C",
+        "text": "In a `.claude/rules/` file scoped with `paths:` to the PR description file",
+        "explanation": "PR descriptions aren't a repo file with a matching path — this scoping wouldn't reliably trigger for every PR."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Always-needed standards belong in CLAUDE.md; occasional workflows belong in a skill.",
+    "sourceRef": "Exam Guide TS 3.2 Skills in; guide_en.md §5.5"
+  },
+  {
+    "id": "d3-3.2-qc8",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.2"
+    ],
+    "lesson": "3.2",
+    "chunk": 4,
+    "difficulty": 2,
+    "stem": "A shared `.claude/skills/deploy/SKILL.md` has a typo in its frontmatter — `alowed-tools: [\"Bash\"]` instead of `allowed-tools` — one letter missing. What's the effect the next time the skill runs?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Claude Code refuses to load the skill at all until the typo is fixed",
+        "explanation": "Not the described behavior — an unrecognized key doesn't block the whole skill from loading."
+      },
+      {
+        "id": "B",
+        "text": "The typo is auto-corrected the first time the skill runs",
+        "explanation": "No such auto-correction exists for frontmatter keys."
+      },
+      {
+        "id": "C",
+        "text": "The intended tool restriction silently doesn't apply",
+        "explanation": "Correct. An unrecognized key is simply ignored — the skill runs with no restriction and no error flagging the typo."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "A misspelled frontmatter key doesn't error loudly — it just silently fails to apply the restriction it was meant to add.",
+    "sourceRef": "Exam Guide TS 3.2 Skills in; guide_en.md §5.5"
+  },
+  {
+    "id": "d3-3.3-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.3"
+    ],
+    "lesson": "3.3",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A rule file meant to load only for GraphQL schema files sets `path: [\"**/*.graphql\"]` (singular, no `s`) in its frontmatter. What actually happens?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The unrecognized field name means the file just loads unconditionally",
+        "explanation": "Correct. `paths` (plural) is the recognized field; an unrecognized key is ignored, leaving the file always-loaded."
+      },
+      {
+        "id": "B",
+        "text": "It works exactly as intended — `path` and `paths` are interchangeable aliases",
+        "explanation": "They aren't aliases; only `paths` is the recognized frontmatter field for conditional loading."
+      },
+      {
+        "id": "C",
+        "text": "The file fails to load at all, since `.graphql` isn't a supported extension",
+        "explanation": "Glob matching isn't limited to a fixed list of extensions — the real problem is the misspelled field."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "paths is the frontmatter field that scopes a rule file to matching glob patterns — get the key wrong and the file just loads unconditionally.",
+    "sourceRef": "Exam Guide TS 3.3 Knowledge of; guide_en.md §5.3"
+  },
+  {
+    "id": "d3-3.3-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.3"
+    ],
+    "lesson": "3.3",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "A repo has 15 different `.claude/rules/` files, each scoped with its own `paths:` pattern for a different part of the codebase. A developer spends an entire day working only inside `src/components/`. At most, how many of those 15 files' contents actually enter context that day?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "None, since path-scoped rules require an explicit `/` invocation, like a skill",
+        "explanation": "Path-scoped rules load automatically on a file match; they don't need explicit invocation."
+      },
+      {
+        "id": "B",
+        "text": "All 15, since `.claude/rules/` files always load regardless of `paths:`",
+        "explanation": "Contradicts what `paths:` is for; scoped rule files are conditional, not always-loaded."
+      },
+      {
+        "id": "C",
+        "text": "Only the ones whose pattern matches something under `src/components/`",
+        "explanation": "Correct. Path-scoped rules load only when a matching file is actually touched."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Path-scoped rules exist to reduce irrelevant context — only patterns matching the files actually touched enter context.",
+    "sourceRef": "Exam Guide TS 3.3 Knowledge of; guide_en.md §5.3"
+  },
+  {
+    "id": "d3-3.3-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.3"
+    ],
+    "lesson": "3.3",
+    "chunk": 2,
+    "difficulty": 2,
+    "stem": "Every module in a codebase has its own `schema.graphql` file sitting next to its resolvers, scattered across 40 different directories. You want one shared naming convention applied to every one of them. What's the most maintainable way to enforce it?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "One `.claude/rules/graphql.md` file with `paths: [\"**/*.graphql\"]`",
+        "explanation": "Correct. One file, matched by pattern regardless of directory."
+      },
+      {
+        "id": "B",
+        "text": "A CLAUDE.md added to each of the 40 directories, repeating the same convention",
+        "explanation": "Unmaintainable — the content has to be duplicated and kept in sync across 40 locations, and new directories are silently missed."
+      },
+      {
+        "id": "C",
+        "text": "A skill developers must remember to invoke before editing a schema file",
+        "explanation": "Requires manual invocation every time; it won't apply automatically just because a matching file is opened."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Glob-scoped rules apply conventions by file pattern, independent of directory location.",
+    "sourceRef": "Exam Guide TS 3.3 Skills in; Official Sample Q6"
+  },
+  {
+    "id": "d3-3.3-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.3"
+    ],
+    "lesson": "3.3",
+    "chunk": 3,
+    "difficulty": 2,
+    "stem": "A team scopes `.claude/rules/security.md` with `paths: [\"**/*\"]` — matching literally every file — 'just to be safe.' What have they given up by doing this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Nothing — this correctly applies the rule universally, which was the actual goal",
+        "explanation": "It does match everything, but that defeats the purpose scoping exists for in the first place."
+      },
+      {
+        "id": "B",
+        "text": "The token-budget benefit of conditional loading — it now behaves as always-loaded",
+        "explanation": "Correct. Matching every file means the rule loads on every task, giving up the benefit `paths:` scoping exists for."
+      },
+      {
+        "id": "C",
+        "text": "The rule silently fails to load, since `**/*` is invalid glob syntax after all",
+        "explanation": "`**/*` is valid and matches broadly — the issue is that scoping it to 'everything' removes the point of scoping."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "A paths: pattern that matches everything gives up the token-budget benefit conditional loading exists for.",
+    "sourceRef": "Exam Guide TS 3.3 Knowledge of; guide_en.md §5.3"
+  },
+  {
+    "id": "d3-3.3-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.3"
+    ],
+    "lesson": "3.3",
+    "chunk": 4,
+    "difficulty": 2,
+    "stem": "A rule must hold with zero exceptions — for example, block any refund request above $500 outright. Which kind of mechanism provides that guarantee?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "A CLAUDE.md instruction written in bold at the top of the file",
+        "explanation": "Still a probabilistic prompt instruction, regardless of emphasis or placement."
+      },
+      {
+        "id": "B",
+        "text": "A `.claude/rules/` file with very clearly worded `paths:` scoping",
+        "explanation": "Still context — probabilistic, no matter how clearly scoped or worded."
+      },
+      {
+        "id": "C",
+        "text": "A hook or a settings permission rule — deterministic enforcement",
+        "explanation": "Correct. These run as code, outside the model's control, regardless of what Claude decides in the moment."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Zero-exception rules need deterministic enforcement (hooks, permissions), not context-based instructions.",
+    "sourceRef": "guide_en.md §3.5 (Agent SDK hooks); reddit_post.md; code.claude.com/docs/en/memory (verified)"
+  },
+  {
+    "id": "d3-3.3-qc6",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.3"
+    ],
+    "lesson": "3.3",
+    "chunk": 4,
+    "difficulty": 1,
+    "stem": "A developer scopes `.claude/rules/rotate-keys.md` with `paths: [\"**/*.pem\"]`, hoping to also run it on demand — like a `/rotate-keys` command — even on days when they aren't touching any `.pem` file. Will that work as intended?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Yes — any `.claude/rules/` file can be invoked with `/`, just like a skill can be",
+        "explanation": "Rule files aren't invokable like skills; there's no `/` command version of a `.claude/rules/` file."
+      },
+      {
+        "id": "B",
+        "text": "No — a path-scoped rule only loads on a matching file; it can't be manually invoked",
+        "explanation": "Correct. `paths:` controls automatic, conditional loading, not a manual invocation option."
+      },
+      {
+        "id": "C",
+        "text": "Yes, as long as the glob pattern includes a wildcard",
+        "explanation": "The wildcard changes which files match, not whether the file can be manually invoked."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Skills are the on-demand mechanism; a paths:-scoped rule is still automatic-only, triggered by a file match.",
+    "sourceRef": "Exam Guide TS 3.2/3.3; guide_en.md §5.5"
+  },
+  {
+    "id": "d3-3.4-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.4"
+    ],
+    "lesson": "3.4",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "Claude enters plan mode for a refactor, reads a dozen files, and drafts a 3-step plan. Before you've approved anything, has any file in the repo actually changed?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Yes — files that were read get automatically reformatted as part of exploring them",
+        "explanation": "Plan mode's exploration has no side effects — reading a file doesn't reformat or otherwise change it."
+      },
+      {
+        "id": "B",
+        "text": "No — plan mode has no side effects until the plan is approved",
+        "explanation": "Correct. Exploration and plan-drafting are read-only; nothing changes until you approve and Claude switches to editing."
+      },
+      {
+        "id": "C",
+        "text": "Only test files change automatically; non-test files wait for approval",
+        "explanation": "There's no such split — plan mode makes no changes at all to any file before approval."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Plan mode is read-only investigation and design, with approval required before any change is made.",
+    "sourceRef": "Exam Guide TS 3.4 Knowledge of; guide_en.md §5.6"
+  },
+  {
+    "id": "d3-3.4-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.4"
+    ],
+    "lesson": "3.4",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "Your team is choosing between three ways to add real-time notifications — WebSockets, Server-Sent Events, or polling — each requiring different infrastructure and different client-side changes throughout the app. Is this a good candidate for plan mode?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "No — plan mode is reserved for migrations that touch at least 45 files",
+        "explanation": "There's no fixed file-count threshold that gates plan mode; the criterion is real uncertainty about approach."
+      },
+      {
+        "id": "B",
+        "text": "No — plan mode only applies to restructuring a monolith into microservices",
+        "explanation": "That's just one example of the underlying criterion, not the only situation plan mode fits."
+      },
+      {
+        "id": "C",
+        "text": "Yes — multiple valid approaches with real tradeoffs need resolving first",
+        "explanation": "Correct. Real uncertainty about which approach to take, with consequences throughout the app, is exactly what plan mode is for."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Plan mode earns its overhead when there's real uncertainty about approach or architecture to resolve first.",
+    "sourceRef": "Exam Guide TS 3.4 Knowledge of/Skills in; Official Sample Q5"
+  },
+  {
+    "id": "d3-3.4-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.4"
+    ],
+    "lesson": "3.4",
+    "chunk": 1,
+    "difficulty": 2,
+    "stem": "One engineer starts editing files immediately for a migration, planning to 'figure out the tricky parts as we go.' Six files in, they discover a shared helper function that three other already-changed files also depend on, forcing some of that work to be redone. What did skipping plan mode cost them here?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "They found a dependency only after committing changes, causing avoidable rework",
+        "explanation": "Correct. This is exactly the risk plan mode's read-only exploration exists to catch before any file is touched."
+      },
+      {
+        "id": "B",
+        "text": "They ran out of tools available for the rest of the task partway through",
+        "explanation": "Not a risk plan mode addresses — tool availability is unrelated to this scenario."
+      },
+      {
+        "id": "C",
+        "text": "The change exceeded a fixed line-count limit that plan mode enforces",
+        "explanation": "No such limit exists as part of plan mode's purpose or mechanics."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Plan mode moves the point where a wrong approach is caught to before any changes are committed.",
+    "sourceRef": "Official Sample Q5"
+  },
+  {
+    "id": "d3-3.4-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.4"
+    ],
+    "lesson": "3.4",
+    "chunk": 2,
+    "difficulty": 1,
+    "stem": "A designer asks Claude to rename a single CSS class, `.btn-primary`, to `.btn-brand`, across one small components file, with no other changes needed. What's the appropriate approach?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Direct execution — simple, well-scoped, with only one reasonable way to do it",
+        "explanation": "Correct. There's no real uncertainty here for plan mode to resolve first."
+      },
+      {
+        "id": "B",
+        "text": "Plan mode, to weigh alternative naming schemes before renaming",
+        "explanation": "Adds review overhead with nothing substantial to weigh for a rename this narrow."
+      },
+      {
+        "id": "C",
+        "text": "The Explore subagent, to check every file in the repo before renaming anything",
+        "explanation": "Over-engineered for a single, already-scoped rename in one small file."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "A simple, well-scoped change with only one reasonable way to do it is exactly what direct execution is for.",
+    "sourceRef": "Exam Guide TS 3.4 Knowledge of/Skills in"
+  },
+  {
+    "id": "d3-3.4-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.4"
+    ],
+    "lesson": "3.4",
+    "chunk": 3,
+    "difficulty": 1,
+    "stem": "A developer is asked to trace how error codes propagate through a checkout pipeline spanning 25 files, then redesign the retry logic. If all of that tracing happens directly in the main conversation, what's likely to run short before the redesign phase even starts?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The number of tools available to Claude",
+        "explanation": "Not related to this scenario — tool availability doesn't shrink from doing work in the main conversation."
+      },
+      {
+        "id": "B",
+        "text": "The user's permission to edit files",
+        "explanation": "Permissions aren't affected by where discovery happens."
+      },
+      {
+        "id": "C",
+        "text": "The context window, filled by raw exploration output",
+        "explanation": "Correct. This is exactly what the Explore subagent is built to prevent in multi-phase tasks."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "The Explore subagent isolates verbose discovery output to protect the main context window in multi-phase tasks.",
+    "sourceRef": "Exam Guide TS 3.4 Knowledge of/Skills in"
+  },
+  {
+    "id": "d3-3.4-qc6",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.4"
+    ],
+    "lesson": "3.4",
+    "chunk": 4,
+    "difficulty": 2,
+    "stem": "A migration needs: (1) tracing every call site of a deprecated function across 40 files, (2) an approved plan for the replacement, then (3) making the changes. Which combination correctly uses the tools from this lesson, in order?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Explore subagent for tracing, plan mode for design, direct execution to implement",
+        "explanation": "Correct. Heavy discovery goes to the Explore subagent, remaining uncertainty gets resolved in plan mode, and execution follows the approved plan."
+      },
+      {
+        "id": "B",
+        "text": "Plan mode for the tracing, Explore subagent to design the replacement, direct execution to implement it",
+        "explanation": "Swaps the two tools' jobs — plan mode isn't built for heavy multi-file tracing, and the Explore subagent doesn't produce an approved plan."
+      },
+      {
+        "id": "C",
+        "text": "Direct execution throughout, since the deprecated function is already known by name",
+        "explanation": "Knowing the function's name doesn't mean every call site or replacement decision is already known."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Heavy discovery, design uncertainty, and implementation each have their own tool — used in that order.",
+    "sourceRef": "Exam Guide TS 3.4 Skills in"
+  },
+  {
+    "id": "d3-3.5-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.5"
+    ],
+    "lesson": "3.5",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "Claude's summaries of support tickets vary between two sentences and two paragraphs across different runs, even though the instruction just says 'write a concise summary.' What's the fastest fix?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Add 'please be extremely concise' to the instruction",
+        "explanation": "Adds emphasis to the same ambiguous wording without pinning down what 'concise' actually means here."
+      },
+      {
+        "id": "B",
+        "text": "Show a couple of example tickets with the length you'd want",
+        "explanation": "Correct. Concrete examples pin down exactly what a vague adjective leaves open."
+      },
+      {
+        "id": "C",
+        "text": "Summarize the same ticket five times and keep the shortest result",
+        "explanation": "Papers over the inconsistency with repetition instead of resolving what 'correct' means."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "When prose produces inconsistent results, concrete examples resolve ambiguity faster than more prose.",
+    "sourceRef": "Exam Guide TS 3.5 Knowledge of/Skills in"
+  },
+  {
+    "id": "d3-3.5-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.5"
+    ],
+    "lesson": "3.5",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "You already gave Claude 3 concrete input/output examples for a date-parsing function, and the result still fails one edge case: `parseDate(\"02/30/2024\")` should raise `ValidationError` but returns `null` instead. Is repeating the same 3 examples with stronger wording likely to fix this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "No — share the specific failing case and its actual vs. expected output",
+        "explanation": "Correct. A concrete new failure needs its own concrete signal; repeating already-given examples adds nothing new."
+      },
+      {
+        "id": "B",
+        "text": "Yes — repeating verified-good examples always resolves any remaining failures",
+        "explanation": "The examples already didn't cover this edge case; repeating them unchanged gives no new information."
+      },
+      {
+        "id": "C",
+        "text": "Yes, as long as the same three examples are reformatted as a numbered list",
+        "explanation": "Reformatting doesn't add information — the missing signal is the new failing case."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Test-driven iteration converges by sharing concrete failures, not by restating examples that already didn't cover the case.",
+    "sourceRef": "Exam Guide TS 3.5 Knowledge of/Skills in"
+  },
+  {
+    "id": "d3-3.5-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.5"
+    ],
+    "lesson": "3.5",
+    "chunk": 2,
+    "difficulty": 1,
+    "stem": "A developer already has a full test suite for a caching feature, explicitly covering TTL, invalidation, and stale-read behavior. Is the interview pattern still needed before implementing?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Yes — the interview pattern is required before implementing any caching feature",
+        "explanation": "Overgeneralizes to a blanket rule; the interview pattern's value is surfacing considerations that aren't yet specified."
+      },
+      {
+        "id": "B",
+        "text": "Yes, because Claude can't read a test suite, so it needs the same questions asked separately",
+        "explanation": "Misstates the situation — Claude can use a provided test suite directly."
+      },
+      {
+        "id": "C",
+        "text": "No — the test suite already answers the non-obvious questions the pattern exists to surface",
+        "explanation": "Correct. When the ambiguity is already resolved by concrete specs, asking again adds delay with no new information."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "The interview pattern earns its cost when real ambiguity remains — not automatically for every task in a given domain.",
+    "sourceRef": "Exam Guide TS 3.5 Skills in; guide_en.md §6.4"
+  },
+  {
+    "id": "d3-3.5-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.5"
+    ],
+    "lesson": "3.5",
+    "chunk": 3,
+    "difficulty": 2,
+    "stem": "A refactor renames a shared `formatCurrency()` function's parameter order. A second fix updates every call site to match the new order. If these are given to Claude as two separate, sequential requests, what's likely to go wrong?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Nothing — sequential fixes always compose cleanly regardless of dependency",
+        "explanation": "Overgeneralizes — this pair depends on each other, which is exactly the case sequential fixes handle poorly."
+      },
+      {
+        "id": "B",
+        "text": "The call-site fix might use the old order or contradict the rename",
+        "explanation": "Correct. These two fixes interact directly and need to stay consistent with each other."
+      },
+      {
+        "id": "C",
+        "text": "The second fix will automatically detect and adapt to whatever the first fix changed",
+        "explanation": "There's no such automatic detection — an isolated fix doesn't inherently know about a related, separately-made change."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Interacting issues belong in one message; fixing them separately risks one contradicting or undoing the other.",
+    "sourceRef": "Exam Guide TS 3.5 Knowledge of/Skills in"
+  },
+  {
+    "id": "d3-3.5-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.5"
+    ],
+    "lesson": "3.5",
+    "chunk": 3,
+    "difficulty": 1,
+    "stem": "A typo in a footer's copyright year and a completely unrelated flaky test in the payments module both need fixing, with no shared logic between them. Is batching both into one combined request a good idea?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "No — batching helps only when fixes interact, not independent ones",
+        "explanation": "Correct. With no shared logic, there's nothing batching would protect against."
+      },
+      {
+        "id": "B",
+        "text": "Yes — batching is always more efficient, regardless of whether the fixes interact",
+        "explanation": "Overgeneralizes — batching's benefit specifically comes from protecting interacting fixes."
+      },
+      {
+        "id": "C",
+        "text": "Only if a third, unrelated fix is added to make the batch worthwhile",
+        "explanation": "Adding more unrelated fixes doesn't create a benefit that wasn't there."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Independent issues are fine to fix sequentially — each round stays focused and easy to verify.",
+    "sourceRef": "Exam Guide TS 3.5 Knowledge of/Skills in"
+  },
+  {
+    "id": "d3-3.6-qc1",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.6"
+    ],
+    "lesson": "3.6",
+    "chunk": 0,
+    "difficulty": 1,
+    "stem": "A new GitHub Actions step runs `claude --model claude-sonnet-4-5 \"Summarize failing tests\"`, and the workflow times out after six hours with no output. Which single addition fixes this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`--timeout 60`, to shorten how long the step is allowed to wait",
+        "explanation": "Shortens the wait but doesn't address why it's waiting — the job would just fail faster instead of succeeding."
+      },
+      {
+        "id": "B",
+        "text": "`-p` (or `--print`), switching Claude Code to non-interactive mode",
+        "explanation": "Correct. This switches Claude Code to non-interactive mode: process, print, exit — no waiting for a human."
+      },
+      {
+        "id": "C",
+        "text": "`CLAUDE_HEADLESS=true`, set as an env variable for the CI job to pick up",
+        "explanation": "Not a real Claude Code environment variable."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "-p / --print is the documented way to run Claude Code non-interactively in a pipeline.",
+    "sourceRef": "Exam Guide TS 3.6 Knowledge of/Skills in; Official Sample Q10"
+  },
+  {
+    "id": "d3-3.6-qc2",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.6"
+    ],
+    "lesson": "3.6",
+    "chunk": 1,
+    "difficulty": 1,
+    "stem": "A CI script runs `claude -p \"Review this PR\" --json-schema '{\"type\":\"object\", ...}'` with no `--output-format` flag, then tries to `JSON.parse()` the result. It fails. Why?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`--json-schema` only validates output that `--output-format json` produces",
+        "explanation": "Correct. The two flags work together — the schema has nothing to apply to on its own."
+      },
+      {
+        "id": "B",
+        "text": "`--json-schema` needs an additional `--strict` flag before it will activate at all",
+        "explanation": "Not a real flag or requirement — the actual missing piece is `--output-format json`."
+      },
+      {
+        "id": "C",
+        "text": "JSON schemas can only validate arrays, not objects",
+        "explanation": "Not a real restriction; the missing piece is the output-format flag, not the schema's shape."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "--json-schema works together with --output-format json to guarantee a specific, parseable shape.",
+    "sourceRef": "Exam Guide TS 3.6 Knowledge of/Skills in; code.claude.com/docs/en/headless (verified)"
+  },
+  {
+    "id": "d3-3.6-qc3",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.6"
+    ],
+    "lesson": "3.6",
+    "chunk": 2,
+    "difficulty": 1,
+    "stem": "A CI script correctly uses `-p` and `--output-format json`, producing well-formed JSON reviews. But the review comments themselves keep suggesting patterns the team doesn't actually use. Would adding `--json-schema` fix this too?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Yes — a stricter schema would align the suggestions with the team's conventions",
+        "explanation": "A schema constrains the shape of the output, not its content — it can't teach Claude the team's conventions."
+      },
+      {
+        "id": "B",
+        "text": "No — the missing piece is project context, which belongs in `CLAUDE.md`",
+        "explanation": "Correct. The CLI flags shape how output is delivered, not what Claude knows about the project's conventions."
+      },
+      {
+        "id": "C",
+        "text": "Yes — `--output-format json` needs a stricter value to fix the content",
+        "explanation": "There's no 'stricter value' for `--output-format` that changes suggestion content."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "CI output-formatting flags control how a result is delivered; CLAUDE.md gives CI the same project context a human contributor has.",
+    "sourceRef": "Exam Guide TS 3.6 Knowledge of/Skills in"
+  },
+  {
+    "id": "d3-3.6-qc4",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.6"
+    ],
+    "lesson": "3.6",
+    "chunk": 3,
+    "difficulty": 2,
+    "stem": "Team A has Claude implement a feature, then, in the same session, asks it to review its own diff for bugs before opening the PR. Team B has a separate Claude Code invocation review Team A's finished PR, with no memory of writing it. Which is more likely to catch a subtle bug caused by an assumption Team A's session made along the way?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Team A — the same session has full context on why each choice was made",
+        "explanation": "That context is exactly the problem: a reasoning trail justifying its own choices makes a session less likely to challenge them."
+      },
+      {
+        "id": "B",
+        "text": "Both equally — context has no bearing on review quality",
+        "explanation": "Contradicts the documented effect of a session's own reasoning trail on self-review."
+      },
+      {
+        "id": "C",
+        "text": "Team B — an independent instance has no reasoning trail to defend",
+        "explanation": "Correct. This is the documented reason session context isolation improves review effectiveness."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "A generating session's own reasoning trail makes it less likely to challenge its own decisions; an independent instance reviews without that bias.",
+    "sourceRef": "Exam Guide TS 3.6 Knowledge of; guide_en.md §5.9"
+  },
+  {
+    "id": "d3-3.6-qc5",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.6"
+    ],
+    "lesson": "3.6",
+    "chunk": 4,
+    "difficulty": 1,
+    "stem": "After every push, a PR review re-runs from a completely fresh session with zero memory of earlier runs, on the theory that a 'clean slate' avoids bias. Developers complain it keeps re-flagging two issues they fixed three commits ago. What's the flaw in this design?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Fresh sessions are inherently worse at finding any issues at all",
+        "explanation": "Not the actual problem — a fresh session can review fine; it's specifically unaware of what was already resolved."
+      },
+      {
+        "id": "B",
+        "text": "A fresh session has no way to know which issues are already resolved",
+        "explanation": "Correct. Including prior findings in context, and asking for only new issues, fixes duplicate reporting on re-runs."
+      },
+      {
+        "id": "C",
+        "text": "Fresh sessions can only ever review the very first commit made, not later ones",
+        "explanation": "Not a real limitation — a fresh session reviews whatever diff it's given."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Including prior findings in context lets Claude report only new or unresolved issues on re-runs.",
+    "sourceRef": "Exam Guide TS 3.6 Skills in"
+  },
+  {
+    "id": "d3-3.6-qc6",
+    "source": "original",
+    "kind": "quickcheck",
+    "domain": 3,
+    "taskStatements": [
+      "3.6"
+    ],
+    "lesson": "3.6",
+    "chunk": 4,
+    "difficulty": 1,
+    "stem": "A team already documents its testing standards in `CLAUDE.md` for CI runs, but automated test generation still keeps suggesting scenarios the existing suite already covers. Would adding more detail to `CLAUDE.md` fix this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Yes — once the standards are detailed enough, duplicate suggestions stop",
+        "explanation": "CLAUDE.md documents conventions, but it doesn't tell Claude what's already been written — more detail doesn't supply that."
+      },
+      {
+        "id": "B",
+        "text": "Yes, but only if `CLAUDE.md` moves to the directory level instead of the project root",
+        "explanation": "Scope isn't the issue — no CLAUDE.md placement supplies which scenarios are already tested."
+      },
+      {
+        "id": "C",
+        "text": "No — seeing what's covered requires the existing test files themselves in context",
+        "explanation": "Correct. CLAUDE.md explains standards; only the actual test files show what's already tested."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "CLAUDE.md supplies conventions; avoiding duplicate suggestions needs the existing test files themselves in context.",
+    "sourceRef": "Exam Guide TS 3.6 Skills in"
+  },
+  {
+    "id": "d3-3.1-p1",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.1"
+    ],
+    "scenario": 4,
+    "difficulty": 3,
+    "stem": "Your Node.js monorepo has `packages/frontend/` and `packages/backend/`. The team's shared testing conventions (mocking rules, coverage expectations) live in a `CLAUDE.md` placed inside `packages/backend/`. Frontend developers report Claude never applies these conventions when they write frontend tests, even though the file is committed and pulled correctly. What is the most effective fix?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Move the conventions to the project-root `.claude/CLAUDE.md`, which loads for every contributor.",
+        "explanation": "Correct. Directory-level CLAUDE.md only applies to files in that directory; a project-root file is the scope that reaches everyone."
+      },
+      {
+        "id": "B",
+        "text": "Have each frontend developer add a personal `~/.claude/CLAUDE.md` repeating the backend conventions.",
+        "explanation": "User-level files are personal and never shared via version control, so this requires every developer to manually duplicate and maintain the same content."
+      },
+      {
+        "id": "C",
+        "text": "Ask frontend developers to run `/memory` before every session to manually re-load the backend package's CLAUDE.md.",
+        "explanation": "`/memory` only shows what's already loaded; it doesn't force-load a directory's CLAUDE.md into scope for unrelated work."
+      },
+      {
+        "id": "D",
+        "text": "Copy the CLAUDE.md file into `packages/frontend/` as well, keeping a second copy in sync with the backend version.",
+        "explanation": "Works in the moment but creates two files that will drift out of sync — worse than one root-level source of truth."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Directory-level CLAUDE.md only applies within that directory — conventions meant for everyone belong at the project root, not duplicated per directory or per user.",
+    "sourceRef": "Exam Guide TS 3.1; guide_en.md §5.1"
+  },
+  {
+    "id": "d3-3.1-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.1"
+    ],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "A maintainer wants the project's root `CLAUDE.md` to pull in a shared testing-standards file located at `standards/testing.md`, relative to the CLAUDE.md file itself. Which line correctly imports it?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`@ standards/testing.md` (a space between `@` and the path)",
+        "explanation": "A space after `@` breaks import parsing — `@` must sit immediately before the path."
+      },
+      {
+        "id": "B",
+        "text": "`@standards/testing.md`",
+        "explanation": "Correct. `@` immediately before the path, no space, outside of backticks, triggers the import."
+      },
+      {
+        "id": "C",
+        "text": "`import(standards/testing.md)`",
+        "explanation": "Not a Claude Code syntax; this construct doesn't exist."
+      },
+      {
+        "id": "D",
+        "text": "`` `@standards/testing.md` `` written inside backticks",
+        "explanation": "Wrapping a path in backticks keeps it literal text specifically to avoid importing it — this mentions the file without loading it."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "@ immediately before a path (no space, not inside backticks) is what triggers an import; anything else is treated as literal text.",
+    "sourceRef": "Exam Guide TS 3.1; guide_en.md §5.2; code.claude.com/docs/en/memory (verified)"
+  },
+  {
+    "id": "d3-3.1-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.1"
+    ],
+    "scenario": 4,
+    "difficulty": 3,
+    "stem": "Your project's root `CLAUDE.md` has grown to cover build commands, API conventions, database conventions, deployment steps, and security policy — over 600 lines. Team members report Claude increasingly ignores instructions near the bottom of the file, and new contributors don't know where to find a specific convention. What is the most effective fix, without changing what's actually enforced?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Leave everything in one file, but add a detailed table of contents at the top.",
+        "explanation": "Cosmetic navigation only — doesn't reduce the file's size or address the adherence problem with a very long file."
+      },
+      {
+        "id": "B",
+        "text": "Convert the whole file into a skill, `.claude/skills/project-standards/SKILL.md`, so it only loads once a developer remembers to explicitly invoke it every time.",
+        "explanation": "Wrong mechanism — these are always-relevant standards, not an on-demand workflow. As a skill, they might never load unless someone remembers to invoke it."
+      },
+      {
+        "id": "C",
+        "text": "Split the file into topic-focused `.claude/rules/` files.",
+        "explanation": "Correct. Each topic becomes focused and easy to find and maintain, while still loading the same way a project CLAUDE.md does."
+      },
+      {
+        "id": "D",
+        "text": "Move the least-used sections (deployment, security) into each relevant subdirectory's own CLAUDE.md.",
+        "explanation": "Deployment and security conventions aren't tied to one directory — a directory-level file would need duplication or wouldn't reach every relevant file."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "When one CLAUDE.md covers many unrelated topics, .claude/rules/ keeps each topic focused and easy to maintain without changing what's loaded or when.",
+    "sourceRef": "Exam Guide TS 3.1 Skills in; guide_en.md §5.3"
+  },
+  {
+    "id": "d3-3.1-p4",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.1"
+    ],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "After merging a PR that reorganizes CLAUDE.md content into `.claude/rules/`, a developer reports that Claude no longer seems to apply the project's deployment checklist. Before assuming the rewritten instructions are worse, what should you do first?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Rewrite the deployment checklist with stronger, more emphatic language and re-test.",
+        "explanation": "Premature — skips diagnosing whether the file is even loaded before changing its wording."
+      },
+      {
+        "id": "B",
+        "text": "Ask the developer to copy the checklist into their personal `~/.claude/CLAUDE.md` as a workaround.",
+        "explanation": "A per-person band-aid, not a diagnosis, and reintroduces the user-vs-project scope problem."
+      },
+      {
+        "id": "C",
+        "text": "Revert the reorganization back to a single monolithic CLAUDE.md.",
+        "explanation": "Overreacts without first knowing whether the reorganization is actually the cause."
+      },
+      {
+        "id": "D",
+        "text": "Run `/memory` to check whether the new rules file is actually loaded.",
+        "explanation": "Correct. Verifying what's loaded is the first diagnostic step before assuming the content itself is the problem."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Before assuming an instruction is badly worded, verify with /memory that the file containing it was actually loaded.",
+    "sourceRef": "Exam Guide TS 3.1 Skills in; guide_en.md §5.8"
+  },
+  {
+    "id": "d3-3.1-p5",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.1"
+    ],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "You want to record a personal preference — always use Conventional Commits format for your own commit messages — that should apply across every project you personally work on, but should not be forced onto teammates who don't use that convention. Where should this instruction go?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`~/.claude/CLAUDE.md`",
+        "explanation": "Correct. User-level applies to all of your projects and is excluded from version control, so teammates never receive it."
+      },
+      {
+        "id": "B",
+        "text": "`.claude/CLAUDE.md` at the project root",
+        "explanation": "Project-scoped and shared via version control — this would push the preference onto every teammate."
+      },
+      {
+        "id": "C",
+        "text": "A directory-level CLAUDE.md in each project's root package",
+        "explanation": "Still project-scoped and shared, and would need to be recreated in every single project — it doesn't apply 'across every project' automatically."
+      },
+      {
+        "id": "D",
+        "text": "`.claude/rules/commits.md` with no `paths:` field",
+        "explanation": "Still a project-scoped, version-controlled file, shared the same way as CLAUDE.md, and still limited to one project."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "User-level CLAUDE.md is the only scope that is both cross-project and excluded from version control.",
+    "sourceRef": "Exam Guide TS 3.1 Knowledge of; guide_en.md §5.1"
+  },
+  {
+    "id": "d3-3.2-p1",
+    "source": "original",
+    "duplicateOf": "off-04",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.2"
+    ],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "Your team wants a `/deploy-checklist` command that runs the same release checklist for every engineer, automatically available the moment someone clones the repository, with no manual setup step. Where should you create it?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`~/.claude/commands/deploy-checklist.md`",
+        "explanation": "User-scoped and personal — not shared via version control, so it won't appear for a fresh clone."
+      },
+      {
+        "id": "B",
+        "text": "`.claude/commands/deploy-checklist.md` in the repository",
+        "explanation": "Correct. Project-scoped and version-controlled, so every clone gets it automatically."
+      },
+      {
+        "id": "C",
+        "text": "A section in the project's root `CLAUDE.md` describing the checklist steps",
+        "explanation": "CLAUDE.md is always-loaded context, not an invokable `/command` — nobody can run it as a discrete action."
+      },
+      {
+        "id": "D",
+        "text": "`.claude/config.json` with a `\"commands\"` array listing the checklist",
+        "explanation": "Invented — no such configuration file exists in Claude Code."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Project-scoped commands/skills live in the repository so version control distributes them automatically to every clone.",
+    "sourceRef": "Exam Guide TS 3.2 Knowledge of/Skills in; Official Sample Q4"
+  },
+  {
+    "id": "d3-3.2-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.2"
+    ],
+    "scenario": 4,
+    "difficulty": 3,
+    "stem": "A skill named `analyze-deps` reads every file in a large monorepo to build a dependency report, often producing thousands of lines of intermediate tool output before it's done. Developers complain that running `/analyze-deps` fills up their main conversation so much that later, unrelated requests in the same session lose earlier context. Which frontmatter change addresses this directly?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Add `argument-hint: \"[package-path]\"` to the skill's frontmatter.",
+        "explanation": "Helps with missing arguments; doesn't isolate verbose output from the main context."
+      },
+      {
+        "id": "B",
+        "text": "Set `allowed-tools: [\"Read\", \"Grep\", \"Glob\"]`.",
+        "explanation": "Restricts which tools the skill can use (security), but doesn't isolate its output from the main conversation."
+      },
+      {
+        "id": "C",
+        "text": "Set `context: fork`.",
+        "explanation": "Correct. Runs the skill in an isolated sub-agent context, so only its final output reaches the main conversation."
+      },
+      {
+        "id": "D",
+        "text": "Move the skill from `.claude/skills/` to `~/.claude/skills/`.",
+        "explanation": "Changes sharing scope (personal vs. team), which is unrelated to context pollution."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "context: fork isolates a skill's verbose or exploratory output in a sub-agent so it doesn't consume the main conversation's context.",
+    "sourceRef": "Exam Guide TS 3.2 Skills in; guide_en.md §5.5"
+  },
+  {
+    "id": "d3-3.2-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.2"
+    ],
+    "scenario": 4,
+    "difficulty": 3,
+    "stem": "A skill `write-changelog` should only ever append changelog entries to `CHANGELOG.md` — it must not be able to run shell commands or delete files, even if a malformed changelog entry somehow tried to trigger that. Which frontmatter configuration enforces this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`argument-hint: \"[changelog-entry]\"` only.",
+        "explanation": "Only affects the prompt shown for missing arguments — provides no tool restriction at all."
+      },
+      {
+        "id": "B",
+        "text": "`context: fork` only.",
+        "explanation": "Isolates the skill's context, but a forked sub-agent can still call any tool the parent session would allow — it doesn't restrict which tools."
+      },
+      {
+        "id": "C",
+        "text": "A CLAUDE.md instruction telling Claude 'never delete files when running this skill.'",
+        "explanation": "A probabilistic prompt instruction, not a structural restriction — it can be worded well and still not hold every time."
+      },
+      {
+        "id": "D",
+        "text": "`allowed-tools: [\"Write\"]`.",
+        "explanation": "Correct. Structurally limits the skill to the Write tool, so it cannot run Bash or use any other tool, regardless of what the input contains."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "allowed-tools structurally restricts a skill's available tools — a stronger guarantee than a prompt instruction asking Claude not to use a tool.",
+    "sourceRef": "Exam Guide TS 3.2 Skills in; guide_en.md §5.5"
+  },
+  {
+    "id": "d3-3.2-p4",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.2"
+    ],
+    "scenario": 4,
+    "difficulty": 3,
+    "stem": "A senior engineer wants to try a stricter variant of the team's shared `/review` skill for their own use — extra checks they're not ready to impose on the whole team yet. They must not change what teammates get when they run `/review`. What should they do?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a new skill under `~/.claude/skills/review-strict/` (a different name, personal scope).",
+        "explanation": "Correct. A different name avoids colliding with the shared skill, and the personal-scope location keeps it invisible to teammates."
+      },
+      {
+        "id": "B",
+        "text": "Edit `.claude/skills/review/SKILL.md` directly and ask teammates to ignore the new checks for now.",
+        "explanation": "Mutates the shared, version-controlled skill — changes behavior for every teammate who pulls it, not just this engineer."
+      },
+      {
+        "id": "C",
+        "text": "Add the extra checks to the project's root CLAUDE.md so they apply whenever `/review` runs.",
+        "explanation": "CLAUDE.md is always-loaded for everyone, not scoped to one engineer, and isn't tied to when `/review` specifically runs."
+      },
+      {
+        "id": "D",
+        "text": "Duplicate the skill into `.claude/skills/review-strict/` inside the repository.",
+        "explanation": "Right idea (a differently-named variant), wrong scope — a project directory location shares it with the whole team via version control, the opposite of what's wanted for now."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "A personal skill variant needs both a different name and a personal-scope location (~/.claude/skills/) to avoid affecting teammates.",
+    "sourceRef": "Exam Guide TS 3.2 Knowledge of"
+  },
+  {
+    "id": "d3-3.2-p5",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.2"
+    ],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "Your team wants Claude to always use 2-space indentation and your company's error-handling pattern in every response, no matter what the developer asks for. You also want a separate, rarely-used workflow that regenerates API client stubs from an OpenAPI spec, only when a developer explicitly asks for it. How should these two be configured?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Put both in the project's root CLAUDE.md so they're always available together.",
+        "explanation": "Wastes context every session on the rarely-used stub-generation workflow, which nobody needs most of the time."
+      },
+      {
+        "id": "B",
+        "text": "Standards in CLAUDE.md (always-loaded); the stub-generation workflow in a skill (on demand).",
+        "explanation": "Correct. Universal, always-relevant standards go where they're always loaded; a rarely-needed workflow goes where it only loads when actually invoked."
+      },
+      {
+        "id": "C",
+        "text": "Put both as skills, so developers explicitly invoke the coding standards at the start of each session.",
+        "explanation": "Makes universal standards optional and easy to forget, since a skill only applies when someone remembers to invoke it."
+      },
+      {
+        "id": "D",
+        "text": "Put the indentation standard in a directory-level CLAUDE.md and the stub-generation workflow in the project root CLAUDE.md.",
+        "explanation": "Reverses the needed loading properties — a directory-level file doesn't reach every response, and the rarely-used workflow ends up always-loaded for no reason."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Always-needed standards belong in CLAUDE.md (always-loaded); occasional, specific workflows belong in a skill (on-demand).",
+    "sourceRef": "Exam Guide TS 3.2 Skills in; guide_en.md §5.5"
+  },
+  {
+    "id": "d3-3.3-p1",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.3"
+    ],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "You want a `.claude/rules/terraform.md` file to load only when Claude edits files under `infra/terraform/`, at any depth. Which frontmatter is correct?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`scope: [\"infra/terraform/**/*\"]` as the frontmatter field",
+        "explanation": "Wrong key name — `scope` isn't a recognized rule frontmatter field."
+      },
+      {
+        "id": "B",
+        "text": "`match: \"infra/terraform/*\"`",
+        "explanation": "Wrong key name (`match`), and the pattern lacks `**`, so it won't reach nested subdirectories anyway."
+      },
+      {
+        "id": "C",
+        "text": "`paths: [\"infra/terraform/**/*\"]`",
+        "explanation": "Correct. `paths` is the recognized field, and `**` reaches any depth under the directory."
+      },
+      {
+        "id": "D",
+        "text": "`directory: \"infra/terraform/\"`",
+        "explanation": "Wrong key name — `.claude/rules/` frontmatter doesn't have a `directory` field."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "paths is the frontmatter field that scopes a .claude/rules/ file to matching glob patterns — other plausible-sounding key names don't exist.",
+    "sourceRef": "Exam Guide TS 3.3 Knowledge of; guide_en.md §5.3"
+  },
+  {
+    "id": "d3-3.3-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.3"
+    ],
+    "scenario": 4,
+    "difficulty": 3,
+    "stem": "A project has `.claude/rules/terraform.md` scoped with `paths: [\"infra/**/*\"]` and `.claude/rules/react-patterns.md` scoped with `paths: [\"src/components/**/*.tsx\"]`. A developer spends an entire session only editing `src/components/Button.tsx`. What is true about these two rule files during that session?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Both load at session start, because all `.claude/rules/` files are always loaded regardless of frontmatter.",
+        "explanation": "Contradicts how `paths:` scoping works — the entire point is conditional loading, not always-on loading."
+      },
+      {
+        "id": "B",
+        "text": "Neither loads, because path-scoped rules only apply to files matching a `.test.*` pattern.",
+        "explanation": "Overgeneralizes from one earlier testing example — `paths:` works with any glob pattern, not only test-file patterns."
+      },
+      {
+        "id": "C",
+        "text": "Only `terraform.md` loads, because infrastructure rules take priority over frontend rules.",
+        "explanation": "Invents a priority system that doesn't exist; loading depends only on whether a matching file was touched."
+      },
+      {
+        "id": "D",
+        "text": "Only `react-patterns.md` loads — the session only touches a file matching its pattern.",
+        "explanation": "Correct. A path-scoped rule loads only when a matching file is actually touched."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "A path-scoped rule loads only when Claude actually touches a file matching its paths: pattern — unrelated rule files simply never load that session.",
+    "sourceRef": "Exam Guide TS 3.3 Knowledge of; guide_en.md §5.3"
+  },
+  {
+    "id": "d3-3.3-p3",
+    "source": "original",
+    "duplicateOf": "off-06",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.3"
+    ],
+    "scenario": 2,
+    "difficulty": 3,
+    "stem": "Your codebase places every test file directly beside the code it tests (`Button.test.tsx` next to `Button.tsx`, `orders_test.py` next to `orders.py`, across dozens of directories). You want every test file, regardless of location, to use the same fixture and mocking conventions. What is the most maintainable way to enforce this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Create one `.claude/rules/testing.md` file with `paths: [\"**/*.test.tsx\", \"**/*_test.py\"]`.",
+        "explanation": "Correct. One file, matched by pattern regardless of directory — the standard fix for conventions spread across the codebase."
+      },
+      {
+        "id": "B",
+        "text": "Add a `CLAUDE.md` file to every directory that contains a test file, each repeating the same conventions.",
+        "explanation": "Works but requires duplicating and maintaining identical content across dozens of locations, and silently misses any new directory added later."
+      },
+      {
+        "id": "C",
+        "text": "Add the testing conventions to the project's root `CLAUDE.md` under a 'Testing' heading.",
+        "explanation": "Loads for every file, not just tests, and relies on Claude inferring when the section applies rather than a deterministic path match."
+      },
+      {
+        "id": "D",
+        "text": "Create a `.claude/skills/run-tests/SKILL.md` skill that developers invoke before writing new tests.",
+        "explanation": "Requires developers to remember to invoke it every time; doesn't apply automatically when Claude simply opens a matching file."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Glob-scoped .claude/rules/ files apply conventions by file pattern, independent of directory — the maintainable choice when matching files are scattered.",
+    "sourceRef": "Exam Guide TS 3.3 Skills in; Official Sample Q6"
+  },
+  {
+    "id": "d3-3.3-p4",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.3"
+    ],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "Which glob pattern in a `paths:` field matches every Python file anywhere under `src/`, including deeply nested subdirectories, but excludes Python files outside `src/`?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`src/*.py`",
+        "explanation": "Only matches files directly inside `src/`, not files in nested subdirectories."
+      },
+      {
+        "id": "B",
+        "text": "`src/**/*.py`",
+        "explanation": "Correct. Anchored to `src/`, and `**` reaches any depth of nested subdirectories."
+      },
+      {
+        "id": "C",
+        "text": "`**/*.py`",
+        "explanation": "Matches Python files anywhere in the whole repository, not scoped to `src/` at all."
+      },
+      {
+        "id": "D",
+        "text": "`src/**.py`",
+        "explanation": "Malformed — without a `/` separating `**` from the filename pattern, it doesn't correctly match nested paths the way `src/**/*.py` does."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "`**` matches any number of intermediate directories; anchoring a pattern with a leading folder scopes it while still reaching every depth.",
+    "sourceRef": "Exam Guide TS 3.3 Skills in; guide_en.md §5.3"
+  },
+  {
+    "id": "d3-3.3-p5",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.3"
+    ],
+    "scenario": 5,
+    "difficulty": 3,
+    "stem": "Your team wants two things: (1) a strong recommendation that all new API endpoints follow a standard response wrapper, documented for Claude to follow, and (2) a hard block that prevents any commit containing a hardcoded AWS secret key, with zero tolerance for exceptions. Which pairing correctly matches each requirement to its mechanism?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Both as `.claude/rules/` files with `paths:` scoping — the response-wrapper rule scoped to API files, the secret-key rule scoped to all files.",
+        "explanation": "Rules are context, not enforcement — a scoped rule cannot guarantee zero exceptions the way the secret-key requirement needs."
+      },
+      {
+        "id": "B",
+        "text": "Both as CLAUDE.md instructions — the response-wrapper convention at project level, the secret-key ban emphasized in bold at the top of the file.",
+        "explanation": "CLAUDE.md is probabilistic for both; no amount of emphasis turns a prompt instruction into a hard guarantee."
+      },
+      {
+        "id": "C",
+        "text": "The response-wrapper convention as a scoped `.claude/rules/` file; the secret-key block as a hook that runs deterministically.",
+        "explanation": "Correct. Strong-preference guidance goes to a context mechanism; the zero-exception requirement goes to deterministic enforcement."
+      },
+      {
+        "id": "D",
+        "text": "Both enforced with hooks, since hooks are the most reliable mechanism available.",
+        "explanation": "Over-engineered for requirement (1) — a strong recommendation doesn't need code-level enforcement, adding engineering overhead a scoped rule would already cover."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Match strong-preference guidance to context mechanisms (CLAUDE.md, rules, skills) and zero-exception requirements to deterministic enforcement (hooks, permissions) — using the heavier mechanism everywhere is over-engineering, and the lighter one everywhere fails the hard requirement.",
+    "sourceRef": "guide_en.md §3.5, §5.3; reddit_post.md; code.claude.com/docs/en/memory (verified)"
+  },
+  {
+    "id": "d3-3.4-p1",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.4"
+    ],
+    "scenario": 2,
+    "difficulty": 3,
+    "stem": "You need to migrate a codebase from one HTTP client library to another across 60 files, where the two libraries have different error-handling APIs and some call sites will need custom adaptation. Which approach is most effective?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Direct execution: update files one at a time, adapting error handling as you encounter each different pattern.",
+        "explanation": "Risks inconsistent adaptation choices across files discovered only as you go, with no upfront view of how many distinct patterns exist."
+      },
+      {
+        "id": "B",
+        "text": "Direct execution with a single, very detailed upfront prompt describing exactly how every call site should be changed.",
+        "explanation": "Assumes you already know every call site's pattern without having explored the codebase first."
+      },
+      {
+        "id": "C",
+        "text": "Plan mode only — investigate and produce a plan, but stop there and have a human implement the changes manually.",
+        "explanation": "Throws away the value of combining plan mode with Claude's own execution; the plan alone doesn't complete the migration."
+      },
+      {
+        "id": "D",
+        "text": "Plan mode to explore the call sites and design an approach, then direct execution to implement it.",
+        "explanation": "Correct. Investigation first resolves the pattern variation, then execution carries out the already-approved plan."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Large migrations with varying call-site patterns need investigation before implementation — plan mode first, then direct execution against the approved plan.",
+    "sourceRef": "Exam Guide TS 3.4 Skills in; guide_en.md §5.6"
+  },
+  {
+    "id": "d3-3.4-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.4"
+    ],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "Your team is deciding whether to adopt a new state-management library across the frontend, with three libraries under consideration, each requiring a different integration pattern and different amounts of rework in existing components. What best justifies using plan mode here rather than direct execution?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "There are multiple valid approaches and an architectural decision to make before any code should change.",
+        "explanation": "Correct. This is precisely the uncertainty plan mode exists to resolve before committing to changes."
+      },
+      {
+        "id": "B",
+        "text": "The task touches frontend code, and frontend changes should always go through plan mode as a matter of policy.",
+        "explanation": "Over-generalizes to 'always plan mode for frontend' instead of the real criterion — multiple approaches and architectural uncertainty."
+      },
+      {
+        "id": "C",
+        "text": "Plan mode is required whenever more than one file will be edited.",
+        "explanation": "File count alone isn't the criterion; a well-scoped multi-file rename can still be direct execution."
+      },
+      {
+        "id": "D",
+        "text": "Direct execution cannot access more than one library's documentation at a time, so plan mode is needed to compare them.",
+        "explanation": "Misstates what plan mode is for — it's a read-only exploration/design phase, not a documentation-access limitation of direct execution."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Plan mode's value comes from resolving real uncertainty (multiple approaches, architectural decisions) before committing changes — not from a blanket rule based on language, file type, or file count.",
+    "sourceRef": "Exam Guide TS 3.4 Knowledge of/Skills in"
+  },
+  {
+    "id": "d3-3.4-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.4"
+    ],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "A production error log shows a null pointer exception at one specific line in `orders/validate.py`, with a stack trace pointing directly to a missing null check before a `.total` field access. What is the most effective response?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Enter plan mode to explore the whole `orders/` module before making any change, in case the null check reveals related issues elsewhere.",
+        "explanation": "Over-cautious for a change this well-scoped; adds review overhead with nothing substantial to review."
+      },
+      {
+        "id": "B",
+        "text": "Direct execution: add the missing null check at the identified line.",
+        "explanation": "Correct. A clear stack trace with an obvious, narrow fix is exactly what direct execution is for."
+      },
+      {
+        "id": "C",
+        "text": "Use the Explore subagent to search the entire codebase for every place `.total` is accessed, before touching this file.",
+        "explanation": "Over-engineered for a single, already-located bug — the Explore subagent earns its cost on heavier, multi-phase discovery, not a one-line fix with a clear stack trace."
+      },
+      {
+        "id": "D",
+        "text": "Write a comprehensive test suite for the entire `orders/` module first, then fix the bug once the suite is in place.",
+        "explanation": "Disproportionate effort for a well-understood, single-line fix; test-driven iteration pays off for ambiguous requirements, not a bug this clearly diagnosed."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "A clear stack trace pointing to one well-understood fix is exactly what direct execution is for — added process doesn't reduce risk that isn't there.",
+    "sourceRef": "Exam Guide TS 3.4 Knowledge of/Skills in"
+  },
+  {
+    "id": "d3-3.4-p4",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.4"
+    ],
+    "scenario": 4,
+    "difficulty": 3,
+    "stem": "During a multi-phase task — first understanding how an authentication module works across 30 files, then redesigning it — a developer notices that by the time the redesign phase starts, the context window is nearly full of raw file contents and grep results from the investigation phase, leaving little room to reason about the redesign itself. What should have been used during the investigation phase?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Plan mode with no further delegation, keeping all investigation directly in the main conversation for full visibility.",
+        "explanation": "This is exactly the setup that caused the problem — full visibility came at the cost of filling the context window."
+      },
+      {
+        "id": "B",
+        "text": "`/compact` run continuously throughout the investigation to keep the context window small.",
+        "explanation": "Compaction summarizes history and risks losing exact details (like which of the 30 files does what); it's a recovery tool, not a substitute for isolating verbose discovery in the first place."
+      },
+      {
+        "id": "C",
+        "text": "The Explore subagent, so discovery stays isolated and only a summary reaches the main conversation.",
+        "explanation": "Correct. This is exactly what the Explore subagent is built to prevent in multi-phase tasks."
+      },
+      {
+        "id": "D",
+        "text": "Direct execution, skipping investigation and redesigning the module based on general authentication best practices.",
+        "explanation": "Skips understanding the actual codebase entirely, risking a redesign that doesn't fit the existing system."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "The Explore subagent isolates verbose discovery output so multi-phase tasks don't exhaust the context window before later phases begin.",
+    "sourceRef": "Exam Guide TS 3.4 Knowledge of/Skills in"
+  },
+  {
+    "id": "d3-3.4-p5",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.4"
+    ],
+    "scenario": 2,
+    "difficulty": 2,
+    "stem": "A developer plans a library migration in plan mode, gets a detailed, approved plan, and then re-enters plan mode a second time to 'plan the implementation of the plan' before making any changes. What's wrong with this approach?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Nothing — repeating plan mode ensures maximum safety and should always be done twice for large migrations.",
+        "explanation": "No such doubling requirement exists, and it adds pure overhead once uncertainty is already resolved."
+      },
+      {
+        "id": "B",
+        "text": "Plan mode cannot be used twice in the same task; the second entry would silently fail.",
+        "explanation": "Invents a technical limitation that isn't described anywhere; the real issue is process design, not a system restriction."
+      },
+      {
+        "id": "C",
+        "text": "The second plan mode phase should have used the Explore subagent instead.",
+        "explanation": "Doesn't address the actual issue, which is redundant planning, not a missing delegation tool."
+      },
+      {
+        "id": "D",
+        "text": "Direct execution should follow immediately once approved — replanning adds delay with no benefit.",
+        "explanation": "Correct. Plan mode's job is done once the plan is approved; execution should follow directly."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Plan mode resolves uncertainty once; after approval, direct execution carries out the plan — repeating the planning phase after uncertainty is already resolved is pure overhead.",
+    "sourceRef": "Exam Guide TS 3.4 Skills in"
+  },
+  {
+    "id": "d3-3.5-p1",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.5"
+    ],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "You ask Claude to 'normalize product SKUs to our standard format.' Three separate runs on the same batch of messy SKUs produce three different normalization choices for SKUs with embedded spaces and mixed case. What is the most effective next step?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Provide 2-3 concrete input/output examples, including one SKU with embedded spaces.",
+        "explanation": "Correct. Concrete examples pin down exactly what 'standard format' means for the edge cases causing inconsistency."
+      },
+      {
+        "id": "B",
+        "text": "Rewrite the instruction as 'normalize product SKUs to our standard format, being very precise and consistent every time.'",
+        "explanation": "Adds emphasis to the same ambiguous prose without resolving what 'standard format' actually means for the edge cases."
+      },
+      {
+        "id": "C",
+        "text": "Run the normalization five times and have Claude vote on the most common result.",
+        "explanation": "Papers over the ambiguity with repetition instead of resolving it, and still doesn't define the correct answer for edge cases."
+      },
+      {
+        "id": "D",
+        "text": "Split the task into two passes: one pass identifies SKUs needing normalization, a second pass normalizes them.",
+        "explanation": "Solves a different problem (attention dilution across many items), not the actual issue, which is an underspecified transformation rule."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "When a prose description produces inconsistent results across runs, concrete input/output examples pin down the ambiguity faster than more prose.",
+    "sourceRef": "Exam Guide TS 3.5 Knowledge of/Skills in"
+  },
+  {
+    "id": "d3-3.5-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.5"
+    ],
+    "scenario": 5,
+    "difficulty": 2,
+    "stem": "You ask Claude to implement a date-range overlap function. The first attempt fails 3 of 12 test cases you'd already written covering boundary conditions. What is the most effective way to iterate?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Describe the date-range overlap concept again from scratch in different words and ask for a new implementation.",
+        "explanation": "Discards the concrete signal already available (which specific tests failed and why) in favor of a vaguer restatement."
+      },
+      {
+        "id": "B",
+        "text": "Share the specific failing test cases and their actual vs. expected output, and ask Claude to fix those cases.",
+        "explanation": "Correct. Concrete failures give a stable, objective target to converge on."
+      },
+      {
+        "id": "C",
+        "text": "Lower the test suite's strictness so all 12 tests pass with the current implementation.",
+        "explanation": "Changes the definition of correct to match the flawed implementation, instead of fixing the implementation."
+      },
+      {
+        "id": "D",
+        "text": "Discard the test suite and ask Claude to self-review the implementation for correctness instead.",
+        "explanation": "Gives up the objective signal (concrete failing cases) for a less reliable self-assessment."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Test-driven iteration converges by sharing concrete failures, not by re-describing the requirement or abandoning the tests.",
+    "sourceRef": "Exam Guide TS 3.5 Knowledge of/Skills in"
+  },
+  {
+    "id": "d3-3.5-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.5"
+    ],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "A developer with no fintech background asks Claude to implement a wallet balance reconciliation job for a payments system. What is the most effective first step, given the developer may not know every relevant consideration?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Implement a straightforward version immediately, and rely on code review to catch any missed considerations.",
+        "explanation": "Defers surfacing considerations like rounding or double-entry consistency until after code exists, which is more costly to fix."
+      },
+      {
+        "id": "B",
+        "text": "Ask Claude to write extensive documentation about wallet reconciliation before implementing anything.",
+        "explanation": "Produces general background reading rather than surfacing the specific decisions this implementation needs."
+      },
+      {
+        "id": "C",
+        "text": "Have Claude ask clarifying questions about rounding and discrepancy handling before implementing.",
+        "explanation": "Correct. The interview pattern surfaces non-obvious design considerations before code exists, when they're cheapest to address."
+      },
+      {
+        "id": "D",
+        "text": "Escalate the task to a domain expert instead of using Claude for the initial implementation at all.",
+        "explanation": "Skips a valuable technique (the interview pattern) that could surface the same considerations without abandoning the task."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "The interview pattern surfaces domain-specific considerations before implementation, which is cheaper than discovering them after code already exists.",
+    "sourceRef": "Exam Guide TS 3.5 Skills in; guide_en.md §6.4"
+  },
+  {
+    "id": "d3-3.5-p4",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.5"
+    ],
+    "scenario": 5,
+    "difficulty": 3,
+    "stem": "A code review turns up two problems in the same authentication module: (1) session tokens don't expire, and (2) the error message shown on an expired-token request currently assumes tokens never expire, so it will need to change to match whatever expiry behavior gets implemented. How should these be given to Claude?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Fix them in two fully separate sessions with no shared context, so each fix is verified in complete isolation.",
+        "explanation": "Risks the error-message fix contradicting whatever expiry behavior the first, disconnected session actually implemented."
+      },
+      {
+        "id": "B",
+        "text": "Fix the error message first, then fix the token expiry separately afterward, in that order.",
+        "explanation": "Fixes the dependent issue before the one it depends on, likely requiring rework once expiry behavior is decided."
+      },
+      {
+        "id": "C",
+        "text": "Report only the token expiry issue for now, and defer the error message issue to a future, unrelated iteration.",
+        "explanation": "Leaves a related issue unresolved even though it directly depends on the fix being made."
+      },
+      {
+        "id": "D",
+        "text": "Describe both issues together in one detailed message, since the fix depends on the chosen expiry behavior.",
+        "explanation": "Correct. Interacting issues belong in one message so the dependent fix is made consistent with the fix it depends on."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Issues that interact (one fix depends on the other) belong in one message; only independent issues benefit from sequential, one-at-a-time iteration.",
+    "sourceRef": "Exam Guide TS 3.5 Knowledge of/Skills in"
+  },
+  {
+    "id": "d3-3.5-p5",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.5"
+    ],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "A data migration script silently drops records whose `middle_name` field is null, instead of migrating them with an empty value as intended. Telling Claude to 'handle null values properly' doesn't change the behavior on the next attempt. What is the most effective next step?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Provide a specific test case: a record with `middle_name: null` and the exact expected output row.",
+        "explanation": "Correct. A concrete test case with exact input and expected output fixes an underspecified edge case faster than a general instruction."
+      },
+      {
+        "id": "B",
+        "text": "Add a general instruction to the script's CLAUDE.md stating that all edge cases must be handled correctly.",
+        "explanation": "Still prose-level and just as vague as the original instruction that already failed to fix the behavior."
+      },
+      {
+        "id": "C",
+        "text": "Ask Claude to add error logging so null-related failures are easier to notice in production.",
+        "explanation": "Makes the symptom more visible without fixing the actual dropped-record behavior."
+      },
+      {
+        "id": "D",
+        "text": "Rewrite the entire migration script from scratch with a different approach.",
+        "explanation": "Disproportionate to a scoped, well-understood edge case; there's no indication the whole approach is wrong, just this one case."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "A concrete test case with exact input and expected output fixes an underspecified edge case faster than a general instruction to 'handle it properly.'",
+    "sourceRef": "Exam Guide TS 3.5 Skills in"
+  },
+  {
+    "id": "d3-3.6-p1",
+    "source": "original",
+    "duplicateOf": "off-10",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.6"
+    ],
+    "scenario": 5,
+    "difficulty": 2,
+    "stem": "Your GitLab CI job runs `claude --output-format json \"Review this merge request for security issues\"` and the job hangs until the runner times out, with logs showing Claude Code waiting for interactive input. The team already knows about `-p`/`--print`, but this job doesn't use it. What is the correct fix?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Add `--json-schema` in addition to `--output-format json`.",
+        "explanation": "Only affects the shape of structured output; doesn't address non-interactive execution at all."
+      },
+      {
+        "id": "B",
+        "text": "Add `-p` (or `--print`) to the command, alongside `--output-format json`.",
+        "explanation": "Correct. -p / --print is what switches Claude Code into non-interactive mode, and it works alongside --output-format json."
+      },
+      {
+        "id": "C",
+        "text": "Replace `--output-format json` with `--batch`.",
+        "explanation": "`--batch` isn't a real Claude Code flag; this doesn't fix the hang and drops the structured-output requirement."
+      },
+      {
+        "id": "D",
+        "text": "Keep the command as-is, but redirect stdin from `/dev/null` in the CI job definition.",
+        "explanation": "A Unix-level workaround, not the documented fix — `-p` is what actually switches Claude Code into non-interactive mode."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "-p / --print is what makes Claude Code run non-interactively; it must be present regardless of which other output flags are also used.",
+    "sourceRef": "Exam Guide TS 3.6 Knowledge of/Skills in; Official Sample Q10"
+  },
+  {
+    "id": "d3-3.6-p2",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.6"
+    ],
+    "scenario": 5,
+    "difficulty": 3,
+    "stem": "Your pipeline needs each finding from an automated review to include exactly four fields — file, line, severity, and fix — validated before your PR-commenting script tries to parse them. Which command achieves this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`claude -p \"Review this PR\" --output-format json`",
+        "explanation": "Returns valid JSON, but with no schema, the shape (which fields are present) isn't validated or guaranteed."
+      },
+      {
+        "id": "B",
+        "text": "`claude -p \"Review this PR, and format each finding as file:line:severity:fix\"`",
+        "explanation": "A prose formatting instruction is still probabilistic — nothing structurally guarantees the four-field shape."
+      },
+      {
+        "id": "C",
+        "text": "`claude -p \"Review this PR\" --output-format json --json-schema '{...findings schema...}'`",
+        "explanation": "Correct. --output-format json produces JSON, and --json-schema validates it against the required shape."
+      },
+      {
+        "id": "D",
+        "text": "`claude -p \"Review this PR\" --json-schema '{\"type\":\"object\"}'` (without `--output-format json`)",
+        "explanation": "Close, but --json-schema validates structured output produced via --output-format json — omitting that flag leaves the schema with nothing to apply to."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "--json-schema works together with --output-format json to guarantee a specific, parseable shape — either flag alone is not enough.",
+    "sourceRef": "Exam Guide TS 3.6 Knowledge of/Skills in; code.claude.com/docs/en/headless (verified)"
+  },
+  {
+    "id": "d3-3.6-p3",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.6"
+    ],
+    "scenario": 5,
+    "difficulty": 3,
+    "stem": "Your CI-invoked review consistently flags a project's custom `assertMatchesFixture()` test helper as 'missing an assertion,' even though it's your team's standard way of asserting against a known-good fixture. Interactive sessions with the same developers don't have this problem. What's the most effective fix?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Disable the automated review's 'missing assertion' check entirely, project-wide.",
+        "explanation": "Throws away a check that's genuinely useful elsewhere, just to work around one false positive."
+      },
+      {
+        "id": "B",
+        "text": "Add `--json-schema` to exclude findings about assertion helpers.",
+        "explanation": "Misunderstands what --json-schema does — it validates output shape, not which categories of findings appear."
+      },
+      {
+        "id": "C",
+        "text": "Have a human manually dismiss this specific finding every time it appears.",
+        "explanation": "Treats a systematic, recurring false positive as a one-off, at ongoing manual cost."
+      },
+      {
+        "id": "D",
+        "text": "Document the fixture conventions in `CLAUDE.md` so CI has that context.",
+        "explanation": "Correct. CI-invoked runs only know what's loaded automatically — CLAUDE.md gives CI the same context an interactive session has."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "CI-invoked Claude Code runs only know what's loaded automatically — documenting project-specific conventions in CLAUDE.md gives CI the same context a human contributor has.",
+    "sourceRef": "Exam Guide TS 3.6 Knowledge of/Skills in"
+  },
+  {
+    "id": "d3-3.6-p4",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.6"
+    ],
+    "scenario": 5,
+    "difficulty": 3,
+    "stem": "Your pipeline uses one Claude Code call to implement a bug fix, then immediately asks the same session, in a follow-up turn, to review its own diff before opening the PR. Over several weeks, this self-review rarely flags anything, even on changes that a human reviewer later found issues with. What's the most likely explanation, and the fix?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "The session already has a reasoning trail justifying its choices; use an independent instance for review.",
+        "explanation": "Correct. This is the documented root cause and its fix — session context isolation."
+      },
+      {
+        "id": "B",
+        "text": "The self-review step needs a more detailed prompt explicitly asking it to 'be more critical of your own work.'",
+        "explanation": "Doesn't address the underlying session context isolation issue; a stronger prompt on the same biased session doesn't remove the bias."
+      },
+      {
+        "id": "C",
+        "text": "Self-review should run before the fix is implemented instead of after.",
+        "explanation": "Doesn't make sense as a review step and doesn't address the root cause (context isolation) — just reorders it."
+      },
+      {
+        "id": "D",
+        "text": "The pipeline should skip review entirely for changes generated by Claude Code, since self-review provides no value.",
+        "explanation": "Overreacts — the fix isn't to eliminate review, it's to make review independent."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "A generating session's own reasoning trail makes it less likely to challenge its own decisions — an independent instance reviews with no such bias.",
+    "sourceRef": "Exam Guide TS 3.6 Knowledge of; guide_en.md §5.9"
+  },
+  {
+    "id": "d3-3.6-p5",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": [
+      "3.6"
+    ],
+    "scenario": 5,
+    "difficulty": 3,
+    "stem": "Your CI pipeline generates suggested test cases for every PR. On a PR adding a discount-code feature, it suggests 8 tests, but 5 duplicate scenarios your existing test suite already covers. Separately, your PR review re-runs after every push and keeps re-flagging two issues a developer already fixed two commits ago. What single change addresses both problems?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Reduce the number of requested suggestions and shorten the review prompt so there's less room for repetition.",
+        "explanation": "Doesn't give Claude the information it's actually missing in either case; shorter prompts don't substitute for relevant context."
+      },
+      {
+        "id": "B",
+        "text": "Include existing test files in context for generation, and prior findings in context for re-runs.",
+        "explanation": "Correct. Both problems come from missing context; providing it directly fixes the root cause in both cases."
+      },
+      {
+        "id": "C",
+        "text": "Add a post-processing filter that removes test suggestions and review comments matching earlier ones by keyword overlap.",
+        "explanation": "A fragile string-matching workaround for something Claude can do directly once given the missing context, and won't generalize well."
+      },
+      {
+        "id": "D",
+        "text": "Run test generation and PR review only once, at the very end of the PR's lifecycle, instead of after every push.",
+        "explanation": "Reduces how often the problems occur but doesn't fix either root cause, and delays useful feedback until the PR is nearly done."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Both duplicate suggestions and duplicate findings come from missing context (what's already tested, what's already fixed) — provide that context directly rather than filtering symptoms afterward.",
+    "sourceRef": "Exam Guide TS 3.6 Skills in"
+  }
+]

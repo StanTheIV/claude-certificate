@@ -1,0 +1,412 @@
+[
+  {
+    "id": "s4-01",
+    "source": "original",
+    "duplicateOf": "d2-2.5-p1",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.5"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "Your developer productivity agent must find every function that calls `sendNotification`, defined in `src/utils/notify.ts`, before you refactor its signature. The codebase has 300 files spread across many directories. What is the most reliable first step?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Use Grep to search file contents for the literal string `sendNotification` across the whole repository, then inspect each match to see how it's used.", "explanation": "Grep searches file contents directly, so a single pattern search returns every call site and import across the entire codebase regardless of directory — the fastest and most reliable way to find callers." },
+      { "id": "B", "text": "Use Grep to search for `sendNotification`, but scope the search to `src/services/` only, since that's where the team's convention says notification logic should live.", "explanation": "This uses the right tool but the wrong scope: a team convention about where logic \"should\" live doesn't guarantee every actual caller follows it, so restricting the search risks missing real call sites outside that directory." },
+      { "id": "C", "text": "Use Glob with the pattern `**/*notify*.ts` to find every file whose name relates to notifications, and treat those as the full set of callers.", "explanation": "Glob matches file paths, not file contents, so this only finds files with \"notify\" in the name — a caller in an unrelated-sounding file (e.g. `orderController.ts`) would be missed entirely." },
+      { "id": "D", "text": "Read `src/utils/notify.ts` in full and note every place it's imported from within that file's own code, without searching the rest of the repository.", "explanation": "The definition file doesn't record who imports it elsewhere; this only looks at one file and has no way to surface callers located anywhere else in the 300-file codebase." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Grep searches file contents for patterns; Glob searches file paths by name — pick the tool that matches what you're actually looking for.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.1"
+  },
+  {
+    "id": "s4-02",
+    "source": "original",
+    "duplicateOf": "mech-11",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.5"],
+    "scenario": 4,
+    "difficulty": 1,
+    "stem": "You're building a tool that runs a project-wide lint pass, but must first collect the list of every React test file in the repository, regardless of which directory it lives in (`Button.test.tsx`, `src/forms/Input.test.tsx`, etc.). What's the most direct way to get that file list?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Search file contents for the string `describe(` to find files that look like test files.", "explanation": "Searching contents for `describe(` is a content search; it could miss test files that use a different pattern and could also match non-test files, so it's a weaker proxy for \"find files named X\"." },
+      { "id": "B", "text": "Use Glob with the pattern `**/*.test.tsx` to match every test file by name across all directories.", "explanation": "Glob matches file paths against a pattern, so `**/*.test.tsx` directly returns every matching file by name in one call, regardless of directory — exactly the naming-pattern search Glob is designed for." },
+      { "id": "C", "text": "Use Bash to run `ls -R` on the repository root and manually filter the output for anything containing \"test\".", "explanation": "Shelling out to `ls -R` and hand-filtering text output reimplements what Glob already does natively, less reliably and with more steps." },
+      { "id": "D", "text": "Read the root CLAUDE.md file to see if test file locations are documented there, then check only those directories.", "explanation": "CLAUDE.md may be incomplete or stale, and it doesn't guarantee every test file is documented — a direct file-pattern search is more dependable than trusting a document." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "When the task is 'find files by name or extension,' reach for Glob, not a content search or a manual shell scan.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.1"
+  },
+  {
+    "id": "s4-03",
+    "source": "original",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.5"],
+    "scenario": 4,
+    "difficulty": 1,
+    "stem": "After your agent finishes an automated refactor of a utility module, you need it to confirm the change didn't break anything by running the project's existing test suite and reporting the results. Which tool should it use to do this?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Read the test files to visually check whether the refactored function's signature still matches how it's called in the tests.", "explanation": "Reading test files can reveal obvious mismatches but can't actually execute the code, so it can't confirm the refactor behaves correctly at runtime." },
+      { "id": "B", "text": "Use Edit to add a temporary `console.log` inside the refactored function and manually trace its output.", "explanation": "Manually inspecting log output from an ad hoc print statement is far less reliable and reproducible than running the existing automated test suite." },
+      { "id": "C", "text": "Use Bash to run the project's test command (e.g., `npm test`) and inspect the output for pass/fail results.", "explanation": "Running a shell command is exactly what Bash is for — it executes the project's real test suite and gives an authoritative pass/fail result, rather than a manual approximation." },
+      { "id": "D", "text": "Use Grep to search the test directory for the function's old name to check whether any references were missed.", "explanation": "Searching for the old function name only checks for missed renames — it says nothing about whether the tests actually still pass." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "Bash is for executing commands (tests, builds, git); Read/Grep/Edit inspect or change files but can't run code.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.1"
+  },
+  {
+    "id": "s4-04",
+    "source": "original",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.5", "5.4"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "Your agent is asked to explain how authentication works in an unfamiliar 500-file codebase before making a change. Which exploration strategy builds an accurate understanding most efficiently?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Read every file in the `src/` directory in alphabetical order to build a complete mental model before answering.", "explanation": "Reading every file up front, in an order unrelated to relevance, is the exact anti-pattern the guide warns against for large codebases; most of it will be irrelevant to authentication." },
+      { "id": "B", "text": "Ask the user to describe the authentication flow from memory instead of inspecting the code, since the codebase is too large to explore safely.", "explanation": "Skipping code inspection entirely defeats the purpose of the tool and risks an inaccurate answer based on the user's possibly outdated memory." },
+      { "id": "C", "text": "Use Glob to list all files in the repository, then Read the ten most recently modified ones as a representative sample.", "explanation": "Recency of modification has no necessary relationship to relevance for authentication — this sample could easily miss the actual authentication code." },
+      { "id": "D", "text": "Use Grep to find authentication entry points (`login`, `authenticate`, `middleware`), then Read those files and follow imports outward.", "explanation": "Building understanding incrementally — starting with a targeted content search for entry points, then reading and following imports from there — finds the relevant code paths without wasting context on unrelated files." }
+    ],
+    "correct": ["D"],
+    "keyPrinciple": "Build codebase understanding incrementally: search for entry points first, then read and follow imports outward, instead of reading everything upfront.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.2"
+  },
+  {
+    "id": "s4-05",
+    "source": "original",
+    "duplicateOf": "d2-2.5-p3",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.5"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "Your agent tries to use Edit to change a single line inside `config.py`, but the operation fails because the target text (`timeout = 30`) appears identically in six different functions in the file. What is the most reliable way to make the intended change?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Use Read to load the full file, identify the correct occurrence from context, then use Write to save the updated content.", "explanation": "When Edit can't find unique anchor text, Read + Write is the documented fallback: load the full content, apply the change with enough surrounding context to target the right occurrence, and write the whole file back." },
+      { "id": "B", "text": "Retry Edit repeatedly with the exact same text until one of the attempts happens to target the right occurrence.", "explanation": "Edit's failure is deterministic, not random — retrying identical input produces the identical failure every time; it won't resolve the ambiguity." },
+      { "id": "C", "text": "Use Bash to run a global find-and-replace across the file that changes every instance of `timeout = 30` to the new value.", "explanation": "A global replace changes all six occurrences, likely breaking the five functions that were not supposed to change." },
+      { "id": "D", "text": "Use Grep to confirm the text exists in the file, then use Edit again since confirming existence should resolve the ambiguity.", "explanation": "Confirming the text exists with Grep doesn't address why Edit failed — the problem is that the match isn't unique, and Grep can't make it unique." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "When Edit fails on non-unique text, fall back to Read + Write rather than retrying Edit or doing a blind global replace.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.3"
+  },
+  {
+    "id": "s4-06",
+    "source": "original",
+    "duplicateOf": "d2-2.5-p6",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.5"],
+    "scenario": 4,
+    "difficulty": 3,
+    "stem": "You need to find every place `formatCurrency` is actually used. It's defined in `src/lib/format.ts`, but the codebase re-exports it from several barrel files (`src/index.ts`, `src/lib/index.ts`) under names like `currency` and `fmtMoney`. A direct search for `formatCurrency` only turns up the definition and the re-export lines. What should the agent do next?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Conclude that the function is unused elsewhere in the codebase, since a direct search for its name found no other call sites.", "explanation": "The absence of hits under the original name doesn't mean the function is unused; it's likely being called under one of its re-exported aliases, which haven't been searched for yet." },
+      { "id": "B", "text": "Identify every name the function is re-exported under, then search the codebase separately for each of those names.", "explanation": "Tracing usage across wrapper modules requires first identifying all the exported names a function is re-exported under, then searching for each of those names individually — a single search under the original name is not enough." },
+      { "id": "C", "text": "Rename the function to one canonical name across the whole codebase first, then search again, to eliminate the aliasing problem.", "explanation": "Renaming everything before confirming actual usage is a large, risky change made without the information needed to know it's even necessary yet." },
+      { "id": "D", "text": "Use Glob to find every file that imports from `src/index.ts`, and assume all of them call `formatCurrency`.", "explanation": "Importing from the barrel file doesn't mean a module uses `formatCurrency` specifically — the barrel file re-exports many things, so this would produce a very inaccurate call list." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "For wrapper/barrel modules, first find every exported alias, then search for each alias separately — a single-name search under-counts real usage.",
+    "sourceRef": "Exam Guide TS 2.5; guide_en.md §13.1"
+  },
+  {
+    "id": "s4-07",
+    "source": "original",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.4", "2.1"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "You've integrated a custom MCP server that performs semantic code search across your monorepo — including understanding renamed variables and cross-language references that plain text search cannot follow. Its tool description reads only: \"Searches code.\" In practice, your agent keeps using the built-in Grep tool instead, even for queries the MCP tool would handle far better. What's the most effective fix?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Remove the built-in Grep tool from the agent's allowed tools entirely so it has no choice but to use the MCP search tool.", "explanation": "Removing Grep entirely also removes it for the many simple lookups it's well suited for, so this overcorrects and creates a new problem instead of fixing tool selection." },
+      { "id": "B", "text": "Add a system prompt instruction telling the agent to \"always prefer the semantic search tool over Grep\" for every query.", "explanation": "A blanket \"always prefer\" instruction is a probabilistic rule competing with the model's own judgment on every query; it doesn't fix the underlying reason the tool is being overlooked, and can misfire on queries Grep would actually handle better." },
+      { "id": "C", "text": "Rewrite the MCP tool's description to explain its semantic search capability in detail, including concrete examples of queries it handles that plain text search cannot.", "explanation": "Tool descriptions are the primary signal an LLM uses for tool selection. Strengthening the description with concrete capabilities and examples that differentiate it from Grep directly fixes the root cause of the agent defaulting to the familiar built-in tool." },
+      { "id": "D", "text": "Wrap every user query in a preprocessing step that automatically rewrites it as a call to the MCP tool, bypassing the agent's own tool selection.", "explanation": "Bypassing the agent's own tool-selection reasoning with hardcoded preprocessing removes its ability to judge when Grep actually is the better choice, and adds a maintenance burden outside the model's normal decision process." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "When an agent prefers built-ins over a more capable MCP tool, the first fix is a richer, more specific tool description — not removing options or forcing behavior.",
+    "sourceRef": "Exam Guide TS 2.4; guide_en.md §2.2, §4.3"
+  },
+  {
+    "id": "s4-08",
+    "source": "original",
+    "duplicateOf": "d2-2.4-p2",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.4"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "Your developer productivity agent frequently needs to know which internal documentation pages exist before deciding what to read. Currently, it discovers this by repeatedly calling a `search_docs` tool with different guesses until it finds something relevant, burning many tool calls per session. The documentation platform's MCP server can expose a full page hierarchy. What's the best way to reduce this exploratory overhead?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Increase the number of results returned by each `search_docs` call so fewer guesses are needed to find a match.", "explanation": "Returning more results per call still requires the agent to guess a search term first; it doesn't remove the fundamental need to guess." },
+      { "id": "B", "text": "Add few-shot examples to the system prompt showing good example queries for `search_docs`.", "explanation": "Few-shot examples might improve the quality of guesses, but the agent still has to guess before it knows what documentation exists at all." },
+      { "id": "C", "text": "Cache the results of previous `search_docs` calls within the session so repeated searches for the same term are free.", "explanation": "Caching helps only if the same exact query repeats; it does nothing to reduce the initial rounds of guessing needed to discover unfamiliar pages." },
+      { "id": "D", "text": "Expose the documentation hierarchy as an MCP resource so the agent can see the available catalog upfront, instead of discovering it through repeated tool calls.", "explanation": "MCP resources are designed to expose content catalogs — like a documentation hierarchy — directly to the agent, giving it visibility into what's available without requiring exploratory search calls to build that picture." }
+    ],
+    "correct": ["D"],
+    "keyPrinciple": "When an agent must repeatedly search just to discover what exists, expose that content as an MCP resource (a catalog) instead of relying on more tool calls.",
+    "sourceRef": "Exam Guide TS 2.4; guide_en.md §4.5"
+  },
+  {
+    "id": "s4-09",
+    "source": "original",
+    "duplicateOf": "d5-5.4-p1",
+    "kind": "practice",
+    "domain": 5,
+    "taskStatements": ["5.4"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "Two hours into an extended codebase-investigation session, your agent starts giving inconsistent answers about a class it examined at the start, at one point describing it in generic terms like \"typical patterns for this kind of class\" rather than citing the specific fields and methods it actually found. What does this behavior most likely indicate, and what's the most effective fix?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Context degradation from the long session; have the agent maintain a scratchpad of key findings and reference it instead of relying on conversation memory.", "explanation": "This is a textbook symptom of context degradation in extended sessions — the model starts substituting \"typical patterns\" for specifics it found earlier. Persisting key findings to a scratchpad file and referencing it counteracts this by anchoring the agent to recorded facts instead of degraded memory." },
+      { "id": "B", "text": "The model has a fundamental limitation with object-oriented code; switch to a model with double the context window and re-run the whole investigation from the start.", "explanation": "A bigger context window doesn't fix attention dilution within a long, information-dense session — the underlying capacity may not even be exhausted; the problem is losing track of specifics, not running out of room." },
+      { "id": "C", "text": "The agent needs stricter system prompt instructions telling it never to generalize and always be specific.", "explanation": "A stricter instruction is a probabilistic nudge that doesn't address the actual cause — the model isn't choosing to generalize, it has lost track of the specific facts it needs." },
+      { "id": "D", "text": "The codebase itself is inconsistent; ask the user to clarify the class's actual structure before continuing.", "explanation": "There's no evidence the codebase itself is inconsistent; the inconsistency is in the agent's own answers about a class it already examined, which points to a session problem, not a code problem." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "When answers degrade into generic 'typical pattern' language in long sessions, persist key findings to a scratchpad rather than trusting conversation memory or a bigger context window.",
+    "sourceRef": "Exam Guide TS 5.4; guide_en.md §11.4"
+  },
+  {
+    "id": "s4-10",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.4"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "Before implementing a multi-file migration, your agent needs to explore the codebase's current state: reading dozens of files, running several greps, and listing directory structures. This discovery phase alone threatens to consume a large fraction of the context window before any actual implementation work begins. What's the most effective way to handle this?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Skip the discovery phase and start implementing directly, correcting course if problems come up during the migration.", "explanation": "Skipping discovery for a multi-file migration risks exactly the costly rework that codebase exploration before committing to changes is meant to prevent." },
+      { "id": "B", "text": "Delegate discovery to the Explore subagent, which isolates verbose file-reading and searching, and returns a concise summary.", "explanation": "The Explore subagent exists specifically to isolate verbose discovery output — the dozens of file reads and greps happen in the subagent's own context, and only a distilled summary returns to the main conversation, preserving context for the implementation phase." },
+      { "id": "C", "text": "Increase max_tokens for the session so the discovery output has more room to fit, and have the agent summarize its own findings at the end before implementing.", "explanation": "max_tokens controls the length of a single response, not the size of the conversation's context window; it doesn't address context consumption from many prior tool calls." },
+      { "id": "D", "text": "Ask the user to summarize the codebase's current state themselves, so the agent doesn't need to explore it at all.", "explanation": "Relying on the user's memory of the codebase is less reliable than direct exploration and doesn't scale to codebases the user doesn't fully remember either." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "Use the Explore subagent to isolate verbose discovery output and protect the main session's context budget for the actual work.",
+    "sourceRef": "Exam Guide TS 3.4; guide_en.md §5.6"
+  },
+  {
+    "id": "s4-11",
+    "source": "original",
+    "duplicateOf": "d1-1.6-p2",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.6"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "You're asked to have your agent \"add comprehensive tests to this legacy codebase,\" which has no existing test infrastructure and dozens of modules of unknown quality. Which task decomposition approach is most effective?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Write a single upfront plan that lists every file in the codebase and assigns a fixed number of tests to each, then execute the full list in order without revisiting it.", "explanation": "A fixed, pre-committed plan for every file assumes full knowledge of the codebase's risk areas and dependencies before any exploration has happened, which a legacy codebase with unknown quality doesn't support." },
+      { "id": "B", "text": "Generate tests for every module in parallel immediately, so the whole codebase reaches some level of coverage as quickly as possible.", "explanation": "Attempting every module in parallel without first identifying high-risk areas wastes effort on low-value modules and risks producing shallow, inconsistent tests across a codebase whose dependencies aren't yet understood." },
+      { "id": "C", "text": "First map the codebase's structure and identify high-risk areas, then build a prioritized plan that adapts as dependencies are discovered.", "explanation": "This is dynamic adaptive decomposition: an open-ended task like this benefits from first mapping structure and prioritizing high-impact areas, then adjusting the plan as dependencies (e.g., needing mocks for external APIs) are discovered — exactly the guide's approach for this kind of task." },
+      { "id": "D", "text": "Ask the user to manually specify which exact functions need tests before doing any exploration, since the scope is otherwise too broad to start.", "explanation": "Requiring the user to enumerate every function upfront defeats the purpose of using the agent to explore and prioritize an unfamiliar codebase in the first place." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "For open-ended tasks like 'add tests to a legacy codebase,' decompose dynamically: map structure, prioritize by impact, then adapt the plan as dependencies surface.",
+    "sourceRef": "Exam Guide TS 1.6; guide_en.md §8.2"
+  },
+  {
+    "id": "s4-12",
+    "source": "original",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.7"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "You paused an investigation session yesterday after your agent thoroughly analyzed the payment module's dependencies. Overnight, a teammate refactored several of those files. This morning, you want the agent to continue the analysis with this change accounted for. What's the most reliable way to proceed?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Resume the named session with `--resume` and give no further instructions, trusting the agent to notice the files changed on its own.", "explanation": "Silently resuming risks the agent continuing to reason from stale tool results for the files that changed, since it has no way to know about the overnight refactor unless it's told." },
+      { "id": "B", "text": "Start an entirely new session with no reference to yesterday's findings, and have the agent re-explore the whole payment module from scratch.", "explanation": "Discarding yesterday's entire analysis and re-exploring everything from scratch is wasteful when most of the prior findings, for unchanged files, are still valid." },
+      { "id": "C", "text": "Resume the named session and ask the agent to re-read every file in the payment module again \"just in case,\" without saying which ones changed.", "explanation": "Re-reading every file \"just in case\" spends effort on files that didn't change, when a targeted re-analysis of only the changed files would be both faster and just as accurate." },
+      { "id": "D", "text": "Resume the named session and explicitly tell the agent which specific files changed overnight, so it can re-analyze just those rather than trusting yesterday's stale results.", "explanation": "Resuming preserves the valid parts of yesterday's analysis, while explicitly flagging which files changed lets the agent target its re-analysis instead of blindly trusting stale tool results for those files." }
+    ],
+    "correct": ["D"],
+    "keyPrinciple": "When resuming a session after files changed, tell the agent exactly which files changed so it can re-analyze targeted parts instead of trusting stale results or re-exploring everything.",
+    "sourceRef": "Exam Guide TS 1.7; guide_en.md §5.10"
+  },
+  {
+    "id": "s4-13",
+    "source": "original",
+    "duplicateOf": "d1-1.7-p2",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.7"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "After a shared investigation establishes how the current caching layer works, you want to explore two different refactoring approaches — one using an in-memory LRU cache, one using a distributed cache — without either exploration contaminating the other's context. What's the most effective way to set this up?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Use `fork_session` from the shared analysis baseline to create two independent branches, one to explore each approach.", "explanation": "`fork_session` is designed exactly for this: branching from a shared analysis baseline into independent explorations, so each approach can be investigated without polluting the other's context, while both retain the already-established understanding of the current caching layer." },
+      { "id": "B", "text": "Run both explorations in the same session sequentially, asking the agent to clearly label which findings belong to which approach.", "explanation": "Running both in one session risks the agent's reasoning about one approach bleeding into the other, and asking it to self-label reliably is a probabilistic safeguard rather than actual isolation." },
+      { "id": "C", "text": "Start two entirely new sessions from scratch, each re-investigating the current caching layer independently before exploring its assigned approach.", "explanation": "Re-investigating the current caching layer from scratch in each session duplicates work that the shared baseline had already established, wasting time and tokens." },
+      { "id": "D", "text": "Explore only the first approach fully; if it doesn't work, ask the agent to explore the second approach afterward in the same conversation.", "explanation": "Exploring the approaches sequentially in the same conversation means the second exploration's context is contaminated by everything reasoned about the first, unlike an actual fork." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Use fork_session to branch from a shared analysis baseline into independent, uncontaminated explorations of divergent approaches.",
+    "sourceRef": "Exam Guide TS 1.7; guide_en.md §5.10"
+  },
+  {
+    "id": "s4-14",
+    "source": "original",
+    "duplicateOf": "d1-1.3-p1",
+    "kind": "practice",
+    "domain": 1,
+    "taskStatements": ["1.3"],
+    "scenario": 4,
+    "difficulty": 1,
+    "stem": "Your coordinator agent spawns a subagent via the Task tool to investigate how the `OrderProcessor` module handles retries, after the coordinator itself already read through several related files earlier in the conversation. The subagent's prompt simply says: \"Investigate the retry behavior of `OrderProcessor`.\" What is the most likely problem with this setup, and what should change?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "There's no problem; subagents automatically inherit the coordinator's conversation history, so the earlier file reads are already available to it.", "explanation": "This is the exact misconception the guide warns against — subagent context must be explicitly provided; nothing is inherited automatically." },
+      { "id": "B", "text": "The subagent has no access to what the coordinator already found; the prompt should include those prior findings and file locations directly.", "explanation": "Subagents operate with isolated context and do not automatically inherit the coordinator's conversation history or memory. The fix is to explicitly include relevant prior findings and locations in the subagent's prompt." },
+      { "id": "C", "text": "The subagent should be given access to the Task tool as well, so it can re-invoke the coordinator to ask clarifying questions.", "explanation": "Giving the subagent the Task tool to call back into the coordinator adds an unnecessary and unusual control-flow inversion; the actual problem is a missing prompt, not a missing tool." },
+      { "id": "D", "text": "The investigation should be done directly by the coordinator instead of a subagent, since subagents cannot read files on their own.", "explanation": "Subagents can read files themselves given appropriate tool access; the issue here is what context they start with, not their inability to read files." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "Subagents do not inherit the coordinator's conversation history — always pass relevant findings and context explicitly in the subagent's prompt.",
+    "sourceRef": "Exam Guide TS 1.3; guide_en.md §3.3, §3.4"
+  },
+  {
+    "id": "s4-15",
+    "source": "original",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.1"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "Your developer productivity agent has two MCP tools available: `search_code`, described as \"searches and returns information,\" and `search_docs`, described as \"searches and returns information.\" In practice, requests like \"find the API documentation for the billing endpoint\" are frequently routed to `search_code` instead of `search_docs`. What's the most effective fix?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Add a pre-processing classifier that inspects each user request and pre-selects which of the two tools should be enabled before the agent responds.", "explanation": "A separate classifier layer is over-engineered for what a clearer tool description can fix directly, and it bypasses the model's own natural-language tool selection." },
+      { "id": "B", "text": "Add several few-shot examples to the system prompt demonstrating correct routing between the two tools for various request types.", "explanation": "Few-shot examples add token overhead on every request and only patch around the underlying ambiguity rather than removing it." },
+      { "id": "C", "text": "Rewrite each tool's description with a distinct purpose, input format, and example queries — naming `search_docs` as being for documentation content and `search_code` for source files.", "explanation": "The tools are misrouted because their descriptions are nearly identical and give the model nothing to differentiate them by. Rewriting each description with a distinct purpose and example queries directly fixes the root cause with minimal effort." },
+      { "id": "D", "text": "Merge the two tools into a single `search_everything` tool whose description just says it \"handles all search needs,\" and have it internally decide whether to look in code or docs.", "explanation": "Merging the tools is a bigger architectural change than the situation calls for as a first step, and the merged tool's description is just as vague as the two it replaces — the same disambiguation problem now happens silently inside one tool instead of being solved." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "When near-identical tool descriptions cause misrouting, the first and most effective fix is to rewrite the descriptions to be distinct — not add examples or infrastructure.",
+    "sourceRef": "Exam Guide TS 2.1; guide_en.md §2.2"
+  },
+  {
+    "id": "s4-16",
+    "source": "original",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.3"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "A single agent in your developer productivity tool has been given all 18 available tools — file operations, MCP code search, CI status checks, deployment tools, and issue tracker access — so it can, in principle, handle any request. You notice it frequently picks the wrong tool for straightforward tasks, such as using the issue tracker tool when asked to simply read a file. What's the most effective fix?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Add a longer system prompt section explaining, in detail, exactly when each of the 18 tools should be used.", "explanation": "A longer explanation still leaves 18 competing options in front of the model on every turn; the guide's finding is that the count itself degrades reliability, not just the quality of the descriptions." },
+      { "id": "B", "text": "Keep all 18 tools available, but increase the model's reasoning effort setting so it thinks longer before each tool call.", "explanation": "There's no evidence a \"reasoning effort\" setting fixes tool-selection reliability, and this leaves the root cause — far too many tools for the role — unaddressed." },
+      { "id": "C", "text": "Remove only the deployment tools, since those are the highest-risk to misuse, but leave the other seventeen available, including issue tracker and CI access.", "explanation": "Removing only the deployment tools still leaves an unnecessarily broad, unscoped toolset that will keep causing misuse elsewhere, since the actual problem is scope, not one specific tool category." },
+      { "id": "D", "text": "Restrict this agent's tools to only what its role needs, and route rarer cross-role needs through other appropriately scoped agents.", "explanation": "Giving an agent access to far more tools than it needs (18 instead of a handful) increases decision complexity and degrades tool selection reliability. Scoping each agent's tools to its role is the direct fix." }
+    ],
+    "correct": ["D"],
+    "keyPrinciple": "Scope each agent's tools to what its role actually needs — too many available tools degrades selection reliability regardless of how well each one is described.",
+    "sourceRef": "Exam Guide TS 2.3; guide_en.md §2.3"
+  },
+  {
+    "id": "s4-17",
+    "source": "original",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.2"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "You've wrapped your CI's linter as an MCP tool for the productivity agent. When the linter fails to run (for example, because a config file is temporarily locked by another process), the tool currently just returns `{\"isError\": true, \"content\": \"Operation failed\"}`. The agent then either gives up or retries blindly, wasting turns. What change would most improve the agent's ability to recover appropriately?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Return structured error content including an error category (e.g., transient vs validation), a retryable flag, and a human-readable description of what happened.", "explanation": "A generic \"Operation failed\" message gives the agent nothing to reason about. Structured metadata — category, retryability, and a clear description — lets it decide intelligently whether to retry, wait, or escalate, instead of guessing." },
+      { "id": "B", "text": "Change the tool to never return `isError: true`; instead, always return an empty lint report so the workflow can continue uninterrupted.", "explanation": "Silently returning an empty report disguises a real failure as a successful, clean run — an anti-pattern that hides information the agent, and downstream systems, need." },
+      { "id": "C", "text": "Add a system prompt instruction telling the agent to always retry any linter failure exactly three times before giving up.", "explanation": "A fixed blind-retry instruction doesn't distinguish transient failures, where retrying may help, from failures that retrying can never fix, wasting turns on the latter." },
+      { "id": "D", "text": "Remove the linter tool from the agent's available tools so it can't encounter this failure at all.", "explanation": "Removing the tool entirely eliminates the capability altogether instead of fixing how its failures are communicated, which is a much bigger loss than the problem being solved." }
+    ],
+    "correct": ["A"],
+    "keyPrinciple": "Structured error metadata (category, retryability, description) lets an agent make an appropriate recovery decision; generic error strings force it to guess.",
+    "sourceRef": "Exam Guide TS 2.2; guide_en.md §4.4"
+  },
+  {
+    "id": "s4-18",
+    "source": "original",
+    "kind": "practice",
+    "domain": 3,
+    "taskStatements": ["3.4"],
+    "scenario": 4,
+    "difficulty": 1,
+    "stem": "You're asked to have your agent replace a single deprecated logging call in one file with the new logging library's equivalent call — the mapping between old and new APIs is already documented in a comment above the deprecated function. Which approach is most appropriate?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Enter plan mode first to explore the whole logging subsystem and design an approach, given that any change to logging carries some risk.", "explanation": "Plan mode is designed for large-scale changes, architectural decisions, or multiple valid approaches — none of which apply here; using it adds overhead without benefit for a change this well-defined." },
+      { "id": "B", "text": "Use direct execution, since this is a small, well-scoped, single-file change with a clear, already-documented mapping.", "explanation": "Direct execution is appropriate for simple, well-understood, well-scoped changes — exactly this case, where the mapping is already documented and only one file is affected." },
+      { "id": "C", "text": "Spawn a coordinator agent with multiple subagents to independently investigate the change from different angles before proceeding.", "explanation": "Multi-agent investigation is a large amount of coordination overhead for a single-file, already-documented change; it solves a scale of problem this task doesn't have." },
+      { "id": "D", "text": "Use plan mode, then re-run plan mode a second time on the same file to double-check the first plan before executing.", "explanation": "Running plan mode twice on an already simple, unambiguous change adds redundant overhead without addressing any actual uncertainty." }
+    ],
+    "correct": ["B"],
+    "keyPrinciple": "Use direct execution for simple, well-scoped changes with a clear path; reserve plan mode for large-scale or architecturally ambiguous work.",
+    "sourceRef": "Exam Guide TS 3.4; guide_en.md §5.6"
+  },
+  {
+    "id": "s4-19",
+    "source": "original",
+    "kind": "practice",
+    "domain": 2,
+    "taskStatements": ["2.4"],
+    "scenario": 4,
+    "difficulty": 2,
+    "stem": "You want to add two MCP servers to your developer productivity setup: a GitHub server that the whole team should have access to, with credentials pulled from an environment variable, and an experimental documentation-search server you're personally testing before proposing it to the team. How should these be configured?",
+    "selectCount": 1,
+    "options": [
+      { "id": "A", "text": "Configure both servers in `.mcp.json` at the project root, since that's the only file Claude Code reads for MCP servers.", "explanation": "`.mcp.json` is project-scoped and shared with the team; putting an untested experimental server there would expose it to every teammate before you're ready." },
+      { "id": "B", "text": "Configure both servers in `~/.claude.json` in your home directory, so you can test the GitHub server safely before committing to a shared config.", "explanation": "Putting the shared GitHub server only in your personal `~/.claude.json` means teammates won't have it available at all, defeating the purpose of team-wide tooling." },
+      { "id": "C", "text": "Configure the GitHub server in `.mcp.json` with `${GITHUB_TOKEN}` expansion, and put the experimental server in `~/.claude.json` instead.", "explanation": "`.mcp.json` at the project root is for shared, version-controlled team tooling — appropriate for the GitHub server, with environment variable expansion keeping the token out of the committed file. `~/.claude.json` is for personal, experimental servers not shared via version control — exactly right for the server you're still testing." },
+      { "id": "D", "text": "Configure the GitHub server in `~/.claude.json` for security, and the experimental server in `.mcp.json` so teammates can give feedback while you're still testing it.", "explanation": "This reverses the intended scoping — the credentialed, team-wide tool belongs in the shared project file (with env var expansion for the secret), while the untested one should stay personal until you're ready to share it." }
+    ],
+    "correct": ["C"],
+    "keyPrinciple": "Use project-scoped .mcp.json (with env var expansion) for shared team tooling, and user-scoped ~/.claude.json for personal or experimental servers.",
+    "sourceRef": "Exam Guide TS 2.4; guide_en.md §4.3"
+  },
+  {
+    "id": "s4-20",
+    "source": "original",
+    "kind": "practice",
+    "domain": 5,
+    "taskStatements": ["5.4"],
+    "scenario": 4,
+    "difficulty": 3,
+    "stem": "Your agent is midway through a multi-phase investigation of a large monorepo, and the context window is filling up with verbose output from dozens of file reads and searches. Which two techniques most directly reduce this context pressure while preserving the investigation's accuracy? (Select TWO.)",
+    "selectCount": 2,
+    "options": [
+      { "id": "A", "text": "Delegate specific sub-questions (e.g., \"find all test files,\" \"trace the refund flow's dependencies\") to subagents, which isolate their verbose exploration output and return only summarized findings.", "explanation": "Spawning subagents to investigate specific questions isolates their verbose output in their own context, so only a distilled result returns to the main conversation — directly reducing what accumulates in the main session." },
+      { "id": "B", "text": "Lower the model's temperature setting so it produces shorter, more concise responses during exploration.", "explanation": "Sampling settings like temperature affect response style and randomness, not how much prior tool output accumulates in context; it doesn't address the underlying pressure." },
+      { "id": "C", "text": "Have the agent maintain a scratchpad file recording key findings as it goes, and reference that file for later questions instead of re-deriving answers from the full conversation history.", "explanation": "Scratchpad files persist key findings outside the volatile conversation history, so the agent can reference recorded facts instead of relying on (or re-deriving from) an ever-growing, increasingly degraded context." },
+      { "id": "D", "text": "Switch the underlying model to one with a larger context window so more raw output can fit without any other changes.", "explanation": "A larger context window delays the problem but doesn't fix the underlying inefficiency of stuffing all raw discovery output into one session, and it doesn't address attention degradation, which isn't purely a size issue." },
+      { "id": "E", "text": "Ask the user to periodically re-paste the original task description to keep it fresh in context.", "explanation": "Re-pasting the task description adds more tokens to an already-strained context and does nothing to reduce the accumulated verbose output already causing the pressure." }
+    ],
+    "correct": ["A", "C"],
+    "keyPrinciple": "Reduce context pressure during large-scale exploration with subagent delegation (isolate verbose output) and scratchpad files (persist findings outside conversation history) — not a bigger window or sampling tweaks.",
+    "sourceRef": "Exam Guide TS 5.4; guide_en.md §11.4, §11.5"
+  }
+]

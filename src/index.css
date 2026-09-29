@@ -1,0 +1,388 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+/* ---------- Theme tokens ---------- */
+:root {
+  --color-bg: #faf9f7;
+  --color-surface: #ffffff;
+  --color-surface-2: #f3f1ec;
+  --color-border: #e5e1d8;
+  --color-text: #211c16;
+  --color-text-muted: #6f665a;
+  --color-accent: #d97757;
+  --color-accent-ink: #ffffff;
+  --color-accent-soft: #fbe9e1;
+  --color-danger: #b64239;
+  --color-danger-soft: #fbe4e1;
+  --color-warning: #a5680e;
+  --color-warning-soft: #faedd2;
+  --color-success: #2f7a4f;
+  --color-success-soft: #e1f2e6;
+  --color-info: #3567a6;
+  --color-info-soft: #e3edf8;
+  --shadow-card: 0 1px 2px rgba(30, 24, 16, 0.06), 0 1px 8px rgba(30, 24, 16, 0.04);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg: #16140f;
+    --color-surface: #201d17;
+    --color-surface-2: #2a2620;
+    --color-border: #3a352c;
+    --color-text: #f1ede4;
+    --color-text-muted: #a89e8c;
+    --color-accent: #e08863;
+    --color-accent-ink: #1a1108;
+    --color-accent-soft: #3a2a20;
+    --color-danger: #e2857a;
+    --color-danger-soft: #402420;
+    --color-warning: #dbaa53;
+    --color-warning-soft: #3c3018;
+    --color-success: #7fc596;
+    --color-success-soft: #1e3324;
+    --color-info: #7fabde;
+    --color-info-soft: #1e2c3c;
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 8px rgba(0, 0, 0, 0.25);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #16140f;
+  --color-surface: #201d17;
+  --color-surface-2: #2a2620;
+  --color-border: #3a352c;
+  --color-text: #f1ede4;
+  --color-text-muted: #a89e8c;
+  --color-accent: #e08863;
+  --color-accent-ink: #1a1108;
+  --color-accent-soft: #3a2a20;
+  --color-danger: #e2857a;
+  --color-danger-soft: #402420;
+  --color-warning: #dbaa53;
+  --color-warning-soft: #3c3018;
+  --color-success: #7fc596;
+  --color-success-soft: #1e3324;
+  --color-info: #7fabde;
+  --color-info-soft: #1e2c3c;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 8px rgba(0, 0, 0, 0.25);
+  color-scheme: dark;
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: 16px/1.55 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+}
+
+/* ---------- Reusable primitives ---------- */
+.surface {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.surface-2 {
+  background: var(--color-surface-2);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-card);
+}
+
+.prose-page {
+  max-width: 72ch;
+}
+
+/* Entry transitions: make it obvious that a new question or section has rendered. */
+@keyframes question-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    border-color: var(--color-accent);
+  }
+  60% {
+    border-color: var(--color-accent);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes section-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.question-enter {
+  animation: question-enter 450ms ease-out;
+}
+.section-enter {
+  animation: section-enter 300ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .question-enter,
+  .section-enter {
+    animation: none;
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.05s ease;
+}
+
+.btn:hover {
+  filter: brightness(0.97);
+}
+
+:root[data-theme='dark'] .btn:hover {
+  filter: brightness(1.15);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .btn:hover {
+    filter: brightness(1.15);
+  }
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+  color: #fff;
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.input {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+input:focus-visible,
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Markdown content ---------- */
+.md-body {
+  max-width: 72ch;
+  --tw-prose-body: var(--color-text);
+  --tw-prose-headings: var(--color-text);
+  --tw-prose-bold: var(--color-text);
+  --tw-prose-links: var(--color-accent);
+  --tw-prose-code: var(--color-text);
+  --tw-prose-quotes: var(--color-text-muted);
+  --tw-prose-quote-borders: var(--color-border);
+  --tw-prose-th-borders: var(--color-border);
+  --tw-prose-td-borders: var(--color-border);
+  --tw-prose-counters: var(--color-text-muted);
+  --tw-prose-bullets: var(--color-text-muted);
+  --tw-prose-hr: var(--color-border);
+  --tw-prose-captions: var(--color-text-muted);
+}
+
+.md-body :is(h1, h2, h3, h4) {
+  color: var(--color-text);
+}
+
+.md-body pre {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+  font-size: 0.85em;
+}
+
+.md-body code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+}
+
+.md-body :not(pre) > code {
+  background: var(--color-surface-2);
+  border-radius: 0.3rem;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.88em;
+}
+
+.md-table-wrap {
+  overflow-x: auto;
+  margin: 1rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+}
+
+.md-table-wrap table {
+  margin: 0;
+}
+
+.callout {
+  border-left: 4px solid var(--color-border);
+  border-radius: 0.4rem;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+  background: var(--color-surface-2);
+}
+
+/* Undo the typography plugin's blockquote look (italics, muted color, curly quotes). */
+.prose .callout {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--color-text);
+  quotes: none;
+}
+.prose .callout p::before,
+.prose .callout p::after {
+  content: none;
+}
+.prose .callout strong {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.callout p:first-child {
+  margin-top: 0;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+.callout-trap {
+  border-left-color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.callout-key {
+  border-left-color: var(--color-info);
+  background: var(--color-info-soft);
+}
+
+.callout-note {
+  border-left-color: var(--color-text-muted);
+}
+
+/* ---------- Misc ---------- */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  padding: 0.5rem 1rem;
+  z-index: 100;
+  border-radius: 0 0 0.5rem 0;
+  border: none;
+  cursor: pointer;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+.heat-cell {
+  aspect-ratio: 1;
+  border-radius: 0.3rem;
+  border: 1px solid var(--color-border);
+}
+
+.note-highlight {
+  animation: note-flash 2s ease-out;
+  border-radius: 0.5rem;
+}
+
+@keyframes note-flash {
+  0% {
+    background: var(--color-accent-soft);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+/* The typography plugin wraps inline code in literal backticks; the code styling is enough. */
+.prose :where(code):not(:where(pre code))::before,
+.prose :where(code):not(:where(pre code))::after {
+  content: none;
+}

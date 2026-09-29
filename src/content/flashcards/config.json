@@ -1,0 +1,34 @@
+[
+  {
+    "id": "fc-1.5-cfg1",
+    "domain": 1,
+    "taskStatement": "1.5",
+    "front": "In what order does Claude Code evaluate permission rules, and does a more specific rule change that order?",
+    "back": "Deny, then ask, then allow — first match wins. Rule specificity doesn't change the order: a broad deny rule (e.g. `Bash(aws *)`) still blocks a call that also matches a narrower allow rule (e.g. `Bash(aws s3 ls)`).",
+    "sourceRef": "code.claude.com/docs/en/permissions (current docs)"
+  },
+  {
+    "id": "fc-1.5-cfg2",
+    "domain": 1,
+    "taskStatement": "1.5",
+    "front": "What's the difference between a bare tool-name deny rule (`\"Bash\"`) and a scoped one (`Bash(rm *)`)?",
+    "back": "A bare tool name removes the tool from Claude's context entirely — Claude never sees it. A scoped rule leaves the tool available and blocks only the matching calls.",
+    "sourceRef": "code.claude.com/docs/en/permissions (current docs)"
+  },
+  {
+    "id": "fc-3.1-cfg1",
+    "domain": 3,
+    "taskStatement": "3.1",
+    "front": "List the settings.json precedence levels, highest to lowest, and their files.",
+    "back": "1. Managed settings (`managed-settings.json`/MDM) → 2. Command line (`claude --settings`) → 3. Project local (`.claude/settings.local.json`) → 4. Shared project (`.claude/settings.json`) → 5. User (`~/.claude/settings.json`). List-type keys like `permissions.allow` merge across scopes instead of one overriding the other.",
+    "sourceRef": "code.claude.com/docs/en/settings (current docs)"
+  },
+  {
+    "id": "fc-1.5-cfg3",
+    "domain": 1,
+    "taskStatement": "1.5",
+    "front": "What are the four values a PreToolUse hook can set for `hookSpecificOutput.permissionDecision`, and what does each do?",
+    "back": "`allow` — skip the prompt, let the call proceed. `deny` — block the call. `ask` — force a permission prompt. `defer` — defer the decision. Even an \"allow\" from a hook doesn't bypass a matching deny rule in settings permissions.",
+    "sourceRef": "code.claude.com/docs/en/hooks (current docs)"
+  }
+]

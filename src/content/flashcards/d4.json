@@ -1,0 +1,207 @@
+[
+  {
+    "id": "fc-4.1-1",
+    "domain": 4,
+    "taskStatement": "4.1",
+    "front": "Why does \"be conservative / only report high-confidence findings\" fail to improve precision?",
+    "back": "It's still a subjective instruction with no fixed, checkable rule — the model applies it differently run to run. Explicit categorical criteria (what to flag vs. skip, as concrete conditions) work because they're testable the same way every time.",
+    "sourceRef": "Exam Guide TS 4.1; guide_en.md §6.2"
+  },
+  {
+    "id": "fc-4.1-2",
+    "domain": 4,
+    "taskStatement": "4.1",
+    "front": "What is the broader risk of a high-false-positive review category?",
+    "back": "It erodes developer trust in the whole tool, not just that category — reviewers start skimming past accurate findings from other categories too.",
+    "sourceRef": "Exam Guide TS 4.1"
+  },
+  {
+    "id": "fc-4.1-3",
+    "domain": 4,
+    "taskStatement": "4.1",
+    "front": "How should severity levels (critical/high/medium/low) be defined to get consistent classification?",
+    "back": "Anchor each level with a concrete code example (e.g., CRITICAL: NullPointerException during payment; HIGH: SQL injection). Labels alone without examples get applied inconsistently.",
+    "sourceRef": "Exam Guide TS 4.1; guide_en.md §6.2"
+  },
+  {
+    "id": "fc-4.1-4",
+    "domain": 4,
+    "taskStatement": "4.1",
+    "front": "A category has a high false-positive rate right now. What's the recommended immediate action?",
+    "back": "Temporarily disable that category (not a disclaimer, not permanent removal) while you tighten its criteria against known dismissed examples, then re-enable it.",
+    "sourceRef": "Exam Guide TS 4.1"
+  },
+
+  {
+    "id": "fc-4.2-1",
+    "domain": 4,
+    "taskStatement": "4.2",
+    "front": "How many few-shot examples are recommended for ambiguous scenarios?",
+    "back": "2-4 targeted examples — enough to show diverse decision boundaries, not so many that they just repeat one narrow pattern.",
+    "sourceRef": "Exam Guide TS 4.2"
+  },
+  {
+    "id": "fc-4.2-2",
+    "domain": 4,
+    "taskStatement": "4.2",
+    "front": "What makes a few-shot example teach generalizable judgment instead of a lookup table?",
+    "back": "Including a short rationale alongside the action — why this action was chosen over a plausible alternative — for genuinely ambiguous cases, not just clear-cut ones.",
+    "sourceRef": "Exam Guide TS 4.2; guide_en.md §6.1"
+  },
+  {
+    "id": "fc-4.2-3",
+    "domain": 4,
+    "taskStatement": "4.2",
+    "front": "Why do few-shot examples reduce hallucination in extraction tasks (e.g., informal measurements, varied document formats)?",
+    "back": "Written rules can't enumerate every informal phrasing or document structure. A few representative examples let the model generalize a sensible interpretation approach instead of guessing/fabricating a value.",
+    "sourceRef": "Exam Guide TS 4.2; guide_en.md §6.1"
+  },
+
+  {
+    "id": "fc-4.3-1",
+    "domain": 4,
+    "taskStatement": "4.3",
+    "front": "tool_choice values and their behavior?",
+    "back": "`{\"type\": \"auto\"}` — model may call a tool or answer in text. `{\"type\": \"any\"}` — model must call some tool, picks which. `{\"type\": \"tool\", \"name\": \"X\"}` — model must call the named tool X.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.3"
+  },
+  {
+    "id": "fc-4.3-2",
+    "domain": 4,
+    "taskStatement": "4.3",
+    "front": "What does tool_use with a JSON schema guarantee, and what does it NOT guarantee?",
+    "back": "Guarantees syntactically valid, schema-shaped JSON (no missing braces, correct types, required fields present). Does NOT guarantee semantic correctness — values can still be wrong (e.g., a total that doesn't sum, or a value in the wrong field).",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.5"
+  },
+  {
+    "id": "fc-4.3-3",
+    "domain": 4,
+    "taskStatement": "4.3",
+    "front": "When should a schema field be nullable/optional instead of required?",
+    "back": "When the source document may legitimately not contain that information. A required field pushes the model to fabricate a value; `[\"string\", \"null\"]` lets it honestly return null instead.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.4"
+  },
+  {
+    "id": "fc-4.3-4",
+    "domain": 4,
+    "taskStatement": "4.3",
+    "front": "What is the \"other\" + detail pattern for enum fields, and what does \"unclear\" cover?",
+    "back": "`\"other\"` enum value + a nullable detail string preserves real values that don't fit the predefined categories. `\"unclear\"` is for cases where the model genuinely cannot confidently pick a category — honest \"unclear\" beats a guessed wrong category.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.4"
+  },
+  {
+    "id": "fc-4.3-5",
+    "domain": 4,
+    "taskStatement": "4.3",
+    "front": "A `price` field passes schema validation as a string but values like \"5 bucks\" and \"$5.00\" are inconsistent. What fixes this?",
+    "back": "Format normalization rules written into the prompt alongside the strict schema (e.g., always output numeric amount + currency code). The schema enforces type, not normalization.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §6.1"
+  },
+
+  {
+    "id": "fc-4.4-1",
+    "domain": 4,
+    "taskStatement": "4.4",
+    "front": "What three things should an effective retry-with-feedback prompt include?",
+    "back": "The original document, the previous (failed) extraction, and the specific validation error (e.g., \"total = 150, but sum(line_items) = 145\"). A generic \"try again\" gives the model nothing to act on.",
+    "sourceRef": "Exam Guide TS 4.4; guide_en.md §6.5"
+  },
+  {
+    "id": "fc-4.4-2",
+    "domain": 4,
+    "taskStatement": "4.4",
+    "front": "When is retry ineffective, no matter how good the error feedback is?",
+    "back": "When the required information is simply absent from the source document provided (vs. a format/structural/arithmetic error the model can re-check). Retry can't invent missing information — supply the missing source or accept null/unclear instead.",
+    "sourceRef": "Exam Guide TS 4.4; guide_en.md §6.5"
+  },
+  {
+    "id": "fc-4.4-3",
+    "domain": 4,
+    "taskStatement": "4.4",
+    "front": "What is `detected_pattern` and why add it to findings?",
+    "back": "A field describing the specific code construct/phrase that triggered a finding. Recording it lets you aggregate dismissed findings by underlying pattern, revealing which specific pattern is systematically unreliable (vs. a broad category-level guess).",
+    "sourceRef": "Exam Guide TS 4.4"
+  },
+  {
+    "id": "fc-4.4-4",
+    "domain": 4,
+    "taskStatement": "4.4",
+    "front": "What do `calculated_total` vs `stated_total` and `conflict_detected` do in a self-correction schema?",
+    "back": "`stated_total` is what the document says; `calculated_total` is what the model computes from extracted line items. `conflict_detected` (boolean) flags when they disagree, surfacing internal inconsistencies without a separate external validation pass.",
+    "sourceRef": "Exam Guide TS 4.4; guide_en.md §6.6"
+  },
+
+  {
+    "id": "fc-4.5-1",
+    "domain": 4,
+    "taskStatement": "4.5",
+    "front": "Message Batches API: cost savings, processing window, SLA guarantee?",
+    "back": "50% cost savings vs. synchronous calls; up to 24-hour processing window; no guaranteed latency SLA.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.1"
+  },
+  {
+    "id": "fc-4.5-2",
+    "domain": 4,
+    "taskStatement": "4.5",
+    "front": "What does `custom_id` do in the Message Batches API, and what does the Batch API NOT support?",
+    "back": "`custom_id` correlates each batch request with its response, so you can resubmit only failed items and match results regardless of order. The Batch API does not support multi-turn tool calling within a single request (one request in, one response out).",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.1, §7.3"
+  },
+  {
+    "id": "fc-4.5-3",
+    "domain": 4,
+    "taskStatement": "4.5",
+    "front": "Rule of thumb: synchronous Messages API vs. Message Batches API?",
+    "back": "Synchronous: blocking workflows where someone is waiting (pre-merge checks, interactive review). Batch: non-blocking, latency-tolerant workloads (overnight reports, weekly audits, bulk document processing).",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.2"
+  },
+  {
+    "id": "fc-4.5-4",
+    "domain": 4,
+    "taskStatement": "4.5",
+    "front": "SLA math: 30-hour SLA, batch processing up to 24 hours. What's the safe submission window?",
+    "back": "30 - 24 = 6 hours. Submission must happen within the first 6 hours of the window for the worst case to still meet the SLA; many teams submit more often (e.g., every 4 hours) within that window for margin.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.5"
+  },
+  {
+    "id": "fc-4.5-5",
+    "domain": 4,
+    "taskStatement": "4.5",
+    "front": "A batch of documents partially fails (e.g., context-limit errors). What's the correct recovery, and what should happen before scaling a prompt to a large batch?",
+    "back": "Identify failures by `custom_id`, modify only those inputs (e.g., chunk oversized documents), and resubmit only the failed ones. Before running a large batch, refine the prompt on a small sample using the synchronous API first.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.4"
+  },
+
+  {
+    "id": "fc-4.6-1",
+    "domain": 4,
+    "taskStatement": "4.6",
+    "front": "Why is self-review (same instance, same session) limited?",
+    "back": "The instance retains the reasoning context from generation, making it less likely to seriously question its own earlier decisions in the same session.",
+    "sourceRef": "Exam Guide TS 4.6"
+  },
+  {
+    "id": "fc-4.6-2",
+    "domain": 4,
+    "taskStatement": "4.6",
+    "front": "What actually fixes the self-review limitation — self-review instructions, extended thinking, or an independent instance?",
+    "back": "An independent Claude instance without the generator's reasoning context. Self-review instructions and extended thinking both still run inside the same context that produced the original output, so they don't remove the limitation.",
+    "sourceRef": "Exam Guide TS 4.6"
+  },
+  {
+    "id": "fc-4.6-3",
+    "domain": 4,
+    "taskStatement": "4.6",
+    "front": "What is \"attention dilution\" in a large multi-file review, and what fixes it?",
+    "back": "Analyzing too many files in one pass causes inconsistent depth (deep on some files, shallow on others) and missed/contradictory findings. Fix: split into per-file passes for local issues, plus a separate integration pass for cross-file issues. A larger context window does not fix it.",
+    "sourceRef": "Exam Guide TS 4.6; guide_en.md §8.3"
+  },
+  {
+    "id": "fc-4.6-4",
+    "domain": 4,
+    "taskStatement": "4.6",
+    "front": "Why report confidence per finding instead of one overall confidence for a whole review?",
+    "back": "Per-finding confidence enables calibrated routing — high-confidence findings can be surfaced or auto-applied, while low-confidence findings are routed to human review, instead of treating every finding with equal weight.",
+    "sourceRef": "Exam Guide TS 4.6"
+  }
+]

@@ -1,0 +1,819 @@
+[
+  {
+    "id": "s6-01",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.3"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your extraction pipeline currently asks Claude to \"return the invoice data as JSON\" in plain prompt text. In production, about 4% of responses fail to parse because of a missing closing brace, a trailing comma, or an unquoted key. What change eliminates this specific class of failure?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Define an extraction tool with a JSON schema and read the structured data from the `tool_use` block instead of parsing free text.",
+        "explanation": "Tool use with a JSON schema constrains generation to syntactically valid, schema-conformant output, eliminating malformed-JSON failures like missing braces or trailing commas at the source."
+      },
+      {
+        "id": "B",
+        "text": "Add a sentence to the prompt asking Claude to \"double-check that the JSON is valid before responding.\"",
+        "explanation": "This is a near-miss: it may reduce the error rate somewhat, but it's a probabilistic self-check within free-form text generation, not a structural guarantee — the same class of syntax slip can still occur."
+      },
+      {
+        "id": "C",
+        "text": "Lower the temperature to make output more deterministic, which should reduce the chance of malformed JSON.",
+        "explanation": "Lower temperature can reduce variability in wording, but it doesn't structurally prevent the model from occasionally producing invalid JSON syntax the way schema-constrained tool use does."
+      },
+      {
+        "id": "D",
+        "text": "Add a post-processing regular expression that attempts to fix common issues like missing braces before parsing.",
+        "explanation": "Patching malformed output after the fact with regex is fragile and has to anticipate every failure mode; it treats the symptom rather than preventing the syntax error from being generated in the first place."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Tool use with a JSON schema is the most reliable way to eliminate JSON syntax errors — it constrains generation structurally rather than hoping the model self-corrects.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.4"
+  },
+  {
+    "id": "s6-02",
+    "source": "original",
+    "duplicateOf": "d4-4.3-p1",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.3",
+      "2.3"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your pipeline ingests a mix of invoices, receipts, and purchase orders, each requiring a different extraction schema, and the document type isn't known before Claude reads it. You define three separate extraction tools, one per document type. You need every response to produce structured output rather than a plain-text explanation, while still letting the model pick the right schema for the document it's looking at. Which `tool_choice` configuration fits this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`tool_choice: {\"type\": \"tool\", \"name\": \"extract_invoice\"}`, forcing the invoice tool for every document.",
+        "explanation": "This forces one specific tool regardless of document type, which would misclassify receipts and purchase orders into the invoice schema instead of letting the model choose correctly."
+      },
+      {
+        "id": "B",
+        "text": "`tool_choice: {\"type\": \"any\"}`, requiring a call while still letting the model choose which of the three tools fits.",
+        "explanation": "`\"any\"` guarantees a tool call happens — so the response is always structured — while still letting the model select whichever of the three schemas actually matches the document in front of it."
+      },
+      {
+        "id": "C",
+        "text": "`tool_choice: {\"type\": \"auto\"}`, the default, so the model can decide whether to call a tool or just describe the document in text.",
+        "explanation": "This is a near-miss: `\"auto\"` does let the model pick among the three tools correctly, but it also allows the model to skip calling a tool altogether and return plain text instead — which doesn't guarantee structured output."
+      },
+      {
+        "id": "D",
+        "text": "Remove `tool_choice` from the request entirely and rely on the tool descriptions alone to guide selection.",
+        "explanation": "Omitting `tool_choice` falls back to the default \"auto\" behavior, which has the same gap as choosing auto explicitly: it doesn't guarantee a tool is called at all."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "tool_choice: \"any\" guarantees structured output while still letting the model select the right schema among several — \"auto\" leaves open the possibility of a plain-text, unstructured reply.",
+    "sourceRef": "Exam Guide TS 4.3, TS 2.3; guide_en.md §2.3"
+  },
+  {
+    "id": "s6-03",
+    "source": "original",
+    "duplicateOf": "d4-4.3-p2",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.3",
+      "2.3"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your pipeline must always run `extract_metadata` (author, date, document type) as the very first step for every document, before any of the three enrichment tools (`extract_line_items`, `classify_sentiment`, `resolve_entities`) are considered, because those enrichment steps depend on knowing the document type. How should the first API call in the pipeline be configured?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "`tool_choice: {\"type\": \"any\"}` with all four tools available, trusting the model to naturally call `extract_metadata` first since it's the most logical starting point.",
+        "explanation": "This is a near-miss: the model likely would call `extract_metadata` first most of the time given its role, but \"any\" only guarantees that *some* tool is called — it doesn't guarantee it's specifically `extract_metadata` before the others."
+      },
+      {
+        "id": "B",
+        "text": "`tool_choice: {\"type\": \"auto\"}` with all four tools available from the start, plus a system prompt instruction to call `extract_metadata` first.",
+        "explanation": "This is a near-miss: the instruction nudges the model in the right direction, but `\"auto\"` still permits calling any tool (or none at all) on the first turn — the ordering isn't actually guaranteed."
+      },
+      {
+        "id": "C",
+        "text": "`tool_choice: {\"type\": \"tool\", \"name\": \"extract_metadata\"}` on the first call, then make the enrichment tools available on subsequent calls once metadata is known.",
+        "explanation": "Forcing the specific named tool on the first call guarantees `extract_metadata` runs before anything else, after which the pipeline can safely enable the enrichment tools that depend on its output."
+      },
+      {
+        "id": "D",
+        "text": "Make only `extract_metadata` available in the tool list for the first call, and add the enrichment tools in later calls.",
+        "explanation": "This is a near-miss: restricting the tool list to just one tool does force it to be called if `tool_choice` also requires a call, but leaving `tool_choice` unspecified (default `\"auto\"`) with only one tool still permits the model to respond in plain text instead of calling it."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "To guarantee a specific tool runs first, force that named tool with tool_choice — restricting the available tool list or relying on auto/any with an instruction doesn't guarantee the same order.",
+    "sourceRef": "Exam Guide TS 4.3, TS 2.3; guide_en.md §2.3"
+  },
+  {
+    "id": "s6-04",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.3"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your extraction schema marks `purchase_order_number` as a required string field, because most invoices include one. In practice, about 15% of vendor invoices don't have a purchase order number at all, and on those documents the model has started inventing plausible-looking values (e.g. `\"PO-000000\"`) to satisfy the schema. What's the most effective fix?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep the field required, but add a note in the field's schema description saying \"only fill this in if you're confident.\"",
+        "explanation": "This is a near-miss: a confidence caveat in the description might help somewhat, but the field is still marked required, so the model is still structurally pressured to produce some value rather than being allowed to omit one."
+      },
+      {
+        "id": "B",
+        "text": "Keep the field required, and add a retry step that re-prompts the model whenever the value looks like a placeholder (e.g. matches `PO-0+`).",
+        "explanation": "This is a near-miss: pattern-matching placeholders can catch some fabrications, but it's a reactive patch for a problem the schema itself is causing, and inventive fabrications that don't match the placeholder pattern would still slip through."
+      },
+      {
+        "id": "C",
+        "text": "Keep the field required, and lower the temperature so fabricated values are at least more consistent across similar documents.",
+        "explanation": "Making fabricated values more consistent doesn't stop them from being fabricated — it doesn't address why the model is inventing a value in the first place."
+      },
+      {
+        "id": "D",
+        "text": "Change `purchase_order_number` to optional and nullable, and instruct the model to return `null` when it's missing.",
+        "explanation": "Marking the field as optional/nullable removes the pressure to satisfy a required field with invented data — the model can now honestly report that the information isn't present."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Mark fields as optional/nullable when the source data may genuinely be absent — required fields push the model to fabricate values rather than admit the information isn't there.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.4"
+  },
+  {
+    "id": "s6-05",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.3"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your `expense_category` field is an enum with five fixed values: `travel`, `meals`, `supplies`, `software`, `equipment`. Around 6% of receipts are for legitimate business expenses that don't fit any of these five categories (e.g. a conference registration fee), and the model currently forces them into the closest-sounding category, corrupting downstream reporting. What schema change most directly fixes this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a sixth enum value, `other`, and an accompanying free-text `category_detail` field the model fills in whenever it selects `other`.",
+        "explanation": "The `\"other\" + detail` pattern lets the model honestly flag genuinely uncategorizable expenses instead of forcing them into the nearest fixed category, while still capturing what the expense actually was in the detail field."
+      },
+      {
+        "id": "B",
+        "text": "Expand the enum to include every specific expense type you can think of, such as `conference_fees`, `training`, `subscriptions`, and a dozen more.",
+        "explanation": "This is a near-miss: it reduces some misclassification, but a fixed, longer list still can't anticipate every future edge case, and each new expense type requires another schema change instead of a general escape hatch."
+      },
+      {
+        "id": "C",
+        "text": "Remove the enum constraint entirely and let `expense_category` be a free-text field the model fills in however it likes.",
+        "explanation": "This solves the forced-miscategorization problem but loses the consistency benefit of an enum entirely — downstream systems can no longer rely on a small, known set of category values for the other 94% of cases."
+      },
+      {
+        "id": "D",
+        "text": "Keep the five-value enum, but add a `confidence` field so low-confidence category assignments can be flagged for review.",
+        "explanation": "This is a near-miss: confidence scoring helps triage uncertain assignments, but it doesn't fix the underlying problem — the model is still forced to pick one of five categories even when none of them actually fits."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "For enums that can't anticipate every case, add an 'other' value plus a free-text detail field, preserving both consistency for known cases and honesty for edge cases.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.4"
+  },
+  {
+    "id": "s6-06",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.3"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your `document_language` enum includes `english`, `spanish`, and `french`. A batch of scanned documents comes in with heavy watermarking and partial OCR corruption, making the language genuinely ambiguous on some pages even to a human reviewer. Currently the model always guesses one of the three languages, and about a third of those guesses turn out wrong on manual review. What's the most effective schema change?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Instruct the model in the prompt to only guess a language if it's at least 90% sure, without changing the schema.",
+        "explanation": "This is a near-miss: a confidence threshold in prose might reduce guessing somewhat, but self-reported certainty thresholds are not reliably calibrated, and the schema still only offers three forced options if the model does respond."
+      },
+      {
+        "id": "B",
+        "text": "Add `unclear` as a valid enum value, so the model can honestly report an undetermined language instead of guessing.",
+        "explanation": "Adding `\"unclear\"` gives the model an honest way out for genuinely ambiguous cases — a wrong-but-confident-looking guess is worse for downstream review than a flagged uncertainty."
+      },
+      {
+        "id": "C",
+        "text": "Remove the `document_language` field from the schema entirely, since OCR corruption makes it unreliable.",
+        "explanation": "Removing the field entirely discards a useful signal for the large majority of documents where the language actually is clear, just to work around a minority of ambiguous cases."
+      },
+      {
+        "id": "D",
+        "text": "Keep the three-value enum, and run each ambiguous document through the pipeline three times, taking the majority vote.",
+        "explanation": "This is a near-miss: majority voting across repeated runs could reduce some noise, but it still forces a choice among three languages on every run and adds significant cost without addressing genuinely undeterminable cases."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Add an 'unclear' enum value for genuinely ambiguous cases — an honest 'unclear' beats a wrong, confident-looking guess.",
+    "sourceRef": "Exam Guide TS 4.3; guide_en.md §2.4"
+  },
+  {
+    "id": "s6-07",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.3",
+      "4.4"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "You've switched your extraction pipeline to use `tool_use` with a strict JSON schema, and malformed-JSON failures have dropped to zero. However, QA still finds cases where an invoice's four line items sum to $410, but the extracted `total` field reads $450. What does this indicate, and what's the appropriate response?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "This shouldn't be possible once tool use with a schema is in place; the schema configuration must not actually be applied correctly.",
+        "explanation": "This is a near-miss: it's true that tool use fixes syntax errors, but it's a misconception to expect it to also fix semantic/value errors — the schema being correctly applied doesn't prevent a wrong number from being extracted."
+      },
+      {
+        "id": "B",
+        "text": "Add `total` as a `required` field in the schema so the model is forced to double-check it before responding.",
+        "explanation": "Marking a field required only guarantees the field is present, not that its value is correct — it wouldn't prevent an inconsistent total from being returned."
+      },
+      {
+        "id": "C",
+        "text": "This is a semantic error, not a syntax error; tool use with a schema doesn't catch it, so a validation check (e.g., comparing the extracted total to the sum of line items) is still needed.",
+        "explanation": "Tool use with JSON schema guarantees syntactic and structural validity, but says nothing about whether the values are semantically correct — a mismatched total is exactly the kind of error that needs a separate validation check, since the schema alone can't catch it."
+      },
+      {
+        "id": "D",
+        "text": "Switch `tool_choice` from `\"any\"` to a forced call on the extraction tool, since forcing a specific tool should improve accuracy of the values it returns.",
+        "explanation": "`tool_choice` controls which tool is called, not how accurately the model fills in the values inside that tool's call — it doesn't address a wrong total."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Tool use with JSON schema eliminates syntax errors, not semantic errors — mismatched totals or misplaced values still need explicit validation.",
+    "sourceRef": "Exam Guide TS 4.3, TS 4.4; guide_en.md §2.5"
+  },
+  {
+    "id": "s6-08",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.4"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your Pydantic validation layer rejects an extraction because the `invoice_date` field came back as `\"03/05/2024\"` instead of the required ISO 8601 format (`\"2024-03-05\"`). What's the most effective next step?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Discard this document entirely and log it as unextractable, treating a date-format validation failure the same as a document with no extractable data at all.",
+        "explanation": "This is a near-miss: giving up is safe, but it's premature for what's very likely a fixable formatting mismatch — a targeted retry would very likely resolve it without losing the document."
+      },
+      {
+        "id": "B",
+        "text": "Re-send the exact same extraction request unchanged, hoping a different sample resolves the format issue.",
+        "explanation": "Retrying with no added information about what went wrong doesn't reliably fix a systematic formatting issue — it's not the same as retry-with-feedback, which includes the specific error."
+      },
+      {
+        "id": "C",
+        "text": "Manually reformat every date field in code after extraction, regardless of what format the model returns.",
+        "explanation": "This is a near-miss: a normalization step can work for a known, consistent format issue, but it treats a symptom document-by-document rather than fixing the extraction itself, and doesn't generalize to other validation failures the same way retry-with-feedback does."
+      },
+      {
+        "id": "D",
+        "text": "Send a follow-up request with the original document, the failed extraction, and the specific validation error, asking the model to correct the date format.",
+        "explanation": "This is a format/structural error, exactly the kind retry-with-feedback is good at fixing: giving the model the specific validation error lets it reformat the date correctly on the next attempt."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "For format or structural validation failures, retry with the specific error appended to the prompt — this is exactly the case retry-with-feedback is designed to fix.",
+    "sourceRef": "Exam Guide TS 4.4; guide_en.md §6.5"
+  },
+  {
+    "id": "s6-09",
+    "source": "original",
+    "duplicateOf": "d4-4.4-p2",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.4"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "A validation check flags that a contract's `counterparty_tax_id` field is missing. On inspection, the source PDF genuinely does not contain a tax ID anywhere in its text — it's simply not part of this particular contract template. Your pipeline currently retries every validation failure up to three times with error feedback. What should happen for this specific case?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Recognize that retries are ineffective when the required information is absent from the source, and let the field be returned as null/missing without further retries on this field.",
+        "explanation": "Retry-with-feedback works when the model made a correctable format or structural mistake — it cannot invent information that simply isn't in the document. Recognizing this and accepting a null value (rather than burning retries or fabricating a value) is the appropriate response."
+      },
+      {
+        "id": "B",
+        "text": "Retry as usual; the three-attempt retry budget should eventually surface the tax ID if it's genuinely in the document.",
+        "explanation": "This is a near-miss: retrying makes sense when the model made a mistake, but here the document itself doesn't contain the information — no amount of retrying can produce data that isn't in the source, so this wastes all three attempts for nothing."
+      },
+      {
+        "id": "C",
+        "text": "Rewrite the extraction prompt to state \"the tax ID is always present\" so the model searches harder for it.",
+        "explanation": "Asserting something false in the prompt doesn't make missing information appear, and it risks encouraging the model to fabricate a value to satisfy an incorrect claim."
+      },
+      {
+        "id": "D",
+        "text": "Increase the retry budget from three attempts to ten for this field, in case more attempts eventually locate it.",
+        "explanation": "More retries against a document that structurally doesn't contain the information will not produce a different, correct result — it just wastes more calls on an unresolvable case."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Retries fix format and structural mistakes, not information that's genuinely absent from the source — recognize that limit instead of burning retry budget or coaxing fabrication.",
+    "sourceRef": "Exam Guide TS 4.4; guide_en.md §6.5"
+  },
+  {
+    "id": "s6-10",
+    "source": "original",
+    "duplicateOf": "d4-4.2-p2",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.2"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your extraction prompt includes detailed prose instructions for handling citations in academic papers, but accuracy varies a lot depending on document structure: papers with inline citations extract well, while papers with numbered bibliographies and papers embedding citation details directly in the methodology section both extract poorly and inconsistently. What's the most effective way to improve consistency across these structures?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Rewrite the prose instructions to be even more detailed, adding another two paragraphs describing each citation structure in words.",
+        "explanation": "This is a near-miss: more detailed prose might help somewhat, but the guide's finding is that detailed instructions alone still produce inconsistent results for structural variation — concrete examples generalize better than more description."
+      },
+      {
+        "id": "B",
+        "text": "Add 2-4 few-shot examples, each showing correct extraction from a document with one of the different citation structures (inline, numbered bibliography, embedded-in-methodology).",
+        "explanation": "Few-shot examples that each demonstrate a different structural variant give the model concrete patterns to generalize from, which is more effective than prose alone at handling structurally varied documents consistently."
+      },
+      {
+        "id": "C",
+        "text": "Restrict the pipeline to only accept papers with inline citations, and reject the other two formats upfront.",
+        "explanation": "This avoids the inconsistency by refusing to handle two of the three structures at all, which isn't a fix — it just narrows the scope of what the pipeline can do."
+      },
+      {
+        "id": "D",
+        "text": "Increase `max_tokens` so the model has more room to reason about each citation structure before answering.",
+        "explanation": "`max_tokens` controls the maximum length of the response, not the model's ability to recognize and handle different citation structures — it doesn't address the actual source of the inconsistency."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Few-shot examples that demonstrate each structural variant improve consistency across varied document formats more reliably than longer prose instructions alone.",
+    "sourceRef": "Exam Guide TS 4.2; guide_en.md §6.1"
+  },
+  {
+    "id": "s6-11",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.5"
+    ],
+    "scenario": 6,
+    "difficulty": 1,
+    "stem": "Your extraction system has two workflows: (1) a user uploads a single document and waits on screen for the extracted fields to display, and (2) a nightly job extracts data from roughly 8,000 archived documents accumulated that day, with results only needed by the next morning. How should these two workflows call the API?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Use the Message Batches API for both, since batching 8,000 documents together is efficient and the savings apply to any workload.",
+        "explanation": "This is a near-miss: the Batches API is right for the nightly job, but applying it to the interactive upload as well would leave the user waiting up to 24 hours with no latency guarantee for a response they need immediately."
+      },
+      {
+        "id": "B",
+        "text": "Use the synchronous Messages API for both, since it's simpler to maintain only one code path.",
+        "explanation": "This is a near-miss: it works technically for both, but running 8,000 nightly documents synchronously forgoes the Batches API's roughly 50% cost savings for a workload that has no need for immediate responses."
+      },
+      {
+        "id": "C",
+        "text": "Use the synchronous Messages API for the interactive upload, and the Message Batches API for the nightly archive job.",
+        "explanation": "The interactive workflow needs an immediate response, which only the synchronous API provides; the nightly job is latency-tolerant and high-volume, exactly the profile the Batches API is designed for, at roughly half the cost."
+      },
+      {
+        "id": "D",
+        "text": "Use the Message Batches API for the interactive upload, since a single document should process quickly within the batch window, and the synchronous API for the nightly job to guarantee it starts on time.",
+        "explanation": "This reverses the appropriate mapping: batches offer no latency guarantee at all (up to 24 hours), which is wrong for a user waiting on screen, while the nightly job has no such immediacy requirement and would needlessly give up the batch savings."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Match the API to latency tolerance: synchronous for blocking, user-facing requests; Message Batches for high-volume, non-blocking workloads that can wait up to 24 hours.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.2"
+  },
+  {
+    "id": "s6-12",
+    "source": "original",
+    "duplicateOf": "d4-4.5-p2",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.5"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "You submit a batch of 500 documents for extraction. When results come back, 480 succeeded and 20 failed because those particular documents exceeded the model's context limit (they were unusually long scanned contracts). What's the most efficient way to handle the failures?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Resubmit the entire original batch of 500 documents unchanged, since batches sometimes succeed on a second attempt.",
+        "explanation": "This reprocesses (and re-charges for) the 480 documents that already succeeded, and resubmitting the 20 oversized documents unchanged doesn't fix the context-limit problem that caused them to fail in the first place."
+      },
+      {
+        "id": "B",
+        "text": "Switch those 20 documents to the synchronous API one at a time, without changing anything else, since synchronous requests might handle long documents differently.",
+        "explanation": "This is a near-miss: switching APIs doesn't address the actual cause of the failure — the documents exceeded a context limit, which affects requests regardless of whether they're sent synchronously or in a batch."
+      },
+      {
+        "id": "C",
+        "text": "Lower the `max_tokens` setting for the retry batch, since that's the parameter most associated with size limits.",
+        "explanation": "`max_tokens` bounds the length of the model's response, not the size of the input document being processed — reducing it doesn't address a document that's too long to fit in the input context."
+      },
+      {
+        "id": "D",
+        "text": "Identify the 20 failed requests by their `custom_id`, split those specific documents into smaller chunks, and resubmit only those 20 in a new batch.",
+        "explanation": "`custom_id` correlates each response back to its original document, so the failures can be identified precisely; resubmitting only the 20 that actually failed, after fixing the specific cause (chunking oversized documents), avoids reprocessing the 480 that already succeeded."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Use custom_id to identify exactly which batch requests failed, fix the specific cause (e.g. chunk oversized documents), and resubmit only those — never the whole batch.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.3, §7.4"
+  },
+  {
+    "id": "s6-13",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.5"
+    ],
+    "scenario": 6,
+    "difficulty": 3,
+    "stem": "Your extraction results must be delivered to a downstream reporting system within 30 hours of a document being scanned, and the Message Batches API can take up to 24 hours to complete a batch (with no tighter guarantee). To keep every document safely within the 30-hour SLA, how frequently should you submit new batches at the latest?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Submit a new batch at least every 6 hours, so the longest wait before inclusion plus the 24-hour worst case still lands within the 30-hour SLA.",
+        "explanation": "30 hours of total SLA minus the worst-case 24-hour batch processing window leaves a 6-hour submission window — submitting at least that often ensures even a document scanned right after a batch was just submitted is included in the next one in time."
+      },
+      {
+        "id": "B",
+        "text": "Submit a new batch every 24 hours, matching the batch processing window exactly.",
+        "explanation": "This is a near-miss: it accounts for the 24-hour processing time, but ignores that a document could be scanned just after a batch is submitted and then have to wait a full 24 hours before even being included in the next batch — pushing its total wait past the 30-hour SLA."
+      },
+      {
+        "id": "C",
+        "text": "Submit a new batch every 30 hours, exactly matching the SLA window, on the assumption that each batch always takes the full window to complete before the next one is needed.",
+        "explanation": "This leaves no margin at all for the batch's own processing time — a document included right at submission could still take up to 24 hours to process, blowing past the 30-hour deadline entirely."
+      },
+      {
+        "id": "D",
+        "text": "Submit continuously, one batch per document, as soon as each document is scanned.",
+        "explanation": "This is a near-miss: it minimizes wait time, but it defeats the purpose of batching (grouping requests for efficiency) and doesn't reflect a calculated submission frequency tied to the actual SLA math."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Submission frequency for batch SLA planning = total SLA minus the batch API's worst-case processing window, so the last document in any submission window still finishes in time.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.5"
+  },
+  {
+    "id": "s6-14",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.5"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "You've just finished designing a new extraction schema and prompt for a document type you haven't processed before. You have 50,000 of these documents queued for a batch run. What should you do immediately before submitting all 50,000?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Submit all 50,000 documents as a single batch immediately, since the Batches API is cheaper and any issues can be fixed by resubmitting failed `custom_id`s afterward.",
+        "explanation": "This is a near-miss: resubmitting failures by `custom_id` does work for isolated failures, but it doesn't help with a systematic prompt or schema problem — that would show up across a large fraction of the 50,000, requiring a costly, slow full resubmission instead of a quick fix caught on a small sample first."
+      },
+      {
+        "id": "B",
+        "text": "Run the prompt against a small representative sample (e.g. 20-50 documents) synchronously, refine the prompt and schema based on the failures, then submit the batch.",
+        "explanation": "Refining the prompt on a small sample first catches systematic issues cheaply and quickly; submitting the full batch only after that maximizes the first-pass success rate and avoids paying to reprocess large volumes of failures found only after the fact."
+      },
+      {
+        "id": "C",
+        "text": "Split the 50,000 documents into 10 batches of 5,000 each, submitted simultaneously, to parallelize processing.",
+        "explanation": "Splitting into parallel batches doesn't address prompt or schema quality at all — if the prompt has a systematic issue, it would still be equally present across all 10 batches."
+      },
+      {
+        "id": "D",
+        "text": "Submit the full batch, but set a lower `max_tokens` value than usual as a precaution against unexpected output length.",
+        "explanation": "This doesn't validate the prompt or schema against real documents at all, and an overly restrictive `max_tokens` could itself cause truncated, invalid extractions across the whole run."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Refine the prompt on a small sample set before submitting a large batch, to maximize first-pass success and avoid costly, slow resubmission cycles for systematic issues.",
+    "sourceRef": "Exam Guide TS 4.5; guide_en.md §7.4"
+  },
+  {
+    "id": "s6-15",
+    "source": "original",
+    "kind": "practice",
+    "domain": 4,
+    "taskStatements": [
+      "4.4",
+      "4.6"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Receipts sometimes contain a printed total that doesn't match the sum of their line items — occasionally due to an unlisted service fee, occasionally due to a genuine printing error on the receipt. You want your extraction pipeline to catch this discrepancy automatically for every document, without a human reviewer manually re-adding the line items each time. What schema/prompt design achieves this?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Extract only `stated_total`, and have a human reviewer manually re-add the line items for every single receipt to double-check it.",
+        "explanation": "This is exactly the manual, per-document effort you're trying to eliminate — it doesn't scale and defeats the purpose of automating the check."
+      },
+      {
+        "id": "B",
+        "text": "Extract only `calculated_total` from the line items, discard the printed total field, and assume the calculated figure is always correct since it's derived mathematically.",
+        "explanation": "This is a near-miss: summing line items is part of the fix, but discarding the printed total loses the comparison signal entirely — you can no longer tell which receipts actually had a discrepancy worth investigating."
+      },
+      {
+        "id": "C",
+        "text": "Have the model extract a `stated_total` and a `calculated_total` (sum of line items), with a `conflict_detected` flag it sets when the two differ.",
+        "explanation": "Extracting both the stated and calculated values, with an explicit conflict flag, surfaces the discrepancy automatically as part of the extraction itself — no separate manual re-summing step is needed for every document."
+      },
+      {
+        "id": "D",
+        "text": "Extract only `stated_total`, and add a prompt instruction telling the model to \"flag any receipt that looks suspicious.\"",
+        "explanation": "\"Looks suspicious\" is a vague instruction with no concrete criteria; it relies on the model's subjective judgment rather than a structured, checkable comparison between two explicitly extracted values."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Extract both a stated and an independently calculated value plus an explicit conflict flag to self-detect discrepancies, instead of relying on manual re-checking or vague instructions.",
+    "sourceRef": "Exam Guide TS 4.4; guide_en.md §6.6"
+  },
+  {
+    "id": "s6-16",
+    "source": "original",
+    "kind": "practice",
+    "domain": 5,
+    "taskStatements": [
+      "5.5"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your extraction pipeline has the model output a `confidence` score (0-1) alongside each field. You want to use this score to decide which extractions can skip human review. Before relying on it in production, what should you do first?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Set the threshold to 0.9 by default, since that's a commonly cited \"high confidence\" cutoff, and start routing below-threshold items to review immediately.",
+        "explanation": "This is a near-miss: 0.9 sounds reasonably strict, but without checking it against actual outcomes on this specific extraction task, there's no evidence that a self-reported 0.9 here corresponds to genuinely high accuracy."
+      },
+      {
+        "id": "B",
+        "text": "Ask the model to explain, in its own words, why it's confident, and manually judge whether the explanation sounds convincing.",
+        "explanation": "Judging the plausibility of a self-generated explanation is subjective and still doesn't establish whether the numeric confidence score itself reliably predicts correctness."
+      },
+      {
+        "id": "C",
+        "text": "Skip confidence scoring and instead route every extraction with any optional field left null to human review.",
+        "explanation": "This conflates two different signals — missing optional data isn't the same as low confidence in the fields that were extracted — and it would flood review with documents that are simply missing information that was never present."
+      },
+      {
+        "id": "D",
+        "text": "Calibrate the confidence threshold using a labeled validation set — comparing the model's reported confidence against actual correctness on documents where the true values are already known.",
+        "explanation": "A raw self-reported confidence score isn't automatically meaningful; calibrating it against a labeled validation set establishes what confidence level actually corresponds to acceptable accuracy before it's trusted to gate human review."
+      }
+    ],
+    "correct": [
+      "D"
+    ],
+    "keyPrinciple": "Calibrate self-reported confidence scores against a labeled validation set before trusting them to gate human review — raw model confidence is not automatically reliable.",
+    "sourceRef": "Exam Guide TS 5.5; guide_en.md §9.4"
+  },
+  {
+    "id": "s6-17",
+    "source": "original",
+    "kind": "practice",
+    "domain": 5,
+    "taskStatements": [
+      "5.5"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your extraction pipeline currently routes every field with confidence below 0.8 to human review, and everything above that threshold goes straight through automatically without any further checking. You want ongoing visibility into whether the high-confidence extractions are actually staying accurate over time as document formats drift. What should you add?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Periodically pull a stratified random sample of high-confidence extractions and verify them, tracking the error rate.",
+        "explanation": "Stratified random sampling of the high-confidence bucket gives ongoing, unbiased visibility into whether those extractions are still actually accurate, and can catch novel error patterns before they silently accumulate — exactly what auto-approved extractions otherwise lack."
+      },
+      {
+        "id": "B",
+        "text": "Lower the confidence threshold to 0.95, so fewer extractions are auto-approved and more go to human review.",
+        "explanation": "This is a near-miss: routing more extractions to review does reduce exposure, but it doesn't actually measure whether the auto-approved ones are staying accurate — it just shrinks the unmeasured population without adding any visibility into it."
+      },
+      {
+        "id": "C",
+        "text": "Trust the aggregate accuracy metric reported when the pipeline was first validated, since it already showed 97% overall accuracy.",
+        "explanation": "An aggregate accuracy figure from initial validation can mask degradation over time or on specific document types, and it says nothing about current performance as formats drift — it's a one-time snapshot, not ongoing monitoring."
+      },
+      {
+        "id": "D",
+        "text": "Add a second confidence field specifically for the high-confidence bucket, asking the model to re-rate its own confidence a second time.",
+        "explanation": "Asking the model to re-score its own already-high confidence doesn't provide an independent, ground-truth check — it's still the same self-reported signal, not actual verification against known-correct values."
+      }
+    ],
+    "correct": [
+      "A"
+    ],
+    "keyPrinciple": "Use stratified random sampling of high-confidence extractions for ongoing error-rate measurement — auto-approving above a threshold without continued sampling leaves drift undetected.",
+    "sourceRef": "Exam Guide TS 5.5; guide_en.md §domain notes 5.5"
+  },
+  {
+    "id": "s6-18",
+    "source": "original",
+    "duplicateOf": "d5-5.5-p1",
+    "kind": "practice",
+    "domain": 5,
+    "taskStatements": [
+      "5.5"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your extraction pipeline reports 97% overall field accuracy across all document types, and leadership wants to reduce human review to save reviewer time. Before reducing review coverage, what should you check first?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Re-run the same 97% accuracy measurement on the exact same sample and the same aggregate grouping, to confirm the number is stable and reproducible.",
+        "explanation": "This is a near-miss: re-measuring on the same sample can confirm the number is reproducible, but it doesn't reveal whether that 97% is uniform across document types and fields or concentrated in the easiest segments."
+      },
+      {
+        "id": "B",
+        "text": "Break the accuracy figure down by document type and field, to confirm it's high across every segment.",
+        "explanation": "An aggregate 97% can hide much weaker performance on a less common document type or a specific field — segmenting by document type and field is the only way to confirm it's safe to reduce review broadly rather than for the segments that are actually driving the average up."
+      },
+      {
+        "id": "C",
+        "text": "Reduce review coverage gradually, starting with a 10% cut, and watch for complaints from downstream teams.",
+        "explanation": "This is a near-miss: a gradual rollout is a reasonable general caution, but reacting to downstream complaints after the fact is a much slower and costlier way to discover a weak segment than checking accuracy by segment beforehand."
+      },
+      {
+        "id": "D",
+        "text": "Increase the overall sample size used to compute the 97% figure, to get a more statistically precise aggregate number.",
+        "explanation": "A larger sample makes the aggregate number more precise, but a more precise aggregate can still mask the same underlying imbalance across document types and fields — precision doesn't substitute for segmentation."
+      }
+    ],
+    "correct": [
+      "B"
+    ],
+    "keyPrinciple": "Aggregate accuracy can mask poor performance on specific document types or fields — validate accuracy by segment before reducing human review based on an overall average.",
+    "sourceRef": "Exam Guide TS 5.5; guide_en.md §domain notes 5.5"
+  },
+  {
+    "id": "s6-19",
+    "source": "original",
+    "kind": "practice",
+    "domain": 5,
+    "taskStatements": [
+      "5.5"
+    ],
+    "scenario": 6,
+    "difficulty": 2,
+    "stem": "Your reviewer team can only manually check about 8% of daily extraction volume. Two categories of extractions exist: those with low model-reported confidence, and those from documents where the source itself contains contradictory information (e.g. two different totals printed on the same invoice). How should limited review capacity be allocated?",
+    "selectCount": 1,
+    "options": [
+      {
+        "id": "A",
+        "text": "Prioritize only low-confidence extractions, since a well-calibrated confidence score should already capture cases involving contradictory source documents.",
+        "explanation": "This is a near-miss: confidence often does correlate with source ambiguity, but a model can still report artificially high confidence on a contradictory document if it just picks one of the two conflicting values without recognizing the conflict — so relying on confidence alone can miss this category."
+      },
+      {
+        "id": "B",
+        "text": "Prioritize only the contradictory-source documents, since those are objectively identifiable, and skip confidence-based routing entirely to simplify the process.",
+        "explanation": "This ignores a real risk signal — low-confidence extractions on otherwise clean documents can still be wrong — and discards a useful, already-available signal for the sake of process simplicity."
+      },
+      {
+        "id": "C",
+        "text": "Prioritize both low-confidence extractions and extractions from ambiguous or contradictory source documents for the available review capacity.",
+        "explanation": "Both categories represent genuinely higher-risk extractions — low confidence signals the model itself is unsure, and contradictory source documents are inherently ambiguous regardless of the model's confidence — so both deserve priority within limited review capacity."
+      },
+      {
+        "id": "D",
+        "text": "Randomly sample 8% of all extractions for review, regardless of confidence or source ambiguity, to keep the process simple and unbiased.",
+        "explanation": "This is a near-miss: random sampling is useful for ongoing error-rate measurement, but it's a worse use of a scarce, capacity-limited review budget than deliberately targeting the extractions most likely to actually be wrong."
+      }
+    ],
+    "correct": [
+      "C"
+    ],
+    "keyPrinciple": "Route both low-confidence extractions and those from ambiguous/contradictory source documents to human review — confidence alone doesn't reliably capture source-level ambiguity.",
+    "sourceRef": "Exam Guide TS 5.5; guide_en.md §domain notes 5.5"
+  },
+  {
+    "id": "s6-20",
+    "source": "original",
+    "kind": "practice",
+    "domain": 5,
+    "taskStatements": [
+      "5.6",
+      "4.3"
+    ],
+    "scenario": 6,
+    "difficulty": 3,
+    "stem": "Your extraction pipeline pulls figures from press releases, analyst reports, and government filings for the same set of companies. Two documents state different revenue figures for what turns out to be the same fiscal quarter. Which TWO structured-output practices best prevent this kind of situation from being silently misinterpreted or lost downstream? (Select TWO.)",
+    "selectCount": 2,
+    "options": [
+      {
+        "id": "A",
+        "text": "Require the source document name/URL and its publication or filing date alongside every extracted figure, so a later difference in dates isn't misread as a contradiction when it's really just a change over time.",
+        "explanation": "Recording publication/filing dates lets a downstream reader correctly interpret two different figures as a change over time (if the dates differ) rather than an unexplained contradiction, or correctly flag them as a real conflict (if the dates match)."
+      },
+      {
+        "id": "B",
+        "text": "When two sources give different values for what appears to be the same period, preserve both values with their source attribution and a `conflict_detected` flag, rather than silently picking one.",
+        "explanation": "Arbitrarily picking one value and discarding the other destroys information a downstream user or reviewer would need to investigate the discrepancy — preserving both with attribution and an explicit conflict flag keeps that decision informed and visible."
+      },
+      {
+        "id": "C",
+        "text": "Always prefer the government filing's figure over the press release's figure, since filings are generally considered more authoritative, and discard the other value.",
+        "explanation": "This is a near-miss: authoritativeness is a reasonable heuristic, but silently discarding the other value throws away information — the correct approach preserves both with attribution rather than arbitrarily resolving the conflict without a trace."
+      },
+      {
+        "id": "D",
+        "text": "Average the two revenue figures together into a single blended number, so downstream systems only ever see one consistent value.",
+        "explanation": "Averaging two figures that may reflect a real change over time, a genuine reporting conflict, or different accounting bases produces a number that doesn't correspond to either source and hides the disagreement entirely."
+      },
+      {
+        "id": "E",
+        "text": "Drop the field entirely whenever two sources disagree, since an uncertain figure is worse than no figure at all.",
+        "explanation": "Dropping the field discards real information — both values are meaningful and can be investigated with proper attribution — rather than presenting the conflict transparently to whoever consumes the data downstream."
+      }
+    ],
+    "correct": [
+      "A",
+      "B"
+    ],
+    "keyPrinciple": "Preserve provenance (source + date) and flag genuine conflicts explicitly with both values attributed — never silently pick, average, or drop one of two conflicting figures.",
+    "sourceRef": "Exam Guide TS 5.6; guide_en.md §12.1, §12.2, §12.3"
+  }
+]

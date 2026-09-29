@@ -1,0 +1,34 @@
+[
+  {
+    "id": "fc-3.6-cli1",
+    "domain": 3,
+    "taskStatement": "3.6",
+    "front": "What's the exact CLI flag (and Agent SDK option name) that caps a print-mode run's API spend in dollars, and does subagent spend count toward it?",
+    "back": "`--max-budget-usd <amount>` (print mode only); Agent SDK: `maxBudgetUsd` (TypeScript) / `max_budget_usd` (Python). Spend from subagents counts toward the cap. Once the cap is reached, spawning another subagent fails with `Budget limit reached` and any background subagents still running are stopped. There is no `settings.json` key for this — it's a per-run flag/option only.",
+    "sourceRef": "code.claude.com/docs/en/cli-reference (current docs)"
+  },
+  {
+    "id": "fc-3.6-cli2",
+    "domain": 3,
+    "taskStatement": "3.6",
+    "front": "In an `--output-format json` (or Agent SDK) result message, what `subtype` values distinguish why a run ended, and what does each mean?",
+    "back": "`\"success\"` — finished normally. `\"error_max_turns\"` — hit `--max-turns`/`maxTurns`. `\"error_max_budget_usd\"` — hit `--max-budget-usd`/`maxBudgetUsd`. `\"error_during_execution\"` — an unrelated failure during the run. `\"error_max_structured_output_retries\"` — exhausted structured-output retries. Read `subtype` before deciding which knob to adjust.",
+    "sourceRef": "code.claude.com/docs/en/agent-sdk/typescript (current docs)"
+  },
+  {
+    "id": "fc-3.6-cli3",
+    "domain": 3,
+    "taskStatement": "3.6",
+    "front": "What does `--strict-mcp-config` do, and why pair it with `--mcp-config` in CI?",
+    "back": "It restricts the session to only the MCP servers passed via `--mcp-config`, ignoring every other MCP configuration source (project `.mcp.json`, user settings, plugin-provided servers, claude.ai connectors). Pairing them makes a CI run's MCP setup reproducible regardless of what's configured on the runner machine.",
+    "sourceRef": "code.claude.com/docs/en/cli-reference (current docs)"
+  },
+  {
+    "id": "fc-3.6-cli4",
+    "domain": 3,
+    "taskStatement": "3.6",
+    "front": "In the Agent SDK, what does `settingSources: []` do, and what's the default if you don't set it?",
+    "back": "`settingSources: []` disables the user, project, and local filesystem settings sources (and CLAUDE.md), so only options passed explicitly in code apply — endpoint-managed policy still loads regardless. Left unset, it defaults to loading the same sources the CLI would (all of them), so an SDK app is NOT settings-isolated by default; you must opt out.",
+    "sourceRef": "code.claude.com/docs/en/agent-sdk/typescript (current docs)"
+  }
+]

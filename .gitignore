@@ -1,0 +1,38 @@
+# Third-party / private source material: local only, never published
+sources/
+exports/
+# Copied from the unlicensed community guide (paullarionov/claude-certified-architect): personal study only
+src/content/questions/community.json
+src/content/domain-notes.md
+
+# Local tooling output
+scripts/ui-review/shots/
+.playwright-mcp/
+.claude/
+.env
+.env.*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
