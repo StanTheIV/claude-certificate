@@ -29,16 +29,16 @@
     "lesson": "R.1",
     "chunk": 1,
     "difficulty": 2,
-    "stem": "An agent often stops right after saying \"Let me check your order status.\" The loop exits as soon as a response contains any text block. What should the exit condition be?",
+    "stem": "A billing agent's loop exits as soon as `stop_reason` is anything other than `\"tool_use\"`. In production, one response comes back with `stop_reason: \"max_tokens\"` and a half-written JSON object. The loop exits and the truncated JSON is sent to the billing system. What caused this?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "Exit only when `stop_reason` is `\"end_turn\"`", "explanation": "Correct: that response also held a `tool_use` block; only `stop_reason` reliably says the task is finished." },
-      { "id": "B", "text": "Tell the model to write DONE when finished, and exit when the text contains DONE", "explanation": "Parsing natural language has no contract; the model may phrase it differently or say it early." },
-      { "id": "C", "text": "Exit after a fixed number of iterations, e.g. five", "explanation": "A cap stops long tasks too early and doesn't detect completion; at most it is a safety net." },
-      { "id": "D", "text": "Exit when `stop_reason` is `\"max_tokens\"` or the response has text", "explanation": "`max_tokens` means the output was cut off, not that the task is complete." }
+      { "id": "A", "text": "The exit check treats every non-`\"tool_use\"` value as finished, so `\"max_tokens\"` is treated the same as `\"end_turn\"`, even though it means the output was cut off", "explanation": "Correct: only `\"end_turn\"` means the response is actually complete; every other value needs its own handling, not a blanket exit." },
+      { "id": "B", "text": "The billing system should have validated the JSON before accepting it", "explanation": "Validating downstream doesn't fix the loop; even well-formed JSON could still be missing data because generation stopped mid-way." },
+      { "id": "C", "text": "The tool result sent back to Claude must have been malformed, causing the response to break", "explanation": "Nothing about a tool result caused this; the response was simply cut off at the token limit." },
+      { "id": "D", "text": "The loop needs a hard cap on iterations to prevent this kind of failure", "explanation": "An iteration cap guards against runaway loops; it doesn't address exiting early on `\"max_tokens\"`." }
     ],
     "correct": ["A"],
-    "keyPrinciple": "Only `stop_reason == \"end_turn\"` ends the loop; text content is not a completion signal.",
+    "keyPrinciple": "Only `stop_reason == \"end_turn\"` means finished; any other value, including `\"max_tokens\"`, still needs its own handling.",
     "sourceRef": "Exam Guide TS 1.1; guide_en.md §1.3"
   },
   {
@@ -50,16 +50,16 @@
     "lesson": "R.1",
     "chunk": 2,
     "difficulty": 2,
-    "stem": "A coordinator's prompt says \"delegate each subtopic to the search agent\", but logs show it never spawns anything and writes the answers itself. Its config is `allowed_tools=[\"summarize\"]`. Most likely cause?",
+    "stem": "A coordinator spawns a `pricing` subagent and an `inventory` subagent for the same order, one after the other. The coordinator's `Task` prompt to `pricing` never mentions the product SKU that `inventory` already looked up, so `pricing` asks for it again. Why did this happen, and what fixes it?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "The prompt needs stronger wording, such as \"you MUST delegate\"", "explanation": "No wording helps when the coordinator has no tool for spawning subagents at all." },
-      { "id": "B", "text": "The search agent's description is too short for the coordinator to find it", "explanation": "Description quality matters for choosing among subagents, but the coordinator can't invoke any of them yet." },
-      { "id": "C", "text": "Subagents need shared memory with the coordinator before they can start", "explanation": "Subagents have isolated context by design; shared memory isn't how spawning works." },
-      { "id": "D", "text": "`\"Task\"` is missing from the coordinator's allowed tools", "explanation": "Correct: subagents are spawned through the Task tool, so without it delegation is impossible." }
+      { "id": "A", "text": "The two subagents need to share a session ID so they automatically see each other's tool results", "explanation": "There is no shared session ID mechanism between subagents; each one's context stays isolated regardless of any ID." },
+      { "id": "B", "text": "Each subagent's context is isolated; the coordinator must put the SKU into `pricing`'s own `Task` prompt, since findings aren't carried over automatically", "explanation": "Correct: a subagent only knows what its own `Task` prompt tells it, so the coordinator has to relay findings between subagents itself." },
+      { "id": "C", "text": "The `inventory` subagent should call `pricing` directly and hand off the SKU itself", "explanation": "Subagents never talk to each other directly; only the coordinator can pass information between them." },
+      { "id": "D", "text": "The two subagents should be merged into one so nothing needs to be passed between them", "explanation": "That changes the architecture instead of simply fixing what goes into the existing `Task` prompt." }
     ],
-    "correct": ["D"],
-    "keyPrinciple": "A coordinator can only spawn subagents if `Task` is in its allowed tools.",
+    "correct": ["B"],
+    "keyPrinciple": "Subagents don't inherit each other's findings; the coordinator must write them into each `Task` prompt explicitly.",
     "sourceRef": "Exam Guide TS 1.3; guide_en.md Ch. 3"
   },
   {
@@ -71,16 +71,16 @@
     "lesson": "R.1",
     "chunk": 2,
     "difficulty": 2,
-    "stem": "A research coordinator spawns three independent subagents, one per turn, and each takes about 40 seconds. How do you cut total latency without changing the subagents?",
+    "stem": "Two subagents, `invoice_parser` and `notification_sender`, are spawned by the same coordinator for the same order. `invoice_parser`'s prompt tells it to hand its parsed totals directly to `notification_sender` when it finishes, skipping the coordinator, to save a round trip. What will actually happen?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "Merge the three subagents into one agent with all their tools", "explanation": "That changes the architecture and gives one agent too many tools; it also does the work in sequence." },
-      { "id": "B", "text": "Have the coordinator emit all three `Task` calls in one response", "explanation": "Correct: multiple Task calls in one response run in parallel." },
-      { "id": "C", "text": "Switch the subagent calls to the Message Batches API", "explanation": "Batches trade latency for cost and can take up to 24 hours; it makes this slower, not faster." },
-      { "id": "D", "text": "Lower `max_tokens` so each subagent finishes sooner", "explanation": "It may truncate results and doesn't remove the one-after-another pattern that causes the delay." }
+      { "id": "A", "text": "It works fine, since subagents can call each other through `Task` the same way a coordinator can", "explanation": "Subagents don't spawn or message each other directly; only the coordinator invokes `Task`." },
+      { "id": "B", "text": "It works only if both subagents are given the same `allowed_tools` list", "explanation": "Matching tool lists doesn't create any communication channel between two subagents." },
+      { "id": "C", "text": "It can't be carried out as written: subagents never talk to each other directly, so the totals can only reach `notification_sender` if the coordinator relays them in its own `Task` prompt", "explanation": "Correct: the coordinator sits at the hub, and subagents never exchange results with each other directly." },
+      { "id": "D", "text": "It fails because `notification_sender` needs `\"Task\"` in its `allowed_tools` to receive the handoff", "explanation": "Adding `Task` to `notification_sender`'s tools would let it spawn subagents of its own; it wouldn't create a channel to receive a direct handoff from a sibling." }
     ],
-    "correct": ["B"],
-    "keyPrinciple": "Parallel subagents = several `Task` calls in one coordinator response.",
+    "correct": ["C"],
+    "keyPrinciple": "Subagents can't message each other directly; every handoff between them has to go through the coordinator.",
     "sourceRef": "Exam Guide TS 1.3"
   },
   {
@@ -92,16 +92,16 @@
     "lesson": "R.1",
     "chunk": 3,
     "difficulty": 2,
-    "stem": "On Monday you investigated a billing module in the named session `billing-bug`. On Tuesday a teammate changed 2 of the 14 files it read. What is the best way to continue?",
+    "stem": "After finishing a deep investigation of a caching module, you want to prototype two independent redesigns from that same understanding, switching to write-through caching and switching to write-behind caching, without either experiment affecting the other or the original session. What's the best approach?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "Start a new session and re-explore all 14 files", "explanation": "Most of the earlier findings are still valid; re-exploring everything wastes them." },
-      { "id": "B", "text": "Use `fork_session` so the original session stays untouched", "explanation": "Forking is for trying divergent approaches; it still carries the same stale results for the 2 files." },
-      { "id": "C", "text": "Resume `billing-bug` and tell it which 2 files changed", "explanation": "Correct: most context is still valid, and naming the changed files triggers a targeted re-check." },
-      { "id": "D", "text": "Resume `billing-bug` without comment; it will notice the changes", "explanation": "Resume does not check file state; the agent may trust its old reads of the changed files." }
+      { "id": "A", "text": "Resume the original session for the write-through redesign, then start a brand-new session with a written summary for the write-behind one", "explanation": "Mixing strategies discards the validated shared baseline for one of the two attempts instead of branching both from it." },
+      { "id": "B", "text": "Resume the same session for both redesigns in turn, undoing the first attempt before starting the second", "explanation": "This mixes both attempts into one session's history, and there is no reliable way to undo what the agent already did." },
+      { "id": "C", "text": "Start two brand-new sessions with no summary, letting each rediscover the caching module independently", "explanation": "This throws away the completed investigation and repeats expensive discovery work twice." },
+      { "id": "D", "text": "Use `fork_session` twice from the investigated baseline, one fork per redesign", "explanation": "Correct: each fork branches from the same validated understanding, and neither fork touches the original session or the other fork." }
     ],
-    "correct": ["C"],
-    "keyPrinciple": "Resume when context is mostly valid, and name the files that changed.",
+    "correct": ["D"],
+    "keyPrinciple": "Comparing multiple approaches from the same understanding calls for `fork_session`, not resuming or restarting.",
     "sourceRef": "Exam Guide TS 1.7; guide_en.md Ch. 7"
   },
   {
@@ -134,16 +134,16 @@
     "lesson": "R.2",
     "chunk": 1,
     "difficulty": 2,
-    "stem": "A product-sheet schema has `\"warranty_months\": {\"type\": \"integer\"}` in `required`. Many sheets don't mention a warranty, yet the output often says `12`. What should change?",
+    "stem": "A submitted timesheet lists five daily entries that add up to 42 hours, but the timesheet's own \"Weekly Total\" field at the bottom reads 40 hours. Which schema approach handles this correctly?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "Make it `[\"integer\", \"null\"]` and describe `null` as \"not stated in the document\"", "explanation": "Correct: a required non-null field forces a value; nullable gives an honest option for missing data." },
-      { "id": "B", "text": "Add \"do not guess the warranty\" to the prompt and keep the field required", "explanation": "The schema still demands an integer, so the pressure to invent one remains." },
-      { "id": "C", "text": "Replace it with an enum of common warranty lengths", "explanation": "An enum still forces a pick when nothing is stated; it doesn't allow absence." },
-      { "id": "D", "text": "Retry the extraction until a warranty is found", "explanation": "Retrying can't find information the document never contained." }
+      { "id": "A", "text": "Extract both a `daily_hours_sum` and a `weekly_total_stated` field, plus a `conflict_detected` boolean", "explanation": "Correct: this surfaces the discrepancy instead of guessing which number is right." },
+      { "id": "B", "text": "Make `weekly_total` nullable, and return null since the two numbers disagree", "explanation": "Nullable is for information the source never states, not for a value that's present but inconsistent with another value." },
+      { "id": "C", "text": "Retry the extraction on the same timesheet until the two numbers match", "explanation": "A retry can't fix an inconsistency that's actually in the source document." },
+      { "id": "D", "text": "Always return the printed \"Weekly Total\" field, since it's presumably the number a manager already approved", "explanation": "Silently picking one number hides the inconsistency from whoever reviews the extraction." }
     ],
     "correct": ["A"],
-    "keyPrinciple": "Fields that may be absent from the source must be nullable, or the model will invent values.",
+    "keyPrinciple": "A field that can contradict another field in the same document needs both values plus a conflict flag, not a forced single answer.",
     "sourceRef": "Exam Guide TS 4.3; guide_en.md Ch. 9"
   },
   {
@@ -155,16 +155,16 @@
     "lesson": "R.2",
     "chunk": 2,
     "difficulty": 2,
-    "stem": "An MCP tool `search_orders` returns `[]` both when the database is unreachable and when a customer has no orders. During an outage, the agent tells customers they have no orders. Best fix?",
+    "stem": "An agent calls `process_refund` with a malformed `order_id` (missing the required `ORD-` prefix). The call fails, and the agent's generic retry policy retries every `isError:true` response up to three times, but this one fails identically every time. Which `errorCategory` should the tool return, and why doesn't retrying help?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "Return the string \"Operation failed\" whenever the result is empty", "explanation": "Real empty results would now look like failures, and the message gives no category or retry guidance." },
-      { "id": "B", "text": "Tell the agent to retry three times whenever it gets an empty list", "explanation": "It wastes calls on genuine empty results and still can't tell the two cases apart." },
-      { "id": "C", "text": "On failure, return `isError: true` with a transient category and `isRetryable: true`; on no matches, return an empty result without an error", "explanation": "Correct: the agent can now tell \"could not look\" from \"looked and found nothing\"." },
-      { "id": "D", "text": "Return `null` in both cases so the agent treats them with caution", "explanation": "Same problem in a new shape: the two situations still look identical." }
+      { "id": "A", "text": "`\"transient\"` with `isRetryable:true`, since retrying against a less busy server might succeed", "explanation": "Nothing about server load caused this; the same malformed input will fail again regardless of timing." },
+      { "id": "B", "text": "`\"validation\"` with `isRetryable:false`, since the malformed input produces the same failure every time", "explanation": "Correct: only a corrected call, not a repeated one, can succeed, so blind retries waste calls." },
+      { "id": "C", "text": "`\"permission\"`, since the call was rejected", "explanation": "This isn't an authorization problem; the caller has no access issue, just a badly formatted argument." },
+      { "id": "D", "text": "`isError:false` with an empty result, so the agent treats it like a normal case with no match", "explanation": "This hides a real failure behind the same shape as a legitimate empty result, the exact ambiguity error categories exist to prevent." }
     ],
-    "correct": ["C"],
-    "keyPrinciple": "An access failure and a valid empty result must look different to the agent.",
+    "correct": ["B"],
+    "keyPrinciple": "A validation failure will recur on retry; only a corrected call, not a repeated one, can succeed.",
     "sourceRef": "Exam Guide TS 2.2, 5.3"
   },
   {
@@ -176,16 +176,16 @@
     "lesson": "R.2",
     "chunk": 3,
     "difficulty": 2,
-    "stem": "A synthesis agent gets Q3 churn figures from two credible internal sources: a finance dashboard says 4.1% and a CRM export says 5.3%. What should the final output contain?",
+    "stem": "A synthesis agent has two figures for smartphone market share: 18% from a 2022 report and 24% from a 2024 report. Should this be flagged as a source conflict?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "The average, 4.7%, with both sources cited", "explanation": "Averaging creates a number neither source reported and hides that they differ." },
-      { "id": "B", "text": "Both values with their sources and a conflict flag", "explanation": "Correct: same period, different values is a real conflict; keep both with attribution and flag it for the coordinator." },
-      { "id": "C", "text": "Only the finance dashboard figure, as the more official source", "explanation": "Picking one silently drops evidence a reviewer would need." },
-      { "id": "D", "text": "Leave out churn until the sources agree", "explanation": "It drops useful information instead of reporting it with its uncertainty." }
+      { "id": "A", "text": "Yes, flag it as `conflict_detected: true`, since two credible sources disagree on the same metric", "explanation": "This treats a change over time as if it were a same-period contradiction." },
+      { "id": "B", "text": "Yes, but only report the more recent 2024 figure and drop the 2022 one as outdated", "explanation": "This discards a data point that's still useful and skips reporting the trend it shows." },
+      { "id": "C", "text": "No, figures from different periods usually reflect a real trend rather than a conflict; report both with their dates as a trend", "explanation": "Correct: same period, different values is a real conflict, but different periods usually mean the value changed over time." },
+      { "id": "D", "text": "Average the two into a single 21% figure with no explanation", "explanation": "Averaging invents a number neither source reported and buries a meaningful change over time." }
     ],
-    "correct": ["B"],
-    "keyPrinciple": "Conflicting sources for the same period: keep both, attributed, and flag the conflict.",
+    "correct": ["C"],
+    "keyPrinciple": "Same metric, different periods, usually shows a trend; don't read it as the same-period conflict it resembles.",
     "sourceRef": "Exam Guide TS 5.6"
   },
   {
@@ -197,16 +197,16 @@
     "lesson": "R.2",
     "chunk": 4,
     "difficulty": 2,
-    "stem": "A Message Batch of 2,000 contracts finishes. 37 requests failed because the documents were too long. The other results are fine. What next?",
+    "stem": "You're about to submit your first Message Batch of 10,000 documents using a brand-new document template you haven't processed before. What should you do before submitting the full batch?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "Find the 37 by `custom_id`, split those documents into chunks, and resubmit only them", "explanation": "Correct: `custom_id` lets you fix and resend just the failed items." },
-      { "id": "B", "text": "Resubmit the whole batch with a higher `max_tokens`", "explanation": "It redoes 1,963 good results, and `max_tokens` limits output, not input length." },
-      { "id": "C", "text": "Move the whole job to the synchronous API", "explanation": "Doubles the cost and doesn't fix the oversized inputs." },
-      { "id": "D", "text": "Rewrite the prompt and run a new sample before anything else", "explanation": "The prompt works for most documents; this is an input-size problem in a few items." }
+      { "id": "A", "text": "Submit the full batch immediately; if some items fail, resubmit just those by `custom_id`", "explanation": "That fixes isolated failures, not a prompt that's systematically wrong for a document type nobody has tested yet." },
+      { "id": "B", "text": "Split the batch into smaller batches submitted a few hours apart to reduce risk", "explanation": "This only spreads out volume; it doesn't tell you whether the prompt actually works on the new template." },
+      { "id": "C", "text": "Submit the batch with a higher `max_tokens` so there's room for the new template's structure", "explanation": "Token budget doesn't validate whether the extraction prompt gets the right values from this template." },
+      { "id": "D", "text": "Run a small sample of the new template through the synchronous API first, to check the prompt works", "explanation": "Correct: tuning the prompt on a sample before a large batch of a new document type catches a systematic problem that `custom_id` resubmission can't." }
     ],
-    "correct": ["A"],
-    "keyPrinciple": "Isolated batch failures: fix and resubmit only those items via `custom_id`.",
+    "correct": ["D"],
+    "keyPrinciple": "A new document type needs a tested sample before a full batch; `custom_id` fixes isolated failures, not an unproven prompt.",
     "sourceRef": "Exam Guide TS 4.5"
   },
   {
@@ -365,16 +365,16 @@
     "lesson": "R.4",
     "chunk": 2,
     "difficulty": 2,
-    "stem": "Before a refactor, you need to know how a 200-file legacy module is wired together. You only need a short summary in your main session. What is the best first move?",
+    "stem": "You're about to investigate how a 500-file monorepo's build tooling fits together, purely to write a short summary in your main session for a rewrite proposal. Context is currently empty. Which is the better way to do the investigation, and why?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "Delegate the discovery to the Explore subagent and keep its summary", "explanation": "Correct: the verbose reads stay in the subagent, and the main context keeps only the result." },
-      { "id": "B", "text": "Read all 200 files in the main session, then run `/compact`", "explanation": "It fills the context first and then loses detail in a summary; avoiding the bloat is better." },
-      { "id": "C", "text": "Run `/memory` to load the module into context", "explanation": "`/memory` shows and edits memory files; it doesn't explore code." },
-      { "id": "D", "text": "Run `/compact` now, before exploring", "explanation": "There is nothing to compact yet; it doesn't keep the future discovery output out of context." }
+      { "id": "A", "text": "Delegate the investigation to the Explore subagent; only its summary returns to the main session", "explanation": "Correct: the verbose reads and grep output stay in the subagent, so they never fill the main context in the first place." },
+      { "id": "B", "text": "Read the files directly in the main session, running `/compact` proactively every 20 files so context never gets too full", "explanation": "This still floods the main session with raw discovery output before each compaction, and each compaction risks losing detail." },
+      { "id": "C", "text": "Read the files directly and wait until context is nearly full before running `/compact` once", "explanation": "`/compact` is a recovery tool for context that's already full; it doesn't prevent the flood, only condenses it afterward." },
+      { "id": "D", "text": "Use a state manifest to track which files you've already read, so you don't read the same file twice", "explanation": "A state manifest tracks saved state across a multi-agent run; it isn't a way to keep single-session exploration output out of context." }
     ],
     "correct": ["A"],
-    "keyPrinciple": "Keep verbose discovery out of the main context with the Explore subagent.",
+    "keyPrinciple": "Route verbose discovery through the Explore subagent before it happens, instead of letting it fill context and compacting afterward.",
     "sourceRef": "Exam Guide TS 5.4, 3.4"
   },
   {
@@ -386,16 +386,16 @@
     "lesson": "R.4",
     "chunk": 3,
     "difficulty": 1,
-    "stem": "Documents arrive all day, and each must be processed within 30 hours of arrival. You use the Message Batches API (up to 24 hours per batch). How often should you submit batches?",
+    "stem": "A support team must have document analysis results ready within 26 hours of upload. They currently submit one Message Batch every 8 hours, and each batch can take up to 24 hours to complete. Will every document meet the deadline?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "Once a day, with everything that arrived", "explanation": "A document can wait up to 24 h for the daily batch, then take 24 h more: 48 h, far past the SLA." },
-      { "id": "B", "text": "Every 12 hours", "explanation": "12 h wait + 24 h processing = 36 h worst case, which breaks the 30 h SLA." },
-      { "id": "C", "text": "Every 4 hours", "explanation": "Correct: at most 4 h waiting + 24 h processing = 28 h, inside 30 h with margin (the exam guide's own example)." },
-      { "id": "D", "text": "Whenever convenient, since batches usually finish much faster", "explanation": "There is no latency SLA; you must plan for the full 24 hours." }
+      { "id": "A", "text": "Yes, most batches finish well under 24 hours in practice, so the 8-hour submission gap leaves enough margin", "explanation": "There is no latency guarantee, so planning has to use the worst case, not typical completion times." },
+      { "id": "B", "text": "No, a document uploaded right after a batch is submitted can wait up to 8 hours for the next batch, then up to 24 hours to process: 32 hours worst case", "explanation": "Correct: 8 h waiting + 24 h processing = 32 h, past the 26-hour deadline." },
+      { "id": "C", "text": "Yes, 8 hours plus 24 hours is 32, which is still under two full days, comfortably inside any same-day deadline", "explanation": "\"Under two days\" has nothing to do with the specific 26-hour SLA; the actual worst-case wait already exceeds it." },
+      { "id": "D", "text": "No, but only because batches should always be submitted exactly once a day no matter the SLA", "explanation": "This isn't tied to the actual SLA math; the real problem is the 8-hour window plus 24-hour processing exceeding 26 hours." }
     ],
-    "correct": ["C"],
-    "keyPrinciple": "Submission window + 24 h worst-case processing must fit inside the SLA.",
+    "correct": ["B"],
+    "keyPrinciple": "Batch SLA math must use the worst case, submission window plus the full 24-hour processing time, not the typical case.",
     "sourceRef": "Exam Guide TS 4.5"
   },
   {
@@ -428,16 +428,16 @@
     "lesson": "R.5",
     "chunk": 1,
     "difficulty": 2,
-    "stem": "An agent sometimes sends a price quote to a customer before a manager's approval is recorded. The system prompt already says \"only send quotes after approval\". Best fix?",
+    "stem": "A team writes a `PreToolUse` hook meant to guarantee that `process_refund` never runs before `get_customer` in the same session. The hook's logic: block `process_refund` if the string `\"get_customer\"` doesn't appear anywhere in the system prompt. Does this actually guarantee the required order?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "Add few-shot examples that show waiting for approval", "explanation": "Still prompt-based; the failure rate drops but isn't zero." },
-      { "id": "B", "text": "Ask the agent to double-check approval before every send", "explanation": "A self-check runs in the same reasoning that made the mistake; no guarantee." },
-      { "id": "C", "text": "Block the `send_quote` call in code until an approval record exists", "explanation": "Correct: a prerequisite gate or hook makes skipping the approval impossible." },
-      { "id": "D", "text": "Move the rule into CLAUDE.md and mark it IMPORTANT", "explanation": "CLAUDE.md is still context the model may not follow." }
+      { "id": "A", "text": "Yes, since it's a hook rather than a prompt instruction, it runs deterministically before the tool call, so the guarantee holds", "explanation": "Being code that runs before the call doesn't help when the condition it checks is the wrong one." },
+      { "id": "B", "text": "No, hooks can only block tools by name, not by any custom condition, so this kind of check isn't possible in a hook", "explanation": "Hooks can run arbitrary logic; that isn't the flaw here." },
+      { "id": "C", "text": "No, checking whether the system prompt mentions `get_customer` says nothing about whether that tool was actually called earlier in this run", "explanation": "Correct: the hook needs to check the real tool-call history, not the wording of the prompt, to guarantee the order." },
+      { "id": "D", "text": "Yes, because the system prompt already tells the agent to call `get_customer` first, the hook is a redundant second layer", "explanation": "Prompt wording being present doesn't guarantee it was followed, which is exactly why a gate is needed, and this specific hook doesn't check for that." }
     ],
     "correct": ["C"],
-    "keyPrinciple": "A required order of actions needs a code-level gate, not better wording.",
+    "keyPrinciple": "A gate is only as good as the condition it checks; a hook still needs to test the real prerequisite, not a proxy for it.",
     "sourceRef": "Exam Guide TS 1.4, 1.5"
   },
   {
@@ -491,16 +491,16 @@
     "lesson": "R.5",
     "chunk": 2,
     "difficulty": 2,
-    "stem": "A review of a 60-file pull request catches bugs in the first and last files but misses obvious ones in the middle. What fix fits best?",
+    "stem": "A team splits their 45-file PR review into individual per-file passes, each looking only at that one file in isolation. The reviews come back thorough, but a bug where two files pass incompatible data formats to each other still reaches production. What's missing from the process?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "Per-file review passes, plus a separate pass for cross-file issues", "explanation": "Correct: each file gets full attention, and the integration pass catches issues between files." },
-      { "id": "B", "text": "Use a model with a larger context window", "explanation": "Capacity isn't the problem; attention across a long input stays uneven." },
-      { "id": "C", "text": "Add \"review every file with equal care\" to the prompt", "explanation": "An instruction doesn't change how attention spreads across a long input." },
-      { "id": "D", "text": "Put the 60 files in alphabetical order", "explanation": "Reordering only moves which files land in the middle." }
+      { "id": "A", "text": "A larger context window so all 45 files can be reviewed together in one pass", "explanation": "That reintroduces the attention-dilution problem the per-file passes were meant to avoid." },
+      { "id": "B", "text": "More reviewers assigned to each individual file's pass", "explanation": "Extra eyes on one isolated file still can't see how it interacts with a different file reviewed separately." },
+      { "id": "C", "text": "A stricter prompt telling each per-file reviewer to also watch for cross-file issues", "explanation": "A reviewer who only sees one file has no visibility into the other file, no matter how the instruction is worded." },
+      { "id": "D", "text": "A separate integration pass that looks across files for cross-file issues like incompatible data contracts", "explanation": "Correct: per-file passes alone can't catch problems that only show up between files." }
     ],
-    "correct": ["A"],
-    "keyPrinciple": "Attention dilution is fixed by splitting passes, not by a bigger window.",
+    "correct": ["D"],
+    "keyPrinciple": "Per-file passes catch local bugs; only a separate integration pass catches problems that only show up between files.",
     "sourceRef": "Exam Guide TS 4.6, 1.6, 5.1"
   },
   {
@@ -512,16 +512,16 @@
     "lesson": "R.5",
     "chunk": 3,
     "difficulty": 2,
-    "stem": "A market report on electric vehicles should cover the whole industry. The coordinator assigned \"battery costs\" and \"Tesla sales\". Each subagent did excellent work, but the report misses charging networks and policy. Where is the fix?",
+    "stem": "A competitive-intelligence report on cloud storage providers was supposed to cover pricing, security certifications, and integrations. The coordinator assigned two subagents: one for AWS pricing, one for Azure pricing. Both delivered excellent, well-sourced pricing data. The final report never mentions security certifications, integrations, or Google Cloud at all. Where's the fix?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "Tell the synthesis agent to find and fill coverage gaps", "explanation": "Synthesis can only combine what it received; this blames a spoke for a hub problem." },
-      { "id": "B", "text": "Give the search subagents broader, more general queries", "explanation": "They did what they were assigned; the assignments were the problem." },
-      { "id": "C", "text": "Broaden the coordinator's task decomposition to cover all subtopics", "explanation": "Correct: the gap was created when the topic was split into too few subtasks." },
-      { "id": "D", "text": "Add a second report-generation agent to review completeness", "explanation": "Over-engineered and still downstream of the real cause." }
+      { "id": "A", "text": "In the coordinator's task decomposition, which only ever assigned two providers' pricing as subtopics and never assigned certifications or integrations at all", "explanation": "Correct: the gap exists regardless of how well the two assigned subagents performed, because the missing subtopics were never handed to anyone." },
+      { "id": "B", "text": "In the subagents' tool descriptions, which may be too generic and are causing them to search for the wrong sources", "explanation": "This misattributes a description-quality problem to what is actually a missing-assignment problem; both subagents found exactly what they were asked to find." },
+      { "id": "C", "text": "Add a dedicated review subagent whose job is to check the finished report for missing sections", "explanation": "Over-engineered: it treats the symptom after the fact instead of fixing the coordinator's original task list." },
+      { "id": "D", "text": "The two subagents should coordinate directly with each other to divide up the remaining subtopics", "explanation": "Subagents don't communicate with each other; only the coordinator can assign the missing subtopics, and neither subagent even knows the gap exists." }
     ],
-    "correct": ["C"],
-    "keyPrinciple": "Good subagent work + narrow coverage = a decomposition problem at the coordinator.",
+    "correct": ["A"],
+    "keyPrinciple": "Good execution on a narrow set of subtopics still traces back to how the coordinator split the task, not to the subagents.",
     "sourceRef": "Exam Guide TS 1.2"
   },
   {
@@ -554,16 +554,16 @@
     "lesson": "R.6",
     "chunk": 0,
     "difficulty": 2,
-    "stem": "The team wants an on-demand `/codebase-report` workflow. It produces pages of verbose analysis that shouldn't clutter the main session, and it must not be able to run destructive commands. What fits best?",
+    "stem": "A team wants a `/summarize-changelog` command that prints a one-paragraph summary of the last 10 git commit messages to the terminal. It needs no file writes, runs no risky commands, and its short output is fine to stay in the conversation. Does this need a skill with `context: fork`, or does a plain slash command fit better?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "A slash command file in `.claude/commands/`", "explanation": "The exam guide ties isolation (`context: fork`) and tool restriction (`allowed-tools`) to skills; a plain command is the weaker answer here." },
-      { "id": "B", "text": "A project skill with `context: fork` and `allowed-tools` limited to read and file-write tools", "explanation": "Correct: fork isolates the verbose output, and allowed-tools keeps destructive tools out." },
-      { "id": "C", "text": "A section in the project CLAUDE.md describing the steps", "explanation": "CLAUDE.md is always-loaded context, not an invokable workflow." },
-      { "id": "D", "text": "A rules file with `paths: [\"src/**/*\"]`", "explanation": "Rules load when editing matching files; they aren't invoked on demand and give no isolation or tool limits." }
+      { "id": "A", "text": "A skill with `context: fork` is required, because any on-demand workflow needs isolation regardless of what it does", "explanation": "Fork isolation exists for verbose output that would otherwise clutter the session, which doesn't apply to a one-paragraph summary." },
+      { "id": "B", "text": "A plain slash command fits better, since there's no verbose output to isolate and no destructive-tool risk to fence off", "explanation": "Correct: the isolation and `allowed-tools` restriction a skill provides aren't needed when nothing here calls for them." },
+      { "id": "C", "text": "A skill with `context: fork` is required, because slash commands can't run `git log`", "explanation": "A slash command's prompt can instruct the agent to run any read-only command; there's no such restriction on commands." },
+      { "id": "D", "text": "Neither fits; this needs a rules file with `paths: [\"**/*\"]` so it runs automatically after every commit", "explanation": "Rules load based on which files are being edited, not on commit events, and this task is invoked on demand, not automatically." }
     ],
     "correct": ["B"],
-    "keyPrinciple": "Need isolation or tool limits for an on-demand workflow → skill, not command.",
+    "keyPrinciple": "Isolation and tool limits are for on-demand work with verbose output or destructive risk; without those, a plain command is enough.",
     "sourceRef": "Exam Guide TS 3.2"
   },
   {
@@ -575,16 +575,16 @@
     "lesson": "R.6",
     "chunk": 1,
     "difficulty": 2,
-    "stem": "Three MCP tools return dates as a Unix timestamp, \"Mar 5, 2025\" and ISO 8601. The agent sometimes compares them wrongly. Where do you fix this?",
+    "stem": "A team writes a `PreToolUse` hook that tries to fix inconsistent date formats by rewriting the arguments passed to `lookup_order` before the call runs. Dates are still inconsistent afterward. What's wrong with this approach?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "A `PreToolUse` hook that reformats the tools' input arguments", "explanation": "The inputs aren't the problem; the mixed formats come back in the results." },
-      { "id": "B", "text": "A system prompt that explains all three formats", "explanation": "The model still converts each date itself, so errors stay possible." },
-      { "id": "C", "text": "Force `tool_choice` so the tools are called in a fixed order", "explanation": "The order of calls doesn't change the formats returned." },
-      { "id": "D", "text": "A `PostToolUse` hook that converts every result to ISO 8601", "explanation": "Correct: it changes results after the tool runs and before Claude sees them, the same way every time." }
+      { "id": "A", "text": "`PreToolUse` hooks can't modify anything at all, they can only block or allow a call", "explanation": "`PreToolUse` hooks can modify a tool's input; that isn't why this one fails." },
+      { "id": "B", "text": "The hook needs to run on all three tools, not just `lookup_order`, since all of them have the problem", "explanation": "Even fixing the scope wouldn't help, since the real issue is which hook type is used, not which tools it covers." },
+      { "id": "C", "text": "The inconsistent formats come back in the tools' results, not in the arguments sent to them", "explanation": "Correct: a `PreToolUse` hook only touches the call going in, so a `PostToolUse` hook is needed to fix what comes back." },
+      { "id": "D", "text": "Hooks can't normalize date formats at all; only a system-prompt glossary can teach the model to interpret each format", "explanation": "Hooks run arbitrary deterministic code and are exactly suited to reformatting; a prompt-based glossary is the less reliable option." }
     ],
-    "correct": ["D"],
-    "keyPrinciple": "Normalise tool results with PostToolUse; block or redirect calls with PreToolUse.",
+    "correct": ["C"],
+    "keyPrinciple": "A `PostToolUse` hook can fix inconsistent results; a `PreToolUse` hook only ever touches what goes into the call, not what comes back.",
     "sourceRef": "Exam Guide TS 1.5"
   },
   {
@@ -596,16 +596,16 @@
     "lesson": "R.6",
     "chunk": 2,
     "difficulty": 2,
-    "stem": "Early on, a customer said \"I was charged $149.50 twice on March 3.\" After 30 turns of summarised history, the agent talks about \"a charge of about $150 in March\". Best fix?",
+    "stem": "A 40-turn support conversation covers both the customer's general frustration about slow shipping, mentioned several different ways over time, and the exact order number, ORD-88213, mentioned once early on. As the session's history gets progressively summarised, which of these needs a persistent case-facts block, and which is fine to let the summariser condense?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "Keep a case-facts block with the exact amount, date and request in every prompt", "explanation": "Correct: the facts stay outside the summary, so they don't lose precision." },
-      { "id": "B", "text": "Run `/compact` more often", "explanation": "Compacting is summarising; it would blur the details even more." },
-      { "id": "C", "text": "Switch to a model with a larger context window", "explanation": "The details were lost in summarisation, not because of a size limit." },
-      { "id": "D", "text": "Ask the customer to repeat the details before any refund", "explanation": "It shifts the burden to the customer and doesn't stop the drift." }
+      { "id": "A", "text": "Both need a case-facts block, since anything mentioned only once in a long conversation is at risk of being lost", "explanation": "This overapplies the mechanism; case-facts blocks are for exact numbers, IDs and dates, not every single-mention detail." },
+      { "id": "B", "text": "Neither needs special handling, since `/compact` is designed to preserve important details automatically", "explanation": "Compaction is probabilistic summarisation, with no guarantee that any specific detail, including an exact ID, survives." },
+      { "id": "C", "text": "Only the sentiment needs a case-facts block, since customer mood should always be tracked precisely for escalation decisions", "explanation": "This inverts which one needs exact preservation; sentiment can drift in a summary without losing its practical meaning." },
+      { "id": "D", "text": "The order number needs a persistent case-facts block; the general sentiment is fine to condense", "explanation": "Correct: exact identifiers must never be paraphrased, while the gist of ongoing sentiment survives summarisation." }
     ],
-    "correct": ["A"],
-    "keyPrinciple": "Exact numbers, IDs and dates belong in a persistent case-facts block, not in summaries.",
+    "correct": ["D"],
+    "keyPrinciple": "Exact identifiers and numbers need a persistent case-facts block; general sentiment can survive being condensed.",
     "sourceRef": "Exam Guide TS 5.1"
   },
   {
@@ -617,16 +617,16 @@
     "lesson": "R.6",
     "chunk": 3,
     "difficulty": 2,
-    "stem": "A schema has `notice_period: {\"enum\": [\"30_days\", \"60_days\", \"90_days\", \"unclear\", \"other\"]}` plus a nullable `notice_detail`. A contract clearly says \"45 days\". What should the output be?",
+    "stem": "A schema field `payment_terms` has `{\"enum\": [\"net_15\", \"net_30\", \"net_60\", \"unclear\", \"other\"]}` plus a nullable `payment_terms_detail`. A contract's payment clause is smudged in the scan and reads only \"net _0 days\", so the exact number of days can't be made out. What should the extraction return?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "`\"60_days\"`, the nearest listed value", "explanation": "Rounding to a listed value turns a clear fact into a wrong one." },
-      { "id": "B", "text": "`\"unclear\"`, since 45 isn't a listed option", "explanation": "The contract is clear; \"unclear\" is for ambiguous source text." },
-      { "id": "C", "text": "`\"other\"` with `notice_detail: \"45 days\"`", "explanation": "Correct: a clear value outside the list goes to \"other\" plus detail." },
-      { "id": "D", "text": "`null`, since no listed value fits", "explanation": "`null` means the information is missing; here it is present." }
+      { "id": "A", "text": "`\"unclear\"`, since the source itself doesn't clearly state which value applies", "explanation": "Correct: this isn't a value missing from the list, it's a value that can't be determined from what's legible." },
+      { "id": "B", "text": "`\"net_30\"`, the middle of the visible options, as a reasonable guess", "explanation": "This invents a specific value the document doesn't actually support." },
+      { "id": "C", "text": "`\"other\"` with `payment_terms_detail: \"net _0 days\"`", "explanation": "\"other\" is for a clear value that just isn't on the enum list; here the value itself isn't clear, so \"unclear\" is the honest answer." },
+      { "id": "D", "text": "`null`, since the exact figure can't be read", "explanation": "`null` means the document never addresses payment terms at all; here it does address them, just illegibly." }
     ],
-    "correct": ["C"],
-    "keyPrinciple": "Absent → null; ambiguous → \"unclear\"; clear but not listed → \"other\" + detail.",
+    "correct": ["A"],
+    "keyPrinciple": "\"Unclear\" is for a source that can't be read or decided; \"other\" is for a clear value that's simply missing from the list.",
     "sourceRef": "Exam Guide TS 4.3"
   },
   {
@@ -638,16 +638,16 @@
     "lesson": "R.6",
     "chunk": 4,
     "difficulty": 2,
-    "stem": "Claude's new pagination code has two bugs: the page-size default is wrong, and the cursor encoding breaks when the page size changes. How should you report them?",
+    "stem": "Claude's new CSV export feature has two bugs: (1) the column headers are in the wrong order, and (2), totally unrelated, the login page's password-reset link is broken. Both need fixing. How should these be reported?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "Fix the page-size default first, then report the cursor bug in a later message", "explanation": "The fixes interact: changing the page size affects the cursor, so fixing one alone may break or hide the other." },
-      { "id": "B", "text": "Describe both in one detailed message, because the fixes affect each other", "explanation": "Correct: interacting issues belong in one message so both fixes are designed together." },
-      { "id": "C", "text": "Re-describe the whole pagination requirement in different words", "explanation": "Rephrasing the requirement gives no stable target; point to the specific failures instead." },
-      { "id": "D", "text": "Report whichever bug is more severe and ignore the other until later", "explanation": "Leaving an interacting bug for later risks a fix that has to be redone." }
+      { "id": "A", "text": "In one detailed message describing both, because combining related work saves round trips", "explanation": "These bugs don't interact at all; the reason to combine issues is that their fixes affect each other, not just that they were found at the same time." },
+      { "id": "B", "text": "As two separate issues, one per bug, since the CSV header order and the password-reset link don't share any code path", "explanation": "Correct: fixing one has no effect on the other, so they can be reported and worked on independently." },
+      { "id": "C", "text": "Neither should be reported yet; wait until a third bug is found so there's a fuller batch to fix at once", "explanation": "This arbitrarily delays two fixes that are already ready to report, with no benefit since the bugs don't interact." },
+      { "id": "D", "text": "Re-describe the whole CSV export and login requirements from scratch so Claude has full context for both", "explanation": "This restates broad requirements instead of pointing at the two specific, unrelated failures, which is unnecessary for two independent bugs." }
     ],
     "correct": ["B"],
-    "keyPrinciple": "Interacting issues → one message; independent issues → fix one at a time.",
+    "keyPrinciple": "Issues that don't affect each other's fix can be reported and resolved independently, even if found at the same time.",
     "sourceRef": "Exam Guide TS 3.5"
   },
   {
@@ -659,16 +659,16 @@
     "lesson": "R.6",
     "chunk": 4,
     "difficulty": 2,
-    "stem": "A customer writes: \"This is the second broken blender! Ridiculous.\" The replacement policy clearly covers this case. What should the agent do first?",
+    "stem": "A customer asks whether their laptop's lost charging cable, not defective, just missing, is covered under the standard 1-year defect warranty. The warranty policy describes coverage for manufacturing defects only; it says nothing about lost accessories. The customer hasn't asked for a human. What should the agent do?",
     "selectCount": 1,
     "options": [
-      { "id": "A", "text": "Escalate to a human, since the customer is clearly upset", "explanation": "Frustration alone isn't a trigger; the issue is solvable and the customer hasn't asked for a human." },
-      { "id": "B", "text": "Ask the customer whether they would like to speak to a human", "explanation": "It skips the resolution the agent can already offer and nudges toward an unneeded escalation." },
-      { "id": "C", "text": "Process a replacement right away without replying to the complaint", "explanation": "Resolving is right, but ignoring the frustration misses the acknowledgement step the guide describes." },
-      { "id": "D", "text": "Acknowledge the frustration and offer a replacement; escalate only if they then insist on a human", "explanation": "Correct: solvable issue → acknowledge and offer resolution; escalate if the customer repeats their preference." }
+      { "id": "A", "text": "Deny the request, since a lost cable clearly isn't a \"manufacturing defect\" and that's all the warranty covers", "explanation": "This treats silence on lost accessories as an automatic no, when the real issue is that no policy covers this case either way." },
+      { "id": "B", "text": "Approve a free replacement cable, treating it like any other warranty claim", "explanation": "This extends a defect-specific policy to a non-defect situation the agent has no documented authority to approve." },
+      { "id": "C", "text": "Escalate to a human, since the warranty policy doesn't address a lost, non-defective accessory either way", "explanation": "Correct: a silent policy isn't something the agent can decide on its own, so it goes to a human." },
+      { "id": "D", "text": "Tell the customer to repurchase the cable, since there's no mention of accessory replacement anywhere", "explanation": "This is the same as denying the request, just phrased differently; it still treats an undocumented case as a clear no instead of flagging it as a gap." }
     ],
-    "correct": ["D"],
-    "keyPrinciple": "Frustrated but solvable: acknowledge, offer the fix, escalate only if the customer asks again.",
+    "correct": ["C"],
+    "keyPrinciple": "A policy that's silent on a situation isn't a yes or a no the agent can decide; it's a reason to escalate.",
     "sourceRef": "Exam Guide TS 5.2"
   }
 ]
