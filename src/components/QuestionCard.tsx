@@ -143,7 +143,7 @@ export function QuestionCard(props: QuestionCardProps) {
       ref={containerRef}
       tabIndex={-1}
       onKeyDown={handleKeyDown}
-      className="card question-enter scroll-mt-20 p-4 sm:p-6 focus:outline-none"
+      className="card question-enter scroll-mt-4p-4 sm:p-6 focus:outline-none"
       aria-label={`Question${questionNumber ? ` ${questionNumber}` : ''}`}
     >
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-sm text-muted">

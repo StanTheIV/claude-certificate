@@ -74,8 +74,18 @@ function LessonReaderInner({ lessonId }: { lessonId: string }) {
     else setQcIndex((i) => i + 1);
   }
 
+  /** Once a lesson is done it stays done, so redoing it doesn't drop it from the completed count in Learn. */
   function goToChunk(next: number, done: boolean) {
-    dispatch({ type: 'SET_LESSON_CHUNK', lessonId, chunkIndex: next, done });
+    dispatch({ type: 'SET_LESSON_CHUNK', lessonId, chunkIndex: next, done: done || !!state.lessonProgress[lessonId]?.done });
+  }
+
+  function handleRedo() {
+    goToChunk(0, false);
+    setChunkIndex(0);
+    setQcIndex(0);
+    setQuizStarted(false);
+    setShowSummary(false);
+    document.getElementById('scroll-root')?.scrollTo({ top: 0 });
   }
 
   function handleContinue() {
@@ -87,7 +97,7 @@ function LessonReaderInner({ lessonId }: { lessonId: string }) {
       setChunkIndex((c) => c + 1);
       setQcIndex(0);
       setQuizStarted(false);
-      window.scrollTo({ top: 0 });
+      document.getElementById('scroll-root')?.scrollTo({ top: 0 });
     }
   }
 
@@ -120,6 +130,9 @@ function LessonReaderInner({ lessonId }: { lessonId: string }) {
               Back to Learn
             </Link>
           )}
+          <button type="button" className="btn btn-ghost" onClick={handleRedo}>
+            Redo lesson
+          </button>
         </div>
       </div>
     );

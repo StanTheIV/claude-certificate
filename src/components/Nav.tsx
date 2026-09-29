@@ -73,7 +73,7 @@ export function Nav() {
       >
         Skip to content
       </button>
-      <header className="surface sticky top-0 z-20 border-b">
+      <header className="surface z-20 shrink-0 border-b">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-3">
           <NavLink to="/" className="flex items-center gap-2 font-bold" style={{ color: 'var(--color-accent)' }}>
             CCAR-F Trainer

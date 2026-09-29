@@ -62,7 +62,7 @@ export function DomainNotes() {
 
       <div className="grid gap-6 md:grid-cols-[220px_1fr]">
         <aside className="hidden md:block">
-          <nav className="sticky top-20 max-h-[calc(100vh-6rem)] space-y-3 overflow-y-auto pr-2 text-sm" aria-label="Domain notes contents">
+          <nav className="sticky top-6 max-h-[calc(100vh-8rem)] space-y-3 overflow-y-auto pr-2 text-sm" aria-label="Domain notes contents">
             {parsed.domains.map((d) => (
               <div key={d.id}>
                 <button
@@ -94,7 +94,7 @@ export function DomainNotes() {
               </h2>
               <div className="space-y-6">
                 {d.taskStatements.map((ts) => (
-                  <div key={ts.id} id={noteAnchorId(ts.id)} className="scroll-mt-24">
+                  <div key={ts.id} id={noteAnchorId(ts.id)} className="scroll-mt-6">
                     <h3 className="mb-2 font-semibold">
                       {ts.id} {ts.title}
                     </h3>

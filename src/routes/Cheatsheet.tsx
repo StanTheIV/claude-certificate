@@ -7,7 +7,7 @@ export function Cheatsheet() {
     return <EmptyState title="The cheat sheet isn't written yet." body="Check back soon." />;
   }
   return (
-    <div>
+    <div className="prose-page mx-auto">
       <h1 className="mb-4 text-xl font-bold">Cheat sheet</h1>
       <Markdown>{CHEATSHEET}</Markdown>
     </div>

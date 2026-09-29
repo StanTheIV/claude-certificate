@@ -21,24 +21,27 @@ function Shell() {
   useThemeEffect(state.settings.theme);
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex h-full flex-col">
       <Nav />
-      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 pb-20 md:pb-6 focus:outline-none">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/learn" element={<Learn />} />
-          <Route path="/learn/:lessonId" element={<LessonReader />} />
-          <Route path="/practice" element={<Practice />} />
-          <Route path="/exam" element={<Exam />} />
-          <Route path="/review" element={<Review />} />
-          <Route path="/flashcards" element={<Flashcards />} />
-          <Route path="/notes" element={<DomainNotes />} />
-          <Route path="/cheatsheet" element={<Cheatsheet />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-      <Footer />
+      {/* Only the body scrolls; the header stays in place above it. Bottom padding on mobile clears the fixed bottom bar. */}
+      <div id="scroll-root" className="flex flex-1 flex-col overflow-y-auto pb-20 md:pb-0">
+        <main id="main" tabIndex={-1} className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 focus:outline-none">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/learn" element={<Learn />} />
+            <Route path="/learn/:lessonId" element={<LessonReader />} />
+            <Route path="/practice" element={<Practice />} />
+            <Route path="/exam" element={<Exam />} />
+            <Route path="/review" element={<Review />} />
+            <Route path="/flashcards" element={<Flashcards />} />
+            <Route path="/notes" element={<DomainNotes />} />
+            <Route path="/cheatsheet" element={<Cheatsheet />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 }
