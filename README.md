@@ -21,14 +21,14 @@ Progress is saved in your browser's localStorage (key `ccarf:progress:v1`). You 
 Live version: https://stantheiv.github.io/claude-certificate/ (deployed to GitHub Pages on every push to `main`).
 
 ## Content
-- `src/content/`: lessons (`lessons/*.md`), questions and flashcards (`*.json`), cheat sheet.
+- `src/content/`: lessons (`lessons/*.md`), questions and flashcards (`*.json`), cheat sheet, domain notes (`notes.md`, condensed from the lessons).
 - `CONTENT_GUIDE.md`: authoring rules. `scripts/validate-content.mjs`: validator.
 - `scripts/ui-review/round1.mjs`: Playwright script for visual UI review.
 
 ### Local-only files (gitignored)
 These are used for authoring or personal study and are **not** in the repo or the deployed site:
 - `sources/`: the source material (official exam guide, community study guide, Reddit experience report, colleague feedback).
-- `src/content/questions/community.json` and `src/content/domain-notes.md`: copied from the community study guide (paullarionov/claude-certified-architect), which has no license. Personal study only. The app works without them. When `domain-notes.md` is missing, the Domain notes page is hidden.
+- `src/content/questions/community.json` and `src/content/domain-notes.md`: copied from the community study guide (paullarionov/claude-certified-architect), which has no license. Personal study only. The app works without them, and `domain-notes.md` is no longer used (the Domain notes page reads `notes.md`).
 
 ## License
 Code and original content: [MIT](LICENSE). The 12 sample questions in `official.json` come from Anthropic's published exam guide and remain Anthropic's (see [LICENSE](LICENSE)). This is an unofficial study aid, not affiliated with or endorsed by Anthropic.

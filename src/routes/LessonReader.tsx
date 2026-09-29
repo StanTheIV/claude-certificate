@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { LESSONS, REPEAT_LESSONS, getLesson, isRepeatLessonId, quickChecksFor } from '../content';
+import { DOMAIN_NOTES, LESSONS, REPEAT_LESSONS, getLesson, isRepeatLessonId, quickChecksFor } from '../content';
 import { useProgress } from '../store/useProgress';
 import { EmptyState } from '../components/EmptyState';
 import { Markdown } from '../components/Markdown';
@@ -116,9 +116,11 @@ function LessonReaderInner({ lessonId }: { lessonId: string }) {
               <Link to={`/practice?mode=taskStatement&ts=${lessonId}`} className="btn btn-primary">
                 Practice this task statement
               </Link>
-              <Link to={`/notes?ts=${lessonId}`} className="btn">
-                Compact notes for {lessonId}
-              </Link>
+              {DOMAIN_NOTES && (
+                <Link to={`/notes?ts=${lessonId}`} className="btn">
+                  Compact notes for {lessonId}
+                </Link>
+              )}
             </>
           )}
           {nextLesson ? (
@@ -144,7 +146,8 @@ function LessonReaderInner({ lessonId }: { lessonId: string }) {
         <Link to="/learn" className="text-sm underline">
           Back to Learn
         </Link>
-        {isRepeat ? (
+        {/* Falls back to the cheat sheet if the domain notes file is ever missing. */}
+        {isRepeat || !DOMAIN_NOTES ? (
           <Link to="/cheatsheet" className="text-sm underline">
             Cheat sheet
           </Link>

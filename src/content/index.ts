@@ -60,8 +60,8 @@ export const QUESTIONS: Question[] = Object.values(questionFiles).flat();
 export const FLASHCARDS: Flashcard[] = Object.values(flashcardFiles).flat();
 export const CHEATSHEET: string = Object.values(cheatsheetFiles)[0] ?? '';
 
-const domainNotesFiles = import.meta.glob('./domain-notes.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
-/** Compact per-domain notes ("# Domain N: …" / "## N.M …" / "### Key knowledge/skills"). */
+const domainNotesFiles = import.meta.glob('./notes.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+/** Compact per-domain notes, written from the lessons ("# Domain N: …" / "## N.M …" / "### Core ideas" / "### Exam traps"). */
 export const DOMAIN_NOTES: string = Object.values(domainNotesFiles)[0] ?? '';
 
 export const getLesson = (id: string) => LESSONS.find((l) => l.id === id) ?? REPEAT_LESSONS.find((l) => l.id === id);

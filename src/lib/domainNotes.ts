@@ -1,4 +1,4 @@
-// Parses DOMAIN_NOTES markdown ("# Domain N: Title (weight%)" / "## N.M Title" / "### Key knowledge:" ...)
+// Parses DOMAIN_NOTES markdown ("# Domain N: Title (weight%)" / "## N.M Title" / "### Core ideas" ...)
 // into a structure the /notes route can render with a table of contents and stable anchors.
 export interface NoteTaskStatement {
   id: string;

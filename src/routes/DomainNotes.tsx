@@ -72,7 +72,8 @@ export function DomainNotes() {
                 >
                   Domain {d.id}
                 </button>
-                <ul className="mt-1 space-y-0.5 border-l pl-2" style={{ borderColor: 'var(--color-border)' }}>
+                {/* Task statement ids wrap in rows so all five domains fit the sticky column without an inner scroll. */}
+                <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 border-l pl-2" style={{ borderColor: 'var(--color-border)' }}>
                   {d.taskStatements.map((ts) => (
                     <li key={ts.id}>
                       <button type="button" className="text-left text-muted hover:underline hover:text-[color:var(--color-text)]" onClick={() => jumpTo(noteAnchorId(ts.id))}>
@@ -95,10 +96,10 @@ export function DomainNotes() {
               <div className="space-y-6">
                 {d.taskStatements.map((ts) => (
                   <div key={ts.id} id={noteAnchorId(ts.id)} className="scroll-mt-6">
-                    <h3 className="mb-2 font-semibold">
+                    <h3 className="mb-2 font-bold">
                       {ts.id} {ts.title}
                     </h3>
-                    <Markdown>{ts.body}</Markdown>
+                    <Markdown className="notes-body">{ts.body}</Markdown>
                   </div>
                 ))}
               </div>

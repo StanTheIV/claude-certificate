@@ -297,6 +297,19 @@ a:focus-visible,
   margin: 0;
 }
 
+/* Domain notes: "Core ideas" / "Exam traps" are small labels under each task statement title, not headings that outrank it. */
+.prose.notes-body h3 {
+  margin: 1rem 0 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.prose.notes-body h3:first-child {
+  margin-top: 0;
+}
+
 /* The typography plugin zeroes the first/last cell's side padding, which puts text against the wrapper's border. */
 .prose .md-table-wrap :is(th, td) {
   padding: 0.5rem 0.75rem;
